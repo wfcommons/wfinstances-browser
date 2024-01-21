@@ -1,9 +1,9 @@
 from typing import Literal
 from datetime import datetime
 from pydantic import BaseModel
-from api.models.wms import WMS
-from api.models.author import Author
-from api.models.workflow import Workflow
+from models.wms import WMS
+from models.author import Author
+from models.workflow import Workflow
 
 
 class WfFormat(BaseModel):

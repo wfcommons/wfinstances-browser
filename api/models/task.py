@@ -1,7 +1,7 @@
 from typing import List, Literal, Union
 from pydantic import BaseModel
-from api.models.command import Command
-from api.models.file import File
+from models.command import Command
+from models.file import File
 
 class Task(BaseModel):
     name: str

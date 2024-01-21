@@ -1,5 +1,7 @@
+certifi
+fastapi
 pydantic
 python-dotenv
 pymongo[srv]
-fastapi
+requests
 uvicorn

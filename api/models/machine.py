@@ -1,6 +1,6 @@
 from pydantic import BaseModel, AnyUrl
 from typing import Literal
-from api.models.cpu import CPU
+from models.cpu import CPU
 
 class Machine(BaseModel):
     system: Literal["linux", "macos", "windows"] = None

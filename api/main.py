@@ -1,17 +1,9 @@
-import os, certifi
-from dotenv import load_dotenv
+import uvicorn
 from fastapi import FastAPI
-from pymongo.mongo_client import MongoClient
-
-load_dotenv()
+from routers.router import router
 
 app = FastAPI()
-uri = os.getenv('MONGO_URI')
-client = MongoClient(uri, tlsCAFile=certifi.where())
+app.include_router(router)
 
-try:
-    client.admin.command('ping')
-    print('Successfully connected to MongoDB')
-except Exception as e:
-    print('Failed to connect to MongoDB:', e)
-
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="localhost", port=8081, reload=True)
