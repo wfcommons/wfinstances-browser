@@ -3,13 +3,14 @@ from pydantic import BaseModel
 from models.command import Command
 from models.file import File
 
+
 class Task(BaseModel):
     name: str
     id: str = None
     category: str = None
     type: Literal["compute", "transfer", "auxiliary"]
     command: Command = None
-    parents: List[str] = None # Todo: Apply regex pattern ^[0-9a-zA-Z-_.]*$
+    parents: List[str] = None  # Todo: Apply regex pattern ^[0-9a-zA-Z-_.]*$
     files: List[File] = None
     runtimeInSeconds: Union[int, float] = None
     cores: Union[int, float] = None
@@ -21,4 +22,3 @@ class Task(BaseModel):
     avgPower: Union[int, float] = None
     priority: Union[int, float] = None
     machine: str = None
-
