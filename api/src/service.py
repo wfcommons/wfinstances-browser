@@ -1,6 +1,6 @@
 import requests
-from config.database import wf_instance_collection, wf_instance_metrics_collection
-from services.metrics_service import generate_metrics
+from src.database import wf_instance_collection, wf_instance_metrics_collection
+from src.metrics.service import generate_metrics
 
 
 def find_and_insert_wf_instances(owner, repo, path=''):
@@ -34,3 +34,18 @@ def find_and_insert_wf_instances(owner, repo, path=''):
                 {'$set': wf_instance_metrics},
                 upsert=True)
 
+
+def insert_wf_instance(wf_instance, file_name):
+    wf_instance['_id'] = file_name
+    wf_instance_collection.find_one_and_update(
+        {'_id': wf_instance['_id']},
+        {'$set': wf_instance},
+        upsert=True)
+
+    wf_instance_metrics = generate_metrics(wf_instance)
+    wf_instance_metrics['_id'] = file_name
+    wf_instance_metrics['_githubRepo'] = ''
+    wf_instance_metrics_collection.find_one_and_update(
+        {'_id': wf_instance_metrics['_id']},
+        {'$set': wf_instance_metrics},
+        upsert=True)
