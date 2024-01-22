@@ -14,3 +14,5 @@ class WfFormat(BaseModel):
     wms: WMS = None
     author: Author = None
     workflow: Workflow
+
+

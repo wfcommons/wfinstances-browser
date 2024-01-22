@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class CPU(BaseModel):
-    count: int
-    speed: int
-    vendor: str
+    count: int = None
+    speed: int = None
+    vendor: str = None
 

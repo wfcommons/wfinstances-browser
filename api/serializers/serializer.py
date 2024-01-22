@@ -1,6 +1,5 @@
 def serialize_wf_instance(wf_instance) -> dict:
     return {
-        'id': str(wf_instance['_id']),
         'name': wf_instance['name'],
         'description': wf_instance['description'],
         'createdAt': wf_instance['createdAt'],
@@ -11,5 +10,13 @@ def serialize_wf_instance(wf_instance) -> dict:
     }
 
 
-def serialize_wf_instances(wf_instances) -> list:
-    return [serialize_wf_instance(wf_instance) for wf_instance in wf_instances]
+def serialize_wf_instance_metrics(wf_instance_metrics) -> dict:
+    return {
+        'id': wf_instance_metrics['_id'],
+        'githubRepo': wf_instance_metrics['_githubRepo'],
+        'tasks': wf_instance_metrics['tasks']
+    }
+
+
+def serialize_wf_instances_metrics(wf_instances_metrics) -> list:
+    return [serialize_wf_instance_metrics(wf_instances_metrics) for wf_instances_metrics in wf_instances_metrics]
