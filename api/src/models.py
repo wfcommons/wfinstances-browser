@@ -33,7 +33,7 @@ class Machine(BaseModel):
 
 class Command(BaseModel):
     program: str = None
-    arguments: List[str]
+    arguments: List[str] = None
 
 
 class File(BaseModel):
