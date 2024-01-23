@@ -1,0 +1,8 @@
+certifi
+fastapi
+pydantic
+python-dotenv
+python-multipart
+pymongo[srv]
+requests
+uvicorn
