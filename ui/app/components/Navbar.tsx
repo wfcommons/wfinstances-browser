@@ -3,6 +3,7 @@ import { IconSun, IconMoon } from '@tabler/icons-react';
 import cx from 'clsx';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './style/Navbar.module.css';
+import logo from '../../public/images/wflogo.png';
 
 
 export function Navbar() {
@@ -17,7 +18,7 @@ export function Navbar() {
           <Image
               radius='xs'
                h={25}
-              src="https://avatars.githubusercontent.com/u/80002382?s=200&v=4"
+              src={logo}
           />
           <Text fw={500}>WfCommons</Text>
         </Group>
