@@ -1,33 +1,14 @@
-import { useState } from 'react';
-import { Container, Group, Burger, Image, Text } from '@mantine/core';
+import { Container, Group, Burger, Image, Text, useMantineColorScheme, ActionIcon, useComputedColorScheme } from '@mantine/core';
+import { IconSun, IconMoon } from '@tabler/icons-react';
+import cx from 'clsx';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './Navbar.module.css';
 
-const links = [
-  { link: '/about', label: 'Features' },
-  { link: '/pricing', label: 'Pricing' },
-  { link: '/learn', label: 'Learn' },
-  { link: '/community', label: 'Community' },
-];
 
 export function Navbar() {
   const [opened, { toggle }] = useDisclosure(false);
-  const [active, setActive] = useState(links[0].link);
-
-  const items = links.map((link) => (
-    <a
-      key={link.label}
-      href={link.link}
-      className={classes.link}
-      data-active={active === link.link || undefined}
-      onClick={(event) => {
-        event.preventDefault();
-        setActive(link.link);
-      }}
-    >
-      {link.label}
-    </a>
-  ));
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme( 'light', { getInitialValueInEffect: true});
 
   return (
     <header className={classes.header}>
@@ -41,10 +22,17 @@ export function Navbar() {
           <Text fw={500}>WfCommons</Text>
         </Group>
         <Group gap={5} visibleFrom="xs">
-          {items}
-        </Group>
+          <ActionIcon
+            onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
+            variant='default'
+            size='lg'
+            aria-label='Toggle site color scheme'
+          >
+            <IconSun className={cx(classes.icon, classes.light)} stroke={1.5}/>
+            <IconMoon className={cx(classes.icon, classes.dark)} stroke={1.5}/>
+          </ActionIcon>
 
-        <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
+        </Group>
       </Container>
     </header>
   );
