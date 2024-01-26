@@ -2,7 +2,7 @@ import { Container, Group, Burger, Image, Text, useMantineColorScheme, ActionIco
 import { IconSun, IconMoon } from '@tabler/icons-react';
 import cx from 'clsx';
 import { useDisclosure } from '@mantine/hooks';
-import classes from './Navbar.module.css';
+import classes from './style/Navbar.module.css';
 
 
 export function Navbar() {

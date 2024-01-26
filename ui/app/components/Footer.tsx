@@ -1,12 +1,12 @@
 import { Anchor, Group, ActionIcon, rem, Container } from '@mantine/core';
 import { IconBrandGithub } from '@tabler/icons-react';
-import classes from './Footer.module.css';
+import classes from './style/Footer.module.css';
 
 const links = [
-  { link: '#', label: 'Documentation' },
-  { link: '#', label: 'Publications' },
-  { link: '#', label: 'Usages' },
-  { link: '#', label: 'Format' },
+  { link: 'https://docs.wfcommons.org/en/latest/', label: 'Documentation' },
+  { link: 'https://wfcommons.org/publications', label: 'Publications' },
+  { link: 'https://wfcommons.org/usages', label: 'Usages' },
+  { link: 'https://wfcommons.org/format', label: 'Format' },
 ];
 
 export function Footer() {
@@ -16,8 +16,8 @@ export function Footer() {
       key={link.label}
       href={link.link}
       lh={1}
-      onClick={(event) => event.preventDefault()}
       size="sm"
+      target="_blank"
     >
       {link.label}
     </Anchor>
@@ -31,7 +31,9 @@ export function Footer() {
 
         <Group gap="xs" justify="flex-end" wrap="nowrap">
           <ActionIcon size="lg" variant="default" radius="xl">
+            <Anchor c="dimmed" href='https://github.com/ICS496WfCommons' target='_blank'>
             <IconBrandGithub style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+            </Anchor>
           </ActionIcon>
         </Group>
       </Container>
