@@ -22,7 +22,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:meteor/recommended",
-    "airbnb",
+    "plugin:react/jsx-runtime",
   ],
 
   overrides: [
@@ -37,7 +37,6 @@ module.exports = {
         "plugin:jsx-a11y/recommended",
         "plugin:react/recommended",
         "plugin:meteor/recommended",
-        "airbnb",
       ],
       settings: {
         react: {
@@ -76,7 +75,6 @@ module.exports = {
         "plugin:import/typescript",
         "plugin:react/recommended",
         "plugin:meteor/recommended",
-        "airbnb",
       ],
     },
 
