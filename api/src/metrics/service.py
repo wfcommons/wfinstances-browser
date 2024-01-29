@@ -1,6 +1,6 @@
+import re
 from collections import Counter, defaultdict, deque
 from datetime import timedelta
-
 from src.metrics.graph import Graph
 
 
@@ -42,6 +42,25 @@ def generate_graph_metrics(tasks):
             input_tasks.append(task['name'])
         for parent in task['parents']:
             tasks_graph.add_edge(parent, task['name'])
+
+    # Build graph from files if parents are non-existent
+    if len(tasks) == len(input_tasks):
+        tasks_graph, input_tasks = Graph(), []
+        input_files, output_files = {}, {}
+        for index, task in enumerate(tasks):
+            num_input = 0
+            for file in task['files']:
+                if file['link'] == 'input':
+                    input_files[file['name']] = task['name'] + str(index)
+                    num_input += 1
+                elif file['link'] == 'output':
+                    output_files[file['name']] = task['name'] + str(index)
+            if num_input == 0:
+                input_tasks.append(task['name'] + str(index))
+
+        for key in list(input_files.keys()):
+            if key in output_files:
+                tasks_graph.add_edge(output_files[key], input_files[key])
 
     # Calculate levels and depth
     depth, levels = 0, defaultdict(int)

@@ -6,4 +6,5 @@ class Graph:
         self.graph = defaultdict(list)
 
     def add_edge(self, u, v):
-        self.graph[u].append(v)
+        if v not in self.graph[u]:
+            self.graph[u].append(v)
