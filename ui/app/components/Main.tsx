@@ -18,14 +18,17 @@ type Workflow = {
   maxWidth: number;
 };
 
-export function Main( fetchedData: any ) {
+export function Main({
+  fetchedData
+} : {
+  fetchedData: Workflow[]
+}) {
 const data: Workflow[] = fetchedData;
-console.log(data);
 const columns = useMemo<MRT_ColumnDef<Workflow>[]>(
   () => [
     {
       accessorKey: 'id',
-      header: 'id',
+      header: 'id   ',
     },
 
     {
@@ -35,18 +38,22 @@ const columns = useMemo<MRT_ColumnDef<Workflow>[]>(
     {
       accessorKey: 'numTasks',
       header: 'Number of Tasks',
+      size: 60,
     },
     {
       accessorKey: 'numFiles',
       header: 'Number of Files',
+      size: 60,
     },
     {
       accessorKey: 'totalBytesRead',
       header: 'Total Bytes Read',
+      size: 75,
     },
     {
       accessorKey: 'totalBytesWritten',
       header: 'Total Bytes Written',
+      size: 75,
     },
     {
       accessorKey: 'work',
@@ -55,14 +62,17 @@ const columns = useMemo<MRT_ColumnDef<Workflow>[]>(
     {
       accessorKey: 'depth',
       header: 'Depth of Workflow',
+      size: 50,
     },
     {
       accessorKey: 'minWidth',
       header: 'Minimum Width',
+      size: 50,
     },
     {
       accessorKey: 'maxWidth',
       header: 'Maximum Width',
+      size: 50,
     },
   ],
   [],

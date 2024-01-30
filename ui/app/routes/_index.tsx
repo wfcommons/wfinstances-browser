@@ -26,7 +26,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const response = await fetch('http://localhost:8081/wf-instance-metrics/epigenomics-chameleon-ilmn-4seq-100k-001.json');
+  const response = await fetch('http://localhost:8081/wf-instance-metrics');
   const workflows: Workflow[] = await response.json();
   return json({ workflows });
 };
@@ -37,9 +37,9 @@ export default function Index() {
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
       <Navbar/>
         <Container fluid>
-          <Main
-            fetchedData= {workflows}
-          />
+        <Main
+          fetchedData= {workflows}
+        />
         </Container>
       <Footer/>
     </div>
