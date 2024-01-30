@@ -29,7 +29,7 @@ module.exports = {
     // React
     {
       files: ["**/*.{js,jsx,ts,tsx}"],
-      plugins: ["react", "jsx-a11y", "meteor"],
+      plugins: ["react", "jsx-a11y"],
       extends: [
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
@@ -56,7 +56,7 @@ module.exports = {
     // Typescript
     {
       files: ["**/*.{ts,tsx}"],
-      plugins: ["@typescript-eslint", "import", "meteor"],
+      plugins: ["@typescript-eslint", "import"],
       parser: "@typescript-eslint/parser",
       settings: {
         "import/internal-regex": "^~/",
@@ -74,7 +74,6 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
         "plugin:react/recommended",
-        "plugin:meteor/recommended",
       ],
     },
 

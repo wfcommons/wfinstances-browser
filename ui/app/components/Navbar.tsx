@@ -1,3 +1,4 @@
+import React from 'react';
 import { Container, Group, Burger, Image, Text, useMantineColorScheme, ActionIcon, useComputedColorScheme } from '@mantine/core';
 import { IconSun, IconMoon } from '@tabler/icons-react';
 import cx from 'clsx';
@@ -16,9 +17,9 @@ export function Navbar() {
       <Container size="md" className={classes.inner}>
         <Group gap={5}>
           <Image
-              radius='xs'
-               h={25}
-              src={logo}
+            radius='xs'
+            h={25}
+            src={logo}
           />
           <Text fw={500}>WfCommons</Text>
         </Group>

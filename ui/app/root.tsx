@@ -1,5 +1,6 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
+import React from 'react';
 import '@mantine/core/styles.css';
 
 import { cssBundleHref } from '@remix-run/css-bundle';

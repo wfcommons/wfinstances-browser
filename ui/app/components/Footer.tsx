@@ -1,3 +1,4 @@
+import React from 'react';
 import { Anchor, Group, ActionIcon, rem, Container } from '@mantine/core';
 import { IconBrandGithub } from '@tabler/icons-react';
 import classes from './style/Footer.module.css';
@@ -32,7 +33,7 @@ export function Footer() {
         <Group gap="xs" justify="flex-end" wrap="nowrap">
           <ActionIcon size="lg" variant="default" radius="xl">
             <Anchor c="dimmed" href='https://github.com/ICS496WfCommons' target='_blank'>
-            <IconBrandGithub style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+              <IconBrandGithub style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
             </Anchor>
           </ActionIcon>
         </Group>
