@@ -5,7 +5,7 @@ import {
   type MRT_ColumnDef,
 } from 'mantine-react-table';
 
-type Workflow = {
+export type Metrics = {
   id: string;
   githubRepo: string;
   numTasks: number;
@@ -18,13 +18,12 @@ type Workflow = {
   maxWidth: number;
 };
 
-export function Main({
-  fetchedData
+export function MetricsTable({
+  data
 } : {
-  fetchedData: Workflow[]
+  data: Metrics[]
 }) {
-const data: Workflow[] = fetchedData;
-const columns = useMemo<MRT_ColumnDef<Workflow>[]>(
+const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
   () => [
     {
       accessorKey: 'id',
