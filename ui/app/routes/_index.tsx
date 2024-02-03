@@ -23,11 +23,11 @@ export default function Index() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
       <Navbar/>
-        <Container fluid>
+      <Container fluid>
         <MetricsTable
           data= {metrics}
         />
-        </Container>
+      </Container>
       <Footer/>
     </div>
   );
