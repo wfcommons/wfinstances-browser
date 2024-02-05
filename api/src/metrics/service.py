@@ -1,3 +1,4 @@
+import time
 from collections import Counter, defaultdict, deque
 from datetime import timedelta
 from src.metrics.graph import Graph
@@ -31,6 +32,56 @@ def _generate_list_metrics(tasks):
         total_bytes_written += task.get('bytesWritten', 0)
 
     return len(tasks), len(files), total_bytes_read, total_bytes_written, work
+
+
+def generate_graph_metrics(tasks):
+    # Build graph of tasks and files
+    graph = Graph()
+    for index, task in enumerate(tasks):
+        task_name = f'task{str(index)}:{task["name"]}'
+        graph.add_node(task_name)
+
+        for file in task['files']:
+            file_name = f'file:{file["name"]}'
+            if file['link'] == 'input':
+                graph.add_edge(file_name, task_name)
+            elif file['link'] == 'output':
+                graph.add_edge(task_name, file_name)
+
+    # Build graph of only tasks
+    task_graph = Graph()
+    all_children = set()
+    for node in list(graph.adj_dict.keys()):
+        if str.startswith(node, 'file:'):
+            continue
+        for file_node in graph.adj_dict[node]:
+            for task_node in graph.adj_dict[file_node]:
+                task_graph.add_edge(node, task_node)
+                all_children.add(task_node)
+
+    # Find top-level nodes
+    all_nodes = set(graph.adj_dict.keys())
+    top_level_nodes = list(all_nodes.difference(all_children))
+
+    # Calculate levels and depth
+    depth, levels = 0, defaultdict(int)
+    for node in top_level_nodes:
+        queue = deque([node])
+        while queue:
+            task = queue.popleft()
+            for child_node in task_graph.adj_dict[task]:
+                levels[child_node] = max(1 + levels[task], levels[child_node])
+                queue.append(child_node)
+                depth = max(depth, levels[child_node])
+    depth += 1
+
+    # Calculate min and max width from levels
+    counter = Counter()
+    for level in levels.values():
+        counter[level] += 1
+    min_width, max_width = counter.most_common()[-1][1], counter.most_common()[0][1]
+
+    return depth, min_width, max_width
 
 
 def _generate_graph_metrics(tasks):
