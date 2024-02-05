@@ -1,4 +1,3 @@
-import time
 from collections import Counter, defaultdict, deque
 from datetime import timedelta
 from src.metrics.graph import Graph
@@ -34,7 +33,7 @@ def _generate_list_metrics(tasks):
     return len(tasks), len(files), total_bytes_read, total_bytes_written, work
 
 
-def generate_graph_metrics(tasks):
+def _generate_graph_metrics(tasks):
     # Build graph of tasks and files
     graph = Graph()
     for index, task in enumerate(tasks):
@@ -42,7 +41,7 @@ def generate_graph_metrics(tasks):
         graph.add_node(task_name)
 
         for file in task['files']:
-            file_name = f'file:{file["name"]}'
+            file_name = f'file:{file.get("path", "")}{file["name"]}'
             if file['link'] == 'input':
                 graph.add_edge(file_name, task_name)
             elif file['link'] == 'output':
@@ -84,54 +83,6 @@ def generate_graph_metrics(tasks):
     return depth, min_width, max_width
 
 
-def _generate_graph_metrics(tasks):
-    # Build graph
-    tasks_graph, input_tasks = Graph(), []
-    for task in tasks:
-        if len(task['parents']) == 0:
-            input_tasks.append(task['name'])
-        for parent in task['parents']:
-            tasks_graph.add_edge(parent, task['name'])
-
-    # Build graph from files if parents are non-existent
-    if len(tasks) == len(input_tasks):
-        tasks_graph, input_tasks = Graph(), []
-        input_files, output_files = {}, {}
-        for index, task in enumerate(tasks):
-            for file in task['files']:
-                if file['link'] == 'input':
-                    input_files[file['name']] = task['name'] + str(index)
-                elif file['link'] == 'output':
-                    output_files[file['name']] = task['name'] + str(index)
-
-        for key in list(input_files.keys()):
-            if key in output_files:
-                tasks_graph.add_edge(output_files[key], input_files[key])
-            else:
-                input_tasks.append(input_files[key])
-
-    # Calculate levels and depth
-    depth, levels = 0, defaultdict(int)
-    for input_task in input_tasks:
-        queue = deque([input_task])
-
-        while queue:
-            task = queue.popleft()
-            for child_task in tasks_graph.graph[task]:
-                levels[child_task] = max(1 + levels[task], levels[child_task])
-                queue.append(child_task)
-                depth = max(depth, levels[child_task])
-    depth += 1
-
-    # Calculate min and max width from levels
-    counter = Counter()
-    for level in levels.values():
-        counter[level] += 1
-    min_width, max_width = counter.most_common()[-1][1], counter.most_common()[0][1]
-
-    return depth, min_width, max_width
-
-
 def _get_bytes_string(size):
     for unit in ['KB', 'MB', 'GB']:
         size = size / 1000
@@ -140,5 +91,12 @@ def _get_bytes_string(size):
 
 
 def _get_time_string(seconds):
-    td = str(timedelta(seconds=seconds)).split(':')
-    return f'{td[0]}h{td[1]}m{float(td[2]):.0f}s'
+    td = str(timedelta(seconds=seconds))
+    if 'day' in td:
+        days = td.split(' ')[0]
+        hours, minutes, seconds = td.split(', ')[1].split(':')
+        return f'{days}d{hours}h{minutes}m{int(float(seconds)):02d}s'
+    else:
+        hours, minutes, seconds = td.split(':')
+        return f'0d{hours}h{minutes}m{int(float(seconds)):02d}s'
+
