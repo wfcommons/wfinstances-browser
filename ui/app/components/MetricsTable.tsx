@@ -61,21 +61,15 @@ const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
           accessorKey: 'numTasks',
           header: 'Number of Tasks',
           size: 40,
-          filterVariant: 'range-slider',
-          mantineFilterRangeSliderProps: {
-            color: 'indigo',
-            label: (value) => value,
-          }
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          filterFn: 'between',
         },
         {
           accessorKey: 'numFiles',
           header: 'Number of Files',
           size: 40,
-          filterVariant: 'range-slider',
-          mantineFilterRangeSliderProps: {
-            color: 'indigo',
-            label: (value) => value,
-          }
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          filterFn: 'between',
         },
         {
           accessorKey: 'totalBytesRead',
@@ -95,30 +89,22 @@ const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
           accessorKey: 'depth',
           header: 'Depth of Workflow',
           size: 30,
-          filterVariant: 'range-slider',
-          mantineFilterRangeSliderProps: {
-            color: 'indigo',
-            label: (value) => value,
-          }
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          filterFn: 'between',
         },
         {
           accessorKey: 'minWidth',
           header: 'Minimum Width',
           size: 30,
-          filterVariant: 'range-slider',
-          mantineFilterRangeSliderProps: {
-            color: 'indigo',
-            label: (value) => value,
-          }
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          filterFn: 'between',
         },
         {
           accessorKey: 'maxWidth',
           header: 'Maximum Width',
           size: 30,
-          filterVariant: 'range-slider',
-          mantineFilterRangeSliderProps: {
-            color: 'indigo',
-          }
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          filterFn: 'between',
         },
       ],
     },

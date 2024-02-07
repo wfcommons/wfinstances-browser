@@ -13,7 +13,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const response = await fetch('http://localhost:8081/wf-instance-metrics');
+  const response = await fetch('http://localhost:8081/metrics');
   const metrics: Metrics[] = await response.json();
   return json({ metrics });
 };

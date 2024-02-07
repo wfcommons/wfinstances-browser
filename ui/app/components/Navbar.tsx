@@ -20,7 +20,7 @@ export function Navbar() {
                h={25}
               src={logo}
           />
-          <Text fw={500}>WfCommons</Text>
+          <Text fw={500}>WfInstances Browser</Text>
         </Group>
         <Group gap={5} visibleFrom="xs">
           <ActionIcon
