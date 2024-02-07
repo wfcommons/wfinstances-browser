@@ -1,4 +1,3 @@
-import React from 'react';
 import type { MetaFunction } from "@remix-run/node";
 import { Navbar } from "~/components/Navbar";
 import { Footer } from "~/components/Footer";

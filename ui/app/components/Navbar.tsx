@@ -1,4 +1,3 @@
-import React from 'react';
 import { Container, Group, Burger, Image, Text, useMantineColorScheme, ActionIcon, useComputedColorScheme } from '@mantine/core';
 import { IconSun, IconMoon } from '@tabler/icons-react';
 import cx from 'clsx';

@@ -21,7 +21,6 @@ module.exports = {
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "plugin:meteor/recommended",
     "plugin:react/jsx-runtime",
   ],
 
@@ -36,7 +35,6 @@ module.exports = {
         "plugin:react-hooks/recommended",
         "plugin:jsx-a11y/recommended",
         "plugin:react/recommended",
-        "plugin:meteor/recommended",
       ],
       settings: {
         react: {
@@ -100,8 +98,6 @@ module.exports = {
     indent: ['error', 2],
     'linebreak-style': 'off',
     'max-len': ['error', 250],
-    'meteor/eventmap-params': [2, { eventParamName: 'event', templateInstanceParamName: 'instance' }],
-    'meteor/template-names': 'off',
     'no-confusing-arrow': ['error', { allowParens: true }],
     'no-plusplus': 'off',
     'no-underscore-dangle': 'off',
@@ -113,8 +109,10 @@ module.exports = {
     'prefer-arrow-callback': 'off',
     'prefer-destructuring': 'off',
     'prefer-promise-reject-errors': 'off',
-    'react/function-component-definition': [2, { namedComponents: 'arrow-function' }],
+    'react/function-component-definition': [2, { namedComponents: 'function-declaration' }],
     'react/jsx-one-expression-per-line': 'off',
     'react/no-array-index-key': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react/jsx-uses-react': 'off',
   },
 };

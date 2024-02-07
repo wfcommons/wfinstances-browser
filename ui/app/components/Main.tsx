@@ -1,4 +1,3 @@
-import React from 'react';
 import { Container, Text, Button, Group } from '@mantine/core';
 import { IconBrandGithub } from '@tabler/icons-react';
 import classes from './style/Main.module.css';

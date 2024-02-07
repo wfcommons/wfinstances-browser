@@ -1,4 +1,3 @@
-import React from 'react';
 import { Anchor, Group, ActionIcon, rem, Container } from '@mantine/core';
 import { IconBrandGithub } from '@tabler/icons-react';
 import classes from './style/Footer.module.css';
