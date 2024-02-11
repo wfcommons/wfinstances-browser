@@ -3,7 +3,7 @@ from src.database import wf_instance_collection, wf_instance_metrics_collection
 from src.metrics.service import generate_metrics
 
 
-def find_and_insert_wf_instances(owner, repo, path=''):
+def insert_wf_instances_from_github(owner: str, repo: str, path='') -> None:
     url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
     response = requests.get(url)
 
@@ -13,7 +13,7 @@ def find_and_insert_wf_instances(owner, repo, path=''):
 
     for file in response.json():
         if file['download_url'] is None:
-            find_and_insert_wf_instances(owner, repo, file['path'])
+            insert_wf_instances_from_github(owner, repo, file['path'])
             continue
         if str.endswith(file['name'], '.json'):
             # TODO: Apply JSON validation
@@ -35,7 +35,7 @@ def find_and_insert_wf_instances(owner, repo, path=''):
                 upsert=True)
 
 
-def insert_wf_instance(wf_instance, file_name):
+def insert_wf_instance(wf_instance: dict, file_name: str) -> None:
     wf_instance['_id'] = file_name
     wf_instance_collection.find_one_and_update(
         {'_id': wf_instance['_id']},

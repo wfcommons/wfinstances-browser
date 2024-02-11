@@ -3,7 +3,7 @@ from datetime import timedelta
 from src.metrics.graph import Graph
 
 
-def generate_metrics(wf_instance):
+def generate_metrics(wf_instance: dict) -> dict:
     tasks = wf_instance['workflow']['tasks']
     num_tasks, num_files, total_bytes_read, total_bytes_written, work = _generate_list_metrics(tasks)
     depth, min_width, max_width = _generate_graph_metrics(tasks)
@@ -20,7 +20,7 @@ def generate_metrics(wf_instance):
     }
 
 
-def _generate_list_metrics(tasks):
+def _generate_list_metrics(tasks: list[dict]) -> tuple[int, int, int, int, int]:
     files, total_bytes_read, total_bytes_written, work = set(), 0, 0, 0
 
     for task in tasks:
@@ -33,7 +33,7 @@ def _generate_list_metrics(tasks):
     return len(tasks), len(files), total_bytes_read, total_bytes_written, work
 
 
-def _generate_graph_metrics(tasks):
+def _generate_graph_metrics(tasks: list[dict]) -> tuple[int, int, int]:
     # Build graph of tasks and files
     graph = Graph()
     for index, task in enumerate(tasks):
@@ -83,14 +83,14 @@ def _generate_graph_metrics(tasks):
     return depth, min_width, max_width
 
 
-def _get_bytes_string(size):
+def _get_bytes_string(size: int | float) -> str:
     for unit in ['KB', 'MB', 'GB']:
         size = size / 1000
         if size < 1000:
             return '{0:.2f} {1}'.format(size, unit)
 
 
-def _get_time_string(seconds):
+def _get_time_string(seconds: int | float) -> str:
     td = str(timedelta(seconds=seconds))
     if 'day' in td:
         days = td.split(' ')[0]
@@ -99,4 +99,3 @@ def _get_time_string(seconds):
     else:
         hours, minutes, seconds = td.split(':')
         return f'0d{hours}h{minutes}m{int(float(seconds)):02d}s'
-
