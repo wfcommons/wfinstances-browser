@@ -6,7 +6,7 @@ from src.wfinstances.exceptions import InvalidWfInstanceException
 from wfcommons.wfinstances import SchemaValidator
 
 
-def insert_wf_instances_from_github(owner: str, repo: str, path='') -> tuple(dict, dict):
+def insert_wf_instances_from_github(owner: str, repo: str, path='') -> tuple[list, list]:
     url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
     response = requests.get(url)
 

@@ -1,6 +1,5 @@
 import uvicorn
 from fastapi import FastAPI
-
 from src.wfinstances.exceptions import InvalidWfInstanceException, invalid_wf_instance_exception_handler
 from src.wfinstances.router import router as wf_instances_router
 from src.metrics.router import router as metrics_router

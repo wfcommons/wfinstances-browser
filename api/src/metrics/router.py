@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-
 from src.database import wf_instance_metrics_collection
 from src.metrics.serializer import serialize_metrics, serialize_metric
 
@@ -7,7 +6,7 @@ router = APIRouter()
 
 
 @router.get('/')
-async def get_all_metrics():
+async def get_all_metrics() -> list[dict]:
     return serialize_metrics(wf_instance_metrics_collection.find())
 
 

@@ -5,22 +5,10 @@ from src.metrics.graph import Graph
 
 def generate_metrics(wf_instance: dict) -> dict:
     tasks = wf_instance['workflow']['tasks']
-    num_tasks, num_files, total_bytes_read, total_bytes_written, work = _generate_list_metrics(tasks)
-    depth, min_width, max_width = _generate_graph_metrics(tasks)
-
-    return {
-        'numTasks': num_tasks,
-        'numFiles': num_files,
-        'totalBytesRead': _get_bytes_string(total_bytes_read),
-        'totalBytesWritten': _get_bytes_string(total_bytes_read),
-        'work': _get_time_string(work),
-        'depth': depth,
-        'minWidth': min_width,
-        'maxWidth': max_width
-    }
+    return _generate_list_metrics(tasks) | _generate_graph_metrics(tasks)
 
 
-def _generate_list_metrics(tasks: list[dict]) -> tuple[int, int, int, int, int]:
+def _generate_list_metrics(tasks: list[dict]) -> dict:
     files, total_bytes_read, total_bytes_written, work = set(), 0, 0, 0
 
     for task in tasks:
@@ -30,10 +18,16 @@ def _generate_list_metrics(tasks: list[dict]) -> tuple[int, int, int, int, int]:
         total_bytes_read += task.get('bytesRead', 0)
         total_bytes_written += task.get('bytesWritten', 0)
 
-    return len(tasks), len(files), total_bytes_read, total_bytes_written, work
+    return {
+        'numTasks': len(tasks),
+        'numFiles': len(files),
+        'totalBytesRead': _get_bytes_string(total_bytes_read),
+        'totalBytesWritten': _get_bytes_string(total_bytes_written),
+        'work': _get_time_string(work),
+    }
 
 
-def _generate_graph_metrics(tasks: list[dict]) -> tuple[int, int, int]:
+def _generate_graph_metrics(tasks: list[dict]) -> dict:
     # Build graph of tasks and files
     graph = Graph()
     for index, task in enumerate(tasks):
@@ -80,7 +74,11 @@ def _generate_graph_metrics(tasks: list[dict]) -> tuple[int, int, int]:
         counter[level] += 1
     min_width, max_width = counter.most_common()[-1][1], counter.most_common()[0][1]
 
-    return depth, min_width, max_width
+    return {
+        'depth': depth,
+        'minWidth': min_width,
+        'maxWidth': max_width
+    }
 
 
 def _get_bytes_string(size: int | float) -> str:
