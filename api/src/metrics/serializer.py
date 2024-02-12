@@ -1,4 +1,4 @@
-def serialize_metric(metric: dict) -> dict:
+def serialize_metric(metric: dict) -> dict | None:
     return {
         'id': metric.get('_id'),
         'githubRepo': metric.get('_githubRepo'),
@@ -10,8 +10,8 @@ def serialize_metric(metric: dict) -> dict:
         'depth': metric.get('depth'),
         'minWidth': metric.get('minWidth'),
         'maxWidth': metric.get('maxWidth')
-    }
+    } if metric else None
 
 
 def serialize_metrics(metrics: list[dict]) -> list[dict]:
-    return [serialize_metric(metrics) for metrics in metrics]
+    return [serialize_metric(metrics) for metrics in metrics if metrics]
