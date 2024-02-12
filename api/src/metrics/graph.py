@@ -3,7 +3,7 @@ from typing import Any
 
 
 class Graph:
-    def __init__(self) -> None:
+    def __init__(self):
         self.adj_dict = defaultdict(list)
 
     def add_node(self, node: Any) -> None:
