@@ -1,6 +1,6 @@
 import json
 from fastapi import APIRouter, UploadFile
-from src.database import wf_instance_collection
+from src.database import wf_instance_collection, wf_instance_metrics_collection
 from src.models import ApiResponse
 from src.wfinstances.serializer import serialize_wf_instance, serialize_wf_instances
 from src.wfinstances.service import insert_wf_instance, insert_wf_instances_from_github
@@ -22,6 +22,7 @@ async def get_wf_instances(ids: list[str]) -> dict[str, list[dict]]:
 @router.delete('/', response_model=ApiResponse)
 async def delete_wf_instances(ids: list[str]) -> dict[str, str]:
     wf_instance_collection.delete({'_id': {'$in': ids}})
+    wf_instance_metrics_collection.delete({'_id': {'$in': ids}})
     return {
         'detail': 'The WfInstances were deleted successfully.',
         'result': ids
@@ -31,6 +32,7 @@ async def delete_wf_instances(ids: list[str]) -> dict[str, str]:
 @router.delete('/{id}', response_model=ApiResponse)
 async def delete_wf_instance(id: str) -> dict[str, str]:
     wf_instance_collection.delete_one({'_id': id})
+    wf_instance_metrics_collection.delete_one({'_id': id})
     return {
         'detail': 'The WfInstance was deleted successfully.',
         'result': id
