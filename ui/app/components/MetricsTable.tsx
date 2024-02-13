@@ -15,13 +15,41 @@ export type Metrics = {
   githubRepo: string;
   numTasks: number;
   numFiles: number;
-  totalBytesRead: string;
-  totalBytesWritten: string;
-  work: string;
+  totalBytesRead: number;
+  totalBytesWritten: number;
+  work: number;
   depth: number;
   minWidth: number;
   maxWidth: number;
 };
+
+function formatBytes(bytes: number) {
+  if (bytes == 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+}
+
+function formatWork(work: number) {
+  var days = Math.floor(work / (3600 * 24));
+  var hours = Math.floor((work % (3600 * 24)) / 3600);
+  var minutes = Math.floor((work % 3600) / 60);
+  var seconds = Math.floor(work % 60);
+
+  var result = '';
+  if (days > 0) {
+    result += days + 'd';
+  }
+  if (hours > 0 || days > 0) {
+    result += hours + 'h';
+  }
+  if (minutes > 0 || days > 0 || hours > 0) {
+    result += minutes + 'm';
+  }
+  result += seconds + 's';
+  return result.trim();
+}
 
 export function MetricsTable({
   data
@@ -61,49 +89,68 @@ const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
           accessorKey: 'numTasks',
           header: 'Number of Tasks',
           size: 40,
-          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
           filterFn: 'between',
         },
         {
           accessorKey: 'numFiles',
           header: 'Number of Files',
           size: 40,
-          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
           filterFn: 'between',
         },
         {
           accessorKey: 'totalBytesRead',
           header: 'Total Bytes Read',
           size: 50,
+          columnFilterModeOptions: ['fuzzy', 'contains', 'endsWith'],
+          Cell: ({ cell }) =>(
+            <Box>
+            {formatBytes(cell.getValue<number>())}
+            </Box>
+          )
         },
         {
           accessorKey: 'totalBytesWritten',
           header: 'Total Bytes Written',
           size: 50,
+          columnFilterModeOptions: ['fuzzy', 'contains', 'endsWith',],
+          Cell: ({ cell }) =>(
+            <Box>
+            {formatBytes(cell.getValue<number>())}
+            </Box>
+          )
         },
         {
           accessorKey: 'work',
           header: 'Total Work',
+          size: 30,
+          columnFilterModeOptions: ['fuzzy', 'contains', 'startsWith',],
+          Cell: ({ cell }) =>(
+            <Box>
+            {formatWork(cell.getValue<number>())}
+            </Box>
+          )
         },
         {
           accessorKey: 'depth',
           header: 'Depth of Workflow',
           size: 30,
-          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
           filterFn: 'between',
         },
         {
           accessorKey: 'minWidth',
           header: 'Minimum Width',
           size: 30,
-          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
           filterFn: 'between',
         },
         {
           accessorKey: 'maxWidth',
           header: 'Maximum Width',
           size: 30,
-          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan'], 
+          columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
           filterFn: 'between',
         },
       ],
