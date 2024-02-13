@@ -1,5 +1,4 @@
 from collections import Counter, defaultdict, deque
-from datetime import timedelta
 from src.metrics.graph import Graph
 
 
@@ -21,9 +20,9 @@ def _generate_list_metrics(tasks: list[dict]) -> dict:
     return {
         'numTasks': len(tasks),
         'numFiles': len(files),
-        'totalBytesRead': _get_bytes_string(total_bytes_read),
-        'totalBytesWritten': _get_bytes_string(total_bytes_written),
-        'work': _get_time_string(work),
+        'totalBytesRead': total_bytes_read,
+        'totalBytesWritten': total_bytes_written,
+        'work': work,
     }
 
 
@@ -79,21 +78,3 @@ def _generate_graph_metrics(tasks: list[dict]) -> dict:
         'minWidth': min_width,
         'maxWidth': max_width
     }
-
-
-def _get_bytes_string(size: int | float) -> str:
-    for unit in ['KB', 'MB', 'GB']:
-        size = size / 1000
-        if size < 1000:
-            return '{0:.2f} {1}'.format(size, unit)
-
-
-def _get_time_string(seconds: int | float) -> str:
-    td = str(timedelta(seconds=seconds))
-    if 'day' in td:
-        days = td.split(' ')[0]
-        hours, minutes, seconds = td.split(', ')[1].split(':')
-        return f'{days}d{hours}h{minutes}m{int(float(seconds)):02d}s'
-    else:
-        hours, minutes, seconds = td.split(':')
-        return f'0d{hours}h{minutes}m{int(float(seconds)):02d}s'
