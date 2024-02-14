@@ -8,6 +8,7 @@ import {
   MRT_ShowHideColumnsButton,
 } from 'mantine-react-table';
 import { Box, Button, Flex, Menu, Text, Title } from '@mantine/core';
+import { submitMethod } from '~/routes/_index';
 
 // Definition of Metrics structure
 export type Metrics = {
@@ -197,10 +198,15 @@ const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
         <Menu.Item>Visualize Workflow</Menu.Item>
       </>
     ),
+          
+    
     renderTopToolbar: ({ table })  => {
-      const handleDownload = () => {
-        const returnVal = table.getSelectedRowModel().flatRows;
-        console.log(returnVal);
+      // HANDLE WORKFLOW DOWNLOADING
+      const handleDownload = async () => {
+        const ids: String[] = table.getSelectedRowModel().flatRows.map((row) => {
+          return row.getValue('id');
+        });
+        submitMethod(ids);
       };
 
       return (

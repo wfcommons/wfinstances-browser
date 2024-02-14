@@ -4,7 +4,7 @@ import { Navbar } from "~/components/Navbar";
 import { Footer } from "~/components/Footer";
 import { Metrics, MetricsTable } from "~/components/MetricsTable";
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useSubmit } from "@remix-run/react";
 
 type JSONResponse = {
   detail: string,
@@ -23,6 +23,15 @@ export const loader = async () => {
   const metrics: Metrics[] = await testConv.result;
   return json({ metrics });
 };
+
+export function submitMethod(ids: String[]) {
+  const submit = useSubmit();
+  return submit(JSON.stringify(ids), {
+    action: 'http://localhost:8081/',
+    method: 'POST',
+    encType: "application/json"
+  });
+}
 
 export default function Index() {
   const { metrics } = useLoaderData<typeof loader>();
