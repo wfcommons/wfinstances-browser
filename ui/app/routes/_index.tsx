@@ -6,6 +6,11 @@ import { Metrics, MetricsTable } from "~/components/MetricsTable";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
+type JSONResponse = {
+  detail: string,
+  result: Array<Metrics>,
+}
+
 export const meta: MetaFunction = () => {
   return [
     { title: "WFInstances Browser" },
@@ -14,7 +19,8 @@ export const meta: MetaFunction = () => {
 
 export const loader = async () => {
   const response = await fetch('http://localhost:8081/metrics');
-  const metrics: Metrics[] = await response.json();
+  const testConv = await response.json();
+  const metrics: Metrics[] = await testConv.result;
   return json({ metrics });
 };
 

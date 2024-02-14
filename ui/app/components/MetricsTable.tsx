@@ -199,10 +199,8 @@ const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
     ),
     renderTopToolbar: ({ table })  => {
       const handleDownload = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          // TODO: Add in downloading functionality.
-          console.log("Dowloading " + row.getValue('id'));
-        });
+        const returnVal = table.getSelectedRowModel().flatRows;
+        console.log(returnVal);
       };
 
       return (
