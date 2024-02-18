@@ -112,9 +112,9 @@ function formatWork(work: number) {
 }
 
 export function MetricsTable({
-  data,
+  data
 } : {
-  data: Metrics[],
+  data: Metrics[]
 }) {
 // Creation of the columns to be used in the table.
   const columns = useMemo<MRT_ColumnDef<Metrics>[]>(

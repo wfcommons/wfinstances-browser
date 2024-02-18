@@ -19,8 +19,8 @@ export const meta: MetaFunction = () => {
 
 export const loader = async () => {
   const response = await fetch('http://localhost:8081/metrics');
-  const testConv: APIResponse = await response.json();
-  const metrics: Metrics[] = await testConv.result;
+  const jsonResponse: APIResponse = await response.json();
+  const metrics: Metrics[] = await jsonResponse.result;
   return json({ metrics });
 };
 
