@@ -8,6 +8,9 @@ router = APIRouter()
 
 @router.get('/', response_model=ApiResponse)
 async def get_all_metrics() -> dict[str, str | list[dict]]:
+    """
+    Get all the metrics from the collection.
+    """
     metrics = serialize_metrics(metrics_collection.find())
     return {
         'detail': ('Metrics retrieved.'
@@ -19,6 +22,11 @@ async def get_all_metrics() -> dict[str, str | list[dict]]:
 
 @router.get('/{id}', response_model=ApiResponse)
 async def get_metric(id: str) -> dict[str, dict]:
+    """
+    Get a metric from the collection.
+
+    - **id**: The id of the metric, usually stored in the collection as a filename that ends in .json
+    """
     metric = serialize_metric(metrics_collection.find_one({'_id': id}))
     return {
         'detail': ('Metric retrieved.'
