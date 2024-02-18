@@ -1,6 +1,6 @@
 import requests
 from fastapi import HTTPException
-from src.database import wf_instance_collection, wf_instance_metrics_collection
+from src.database import wf_instance_collection, metrics_collection
 from src.metrics.service import generate_metrics
 from src.wfinstances.exceptions import InvalidWfInstanceException
 from wfcommons.wfinstances import SchemaValidator
@@ -37,7 +37,7 @@ def insert_wf_instances_from_github(owner: str, repo: str, path='') -> tuple[lis
             wf_instance_metrics = generate_metrics(wf_instance)
             wf_instance_metrics['_id'] = file['name']
             wf_instance_metrics['_githubRepo'] = f'{owner}/{repo}'
-            wf_instance_metrics_collection.find_one_and_update(
+            metrics_collection.find_one_and_update(
                 {'_id': wf_instance_metrics['_id']},
                 {'$set': wf_instance_metrics},
                 upsert=True)
@@ -57,7 +57,7 @@ def insert_wf_instance(wf_instance: dict, file_name: str) -> None:
     wf_instance_metrics = generate_metrics(wf_instance)
     wf_instance_metrics['_id'] = file_name
     wf_instance_metrics['_githubRepo'] = ''
-    wf_instance_metrics_collection.find_one_and_update(
+    metrics_collection.find_one_and_update(
         {'_id': wf_instance_metrics['_id']},
         {'$set': wf_instance_metrics},
         upsert=True)
