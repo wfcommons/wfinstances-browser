@@ -6,8 +6,8 @@ load_dotenv()
 
 uri = os.getenv('MONGO_URI')
 client = MongoClient(uri, tlsCAFile=certifi.where())
-db = client.wf_instance_db
+db = client.wf_instance_browser_db
 
 # Collections
 wf_instance_collection = db['wf_instance_collection']
-wf_instance_metrics_collection = db['wf_instance_metrics_collection']
+metrics_collection = db['metrics_collection']
