@@ -72,6 +72,7 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
         "plugin:react/recommended",
+        "plugin:react/jsx-runtime"
       ],
     },
 
