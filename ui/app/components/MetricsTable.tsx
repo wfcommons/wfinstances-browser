@@ -9,7 +9,6 @@ import {
 } from 'mantine-react-table';
 import { Box, Button, Flex, Menu } from '@mantine/core';
 
-// Definition of Metrics structure
 export type Metrics = {
   id: string;
   githubRepo: string;
@@ -24,8 +23,65 @@ export type Metrics = {
 };
 
 type WfInstance = {
-
-}
+  id?: string
+  name: string,
+  description: string,
+  createdAt: string,
+  schemaVersion: string,
+  wms: {
+    name: string,
+    version: string,
+    url: string
+  },
+  author: {
+    name: string,
+    email: string,
+    institution: string,
+    country: string
+  }
+  workflow: {
+    makespanInSeconds: number,
+    executedAt: string,
+    machines: {
+      system: string,
+      architecture: string,
+      nodeName: string,
+      release: string,
+      memoryInBytes: number,
+      cpu: {
+        count: number,
+        speed: number,
+        vendor: string
+      }
+    }[],
+    tasks: {
+      name: string,
+      id: string,
+      category: string,
+      type: string,
+      command: {
+        program: string,
+        arguments: string[]
+      },
+      parents: string[],
+      files: {
+        name: string,
+        sizeInBytes: number,
+        link: string
+      }[],
+      runtimeInSeconds: number,
+      cores: number,
+      avgCPU: number,
+      readBytes: number,
+      writtenBytes: number,
+      memoryInBytes: number,
+      energy: number,
+      avgPower: number,
+      priority: number,
+      machine: string
+    }[]
+  }
+};
 
 function formatBytes(bytes: number) {
   if (bytes == 0) return '0 Bytes';
@@ -217,9 +273,9 @@ export function MetricsTable({
           .then(res => res.json())
           .then(res => {
             const wfInstances = res.result;
-            wfInstances.forEach((wfInstance: any) => {
+            wfInstances.forEach((wfInstance: WfInstance) => {
               const a = document.createElement('a');
-              a.setAttribute('download', wfInstance.id);
+              a.setAttribute('download', wfInstance.id ?? 'wfinstance.json');
 
               delete wfInstance.id;
               const data = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(wfInstance, null, 4))}`;
