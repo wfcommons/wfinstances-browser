@@ -7,6 +7,19 @@ from wfcommons.wfinstances import SchemaValidator
 
 
 def insert_wf_instances_from_github(owner: str, repo: str, path='') -> tuple[list, list]:
+    """
+    Insert WfInstances and generate their metrics from a GitHub repository into the MongoDB collections.
+
+    Args:
+        owner: The owner of the GitHub repository
+        repo: The name of the GitHub repository
+        path: The path of a directory in the GitHub repository
+
+    Raises:
+        HTTPException: GitHub repository does not exist
+
+    Returns: Valid and invalid JSON filenames that match and mismatches the WfInstance schema
+    """
     url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
     response = requests.get(url)
 
@@ -33,7 +46,7 @@ def insert_wf_instances_from_github(owner: str, repo: str, path='') -> tuple[lis
                 {'$set': wf_instance},
                 upsert=True)
 
-            # Add/replace if already exists to wf_instance_metrics_collection
+            # Add/replace if already exists in metrics_collection
             wf_instance_metrics = generate_metrics(wf_instance)
             wf_instance_metrics['_id'] = file['name']
             wf_instance_metrics['_githubRepo'] = f'{owner}/{repo}'
@@ -46,6 +59,16 @@ def insert_wf_instances_from_github(owner: str, repo: str, path='') -> tuple[lis
 
 
 def insert_wf_instance(wf_instance: dict, file_name: str) -> None:
+    """
+     Insert a WfInstance and generate their metrics from a dictionary into the MongoDB collections.
+
+     Args:
+         wf_instance: The WfInstance to generate metrics and insert into the MongoDB collections
+         file_name: The name of WfInstance file to set as the _id in the MongoDB collections
+
+    Raises:
+        InvalidWfInstanceException: The WfInstance does not match the expected schema
+    """
     _validate_wf_instance(wf_instance)
 
     wf_instance['_id'] = file_name
@@ -64,6 +87,15 @@ def insert_wf_instance(wf_instance: dict, file_name: str) -> None:
 
 
 def _validate_wf_instance(wf_instance: dict) -> None:
+    """
+    Validates the WfInstance dictionary.
+
+    Args:
+        wf_instance: The WfInstance dictionary to validate
+
+    Raises:
+        InvalidWfInstanceException: The WfInstance does not match the expected schema
+    """
     try:
         validator = SchemaValidator()
         validator.validate_instance(wf_instance)

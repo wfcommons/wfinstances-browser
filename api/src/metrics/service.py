@@ -3,11 +3,27 @@ from src.metrics.graph import Graph
 
 
 def generate_metrics(wf_instance: dict) -> dict:
+    """
+    Generate the num_tasks, num_files, total_bytes_read, total_bytes_written, depth, min_width, max_width metrics.
+
+    Args:
+        wf_instance: The WfInstance to generate metrics on
+
+    Returns: The metrics generated using the list and graph data structures
+    """
     tasks = wf_instance['workflow']['tasks']
     return _generate_list_metrics(tasks) | _generate_graph_metrics(tasks)
 
 
 def _generate_list_metrics(tasks: list[dict]) -> dict:
+    """
+    Generate the num_tasks, num_files, total_bytes_read, total_bytes_written metrics.
+
+    Args:
+        tasks: The list of tasks of an WfInstance to generate metrics on
+
+    Returns: The metrics generated using the list data structure
+    """
     files, total_bytes_read, total_bytes_written, work = set(), 0, 0, 0
 
     for task in tasks:
@@ -27,6 +43,14 @@ def _generate_list_metrics(tasks: list[dict]) -> dict:
 
 
 def _generate_graph_metrics(tasks: list[dict]) -> dict:
+    """
+    Generate the depth, min_width, max_width metrics.
+
+    Args:
+        tasks: The list of tasks of an WfInstance to generate metrics on
+
+    Returns: The metrics generated using the graph data structure
+    """
     # Build graph of tasks and files
     graph = Graph()
     for index, task in enumerate(tasks):
