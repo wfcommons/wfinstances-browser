@@ -6,6 +6,11 @@ import { Metrics, MetricsTable } from "~/components/MetricsTable";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
+type APIResponse = {
+  detail: string,
+  result: Array<Metrics>,
+}
+
 export const meta: MetaFunction = () => {
   return [
     { title: "WFInstances Browser" },
@@ -13,8 +18,9 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const response = await fetch('http://localhost:8081/wf-instance-metrics');
-  const metrics: Metrics[] = await response.json();
+  const response = await fetch('http://localhost:8081/metrics');
+  const jsonResponse: APIResponse = await response.json();
+  const metrics: Metrics[] = await jsonResponse.result;
   return json({ metrics });
 };
 
@@ -23,11 +29,9 @@ export default function Index() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
       <Navbar/>
-        <Container fluid>
-        <MetricsTable
-          data= {metrics}
-        />
-        </Container>
+      <Container fluid>
+        <MetricsTable data={metrics} />
+      </Container>
       <Footer/>
     </div>
   );

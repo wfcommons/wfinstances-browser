@@ -8,6 +8,7 @@ def serialize_wf_instance(wf_instance: dict) -> dict | None:
     Returns: The serialized WfInstance or None if the WfInstance passed in is None
     """
     return {
+        'id': wf_instance.get('_id'),
         'name': wf_instance.get('name'),
         'description': wf_instance.get('description', ''),
         'createdAt': wf_instance.get('createdAt', ''),
