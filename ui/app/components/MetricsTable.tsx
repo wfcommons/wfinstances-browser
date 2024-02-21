@@ -8,6 +8,7 @@ import {
   MRT_ShowHideColumnsButton,
 } from 'mantine-react-table';
 import { Box, Button, Flex, Menu } from '@mantine/core';
+import 'mantine-react-table/styles.css';
 
 export type Metrics = {
   id: string;
@@ -243,7 +244,8 @@ export function MetricsTable({
         depth: false,
         minWidth: false,
         maxWidth: false,
-      }
+      },
+      pagination: { pageIndex: 0, pageSize: 10 }
     },
     paginationDisplayMode: 'pages',
     positionToolbarAlertBanner: 'bottom',
@@ -290,12 +292,6 @@ export function MetricsTable({
 
       return (
         <Flex p="md" justify="space-between">
-          <Flex gap="xs">
-            {/* import MRT sub-components */}
-            <MRT_GlobalFilterTextInput table={table} />
-            <MRT_ToggleFiltersButton table={table} />
-            <MRT_ShowHideColumnsButton table={table}/>
-          </Flex>
           <Flex>
             <Button
               color="blue"
@@ -305,6 +301,12 @@ export function MetricsTable({
             >
               Download
             </Button>
+            <MRT_ToggleFiltersButton table={table} />
+            <MRT_ShowHideColumnsButton table={table}/>
+          </Flex>
+          <Flex gap="xs">
+            {/* import MRT sub-components */}
+            <MRT_GlobalFilterTextInput table={table} />
           </Flex>
         </Flex>
       );
