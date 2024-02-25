@@ -69,11 +69,13 @@ type WfInstance = {
 
 function download(wfInstances: WfInstance[]) {
   const zip = new JSZip();
+
   wfInstances.forEach((wfInstance: WfInstance, i: number) => {
     const id = wfInstance.id ?? `wfinstance${i !== 0 ? ` (${i})` : ''}.json`;
     delete wfInstance.id;
     zip.file(id, JSON.stringify(wfInstance, null, 4));
   });
+
   zip.generateAsync({type: 'blob'}).then((content) => {
     FileSaver.saveAs(content, 'WfInstances.zip');
   });
@@ -117,7 +119,6 @@ export function Download({
           <IconDownload size={20}/>
         )}
       </Box>
-      
     </Button>
   );
 }
