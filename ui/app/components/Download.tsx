@@ -84,7 +84,7 @@ export function Download({
 }: {
   table: MRT_TableInstance<Metrics>
 }) {
-  const { isLoading, refetch } = useQuery({
+  const { isFetching, refetch } = useQuery({
     enabled: false,
     queryKey: ['ids'],
     queryFn: () => 
@@ -111,7 +111,7 @@ export function Download({
     >
       Download 
       <Box ml={3}>
-        {isLoading ? (
+        {isFetching ? (
           <Loader type="dots" color="white" size="xs" />
         ) : (
           <IconDownload size={20}/>
