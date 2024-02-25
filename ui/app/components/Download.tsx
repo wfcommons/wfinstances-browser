@@ -86,9 +86,10 @@ export function Download({
 }: {
   table: MRT_TableInstance<Metrics>
 }) {
+  const getIds = () => table.getSelectedRowModel().flatRows.map((row) => row.getValue('id'));
   const { isFetching, refetch } = useQuery({
     enabled: false,
-    queryKey: ['ids'],
+    queryKey: ['ids', getIds],
     queryFn: () => 
       fetch('http://localhost:8081/wf-instances', {
         method: 'POST',
@@ -96,7 +97,7 @@ export function Download({
           'Content-Type': 'application/json',
           'accept': 'application/json'
         },
-        body: JSON.stringify(table.getSelectedRowModel().flatRows.map((row) => row.getValue('id')))
+        body: JSON.stringify(getIds())
       }).then(res => res.json())
         .then(res => {
           download(res.result);
