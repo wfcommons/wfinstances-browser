@@ -13,6 +13,7 @@ import { IconGraph } from '@tabler/icons-react';
 import classes from './style/Navbar.module.css';
 import cx from 'clsx';
 import 'mantine-react-table/styles.css';
+import { Download } from './Download';
 
 export type Metrics = {
   id: string;
@@ -128,7 +129,7 @@ export function MetricsTable({
   const testByteUnit = 'MB';
   const testWorkUnit = 'min';
   
-// Creation of the columns to be used in the table.
+// Columns to be used in the table.
   const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
     () => [
       {
@@ -280,46 +281,11 @@ export function MetricsTable({
         <Menu.Item>Visualize Workflow</Menu.Item>
       </>
     ), 
-    renderTopToolbar: ({ table })  => {
-      const handleDownload = () => {
-        const ids: string[] = table.getSelectedRowModel().flatRows.map((row) => row.getValue('id'));
-        fetch('http://localhost:8081/wf-instances', {
-          method: 'POST',
-          headers: {                              
-            'Content-Type': 'application/json',
-            'accept': 'application/json'
-          },
-          body: JSON.stringify(ids)
-        })
-          .then(res => res.json())
-          .then(res => {
-            const wfInstances = res.result;
-            wfInstances.forEach((wfInstance: WfInstance) => {
-              const a = document.createElement('a');
-              a.setAttribute('download', wfInstance.id ?? 'wfinstance.json');
-
-              delete wfInstance.id;
-              const data = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(wfInstance, null, 4))}`;
-              a.setAttribute('href', data);
-              
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            });
-          });
-      };
-
+    renderTopToolbar: ({ table }) => {
       return (
         <Flex p="md" justify="space-between">
           <Flex>
-            <Button
-              color="blue"
-              disabled={!table.getIsSomeRowsSelected()}
-              onClick={handleDownload}
-              variant="filled"
-            >
-              Download
-            </Button>
+            <Download table={table} />
           </Flex>
           <Flex gap="xs">
             {/* import MRT sub-components */}

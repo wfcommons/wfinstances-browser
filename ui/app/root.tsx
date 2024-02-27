@@ -13,6 +13,9 @@ import {
   ScrollRestoration,
 } from '@remix-run/react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref
@@ -21,6 +24,8 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
+  const queryClient = new QueryClient();
+  
   return (
     <html lang="en">
       <head>
@@ -35,10 +40,14 @@ export default function App() {
       </head>
       <body>
         <MantineProvider>
-          <Outlet />
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
+          <QueryClientProvider client={queryClient}>
+            <Navbar/>
+            <Outlet />
+            <Footer/>
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </QueryClientProvider>
         </MantineProvider>
       </body>
     </html>
