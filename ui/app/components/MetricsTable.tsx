@@ -7,7 +7,8 @@ import {
   MRT_ToggleFiltersButton,
   MRT_ShowHideColumnsButton,
 } from 'mantine-react-table';
-import { Box, Button, Flex, Menu } from '@mantine/core';
+import { Box, Flex, Menu } from '@mantine/core';
+import { Download } from './Download';
 
 export type Metrics = {
   id: string;
@@ -20,67 +21,6 @@ export type Metrics = {
   depth: number;
   minWidth: number;
   maxWidth: number;
-};
-
-type WfInstance = {
-  id?: string
-  name: string,
-  description: string,
-  createdAt: string,
-  schemaVersion: string,
-  wms: {
-    name: string,
-    version: string,
-    url: string
-  },
-  author: {
-    name: string,
-    email: string,
-    institution: string,
-    country: string
-  }
-  workflow: {
-    makespanInSeconds: number,
-    executedAt: string,
-    machines: {
-      system: string,
-      architecture: string,
-      nodeName: string,
-      release: string,
-      memoryInBytes: number,
-      cpu: {
-        count: number,
-        speed: number,
-        vendor: string
-      }
-    }[],
-    tasks: {
-      name: string,
-      id: string,
-      category: string,
-      type: string,
-      command: {
-        program: string,
-        arguments: string[]
-      },
-      parents: string[],
-      files: {
-        name: string,
-        sizeInBytes: number,
-        link: string
-      }[],
-      runtimeInSeconds: number,
-      cores: number,
-      avgCPU: number,
-      readBytes: number,
-      writtenBytes: number,
-      memoryInBytes: number,
-      energy: number,
-      avgPower: number,
-      priority: number,
-      machine: string
-    }[]
-  }
 };
 
 function formatBytes(bytes: number) {
@@ -116,7 +56,7 @@ export function MetricsTable({
 } : {
   data: Metrics[]
 }) {
-// Creation of the columns to be used in the table.
+  // Columns to be used in the table.
   const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
     () => [
       {
@@ -259,35 +199,7 @@ export function MetricsTable({
         <Menu.Item>Visualize Workflow</Menu.Item>
       </>
     ), 
-    renderTopToolbar: ({ table })  => {
-      const handleDownload = () => {
-        const ids: string[] = table.getSelectedRowModel().flatRows.map((row) => row.getValue('id'));
-        fetch('http://localhost:8081/wf-instances', {
-          method: 'POST',
-          headers: {                              
-            'Content-Type': 'application/json',
-            'accept': 'application/json'
-          },
-          body: JSON.stringify(ids)
-        })
-          .then(res => res.json())
-          .then(res => {
-            const wfInstances = res.result;
-            wfInstances.forEach((wfInstance: WfInstance) => {
-              const a = document.createElement('a');
-              a.setAttribute('download', wfInstance.id ?? 'wfinstance.json');
-
-              delete wfInstance.id;
-              const data = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(wfInstance, null, 4))}`;
-              a.setAttribute('href', data);
-              
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            });
-          });
-      };
-
+    renderTopToolbar: ({ table }) => {
       return (
         <Flex p="md" justify="space-between">
           <Flex gap="xs">
@@ -297,14 +209,7 @@ export function MetricsTable({
             <MRT_ShowHideColumnsButton table={table}/>
           </Flex>
           <Flex>
-            <Button
-              color="blue"
-              disabled={!table.getIsSomeRowsSelected()}
-              onClick={handleDownload}
-              variant="filled"
-            >
-              Download
-            </Button>
+            <Download table={table} />
           </Flex>
         </Flex>
       );
