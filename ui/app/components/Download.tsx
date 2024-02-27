@@ -89,7 +89,7 @@ export function Download({
   const getIds = () => table.getSelectedRowModel().flatRows.map((row) => row.getValue('id'));
   const { isFetching, refetch } = useQuery({
     enabled: false,
-    queryKey: ['ids', getIds],
+    queryKey: ['ids', getIds()],
     queryFn: () => 
       fetch('http://localhost:8081/wf-instances', {
         method: 'POST',
