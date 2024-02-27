@@ -124,10 +124,9 @@ export function MetricsTable({
 } : {
   data: Metrics[]
 }) {
-  const [byteUnit, setByteUnit] = useState('B');
-  const [workUnit, setWorkUnit] = useState('sec');
-  const testByteUnit = 'KB';
-  const testWorkUnit = 'sec';
+  // TODO
+  const testByteUnit = 'MB';
+  const testWorkUnit = 'min';
   
 // Creation of the columns to be used in the table.
   const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
@@ -282,10 +281,6 @@ export function MetricsTable({
       </>
     ), 
     renderTopToolbar: ({ table })  => {
-      const handleByteSelectChange = (value: any) => {
-        setByteUnit(value);
-      }
-
       const handleDownload = () => {
         const ids: string[] = table.getSelectedRowModel().flatRows.map((row) => row.getValue('id'));
         fetch('http://localhost:8081/wf-instances', {
@@ -325,16 +320,6 @@ export function MetricsTable({
             >
               Download
             </Button>
-            <Select
-              data={['B','KB','MB','GB']}
-              placeholder="Select Byte Units"
-              value={byteUnit}
-              onChange={handleByteSelectChange}
-            />
-            <Select
-              data={['Seconds', 'Minutes', 'Hours', 'Days']}
-              placeholder="Select Work Units"
-            />
           </Flex>
           <Flex gap="xs">
             {/* import MRT sub-components */}
