@@ -23,13 +23,19 @@ You are able to find out more information on the WFCommons Project [here](https:
 ## Installation
 
 #### Mongo Database Setup:
-Setup your own MongoDB and provide the MONGO_URI in a .env file. A database named wf_instance_browser_db will be automatically generated upon launching the API.
+Setup your own MongoDB and provide the MONGO_URI in a .env file. The .env file should be placed in the /api folder. For example:
+
+`/api/.env`
+```
+MONGO_URI=THE_URI_TO_YOUR_MONGODB
+```
+ A database named wf_instance_browser_db will be automatically generated upon launching the API.
 
 ---
 
 #### Python API Backend:
 WfInstances Browser requires the usage of Python 3.11 or higher.
-You can download the latest versions of python [here](https://www.python.org/downloads/).
+You can download the latest versions of Python [here](https://www.python.org/downloads/).
 
 In the api directory, run the following in a terminal to deploy the backend:
 ```
@@ -42,6 +48,9 @@ If you would like to view the API documentation following the deployment, you ca
 ---
 
 #### Remix UI Frontend:
+WfInstances Browser requires the LTS version of Node.js.
+You can download the latest versions of Node.js [here](https://nodejs.org/en).
+
 In the ui directory, initialize the application by running the following in a terminal:
 ```
 npm install
