@@ -3,6 +3,7 @@ import { Container } from '@mantine/core';
 import { Metrics, MetricsTable } from "~/components/MetricsTable";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { Visualizer } from "~/components/Visualizer";
 
 type APIResponse = {
   detail: string,
@@ -26,6 +27,9 @@ export default function Index() {
   const { metrics } = useLoaderData<typeof loader>();
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
+      <Container>
+        <Visualizer />
+      </Container>
       <Container fluid>
         <MetricsTable data={metrics} />
       </Container>
