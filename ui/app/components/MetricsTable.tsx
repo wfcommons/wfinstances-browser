@@ -29,67 +29,6 @@ export type Metrics = {
   maxWidth: number;
 };
 
-type WfInstance = {
-  id?: string
-  name: string,
-  description: string,
-  createdAt: string,
-  schemaVersion: string,
-  wms: {
-    name: string,
-    version: string,
-    url: string
-  },
-  author: {
-    name: string,
-    email: string,
-    institution: string,
-    country: string
-  }
-  workflow: {
-    makespanInSeconds: number,
-    executedAt: string,
-    machines: {
-      system: string,
-      architecture: string,
-      nodeName: string,
-      release: string,
-      memoryInBytes: number,
-      cpu: {
-        count: number,
-        speed: number,
-        vendor: string
-      }
-    }[],
-    tasks: {
-      name: string,
-      id: string,
-      category: string,
-      type: string,
-      command: {
-        program: string,
-        arguments: string[]
-      },
-      parents: string[],
-      files: {
-        name: string,
-        sizeInBytes: number,
-        link: string
-      }[],
-      runtimeInSeconds: number,
-      cores: number,
-      avgCPU: number,
-      readBytes: number,
-      writtenBytes: number,
-      memoryInBytes: number,
-      energy: number,
-      avgPower: number,
-      priority: number,
-      machine: string
-    }[]
-  }
-};
-
 function formatBytes(bytes: number, unit: string) {
   const units: { [ key: string ]: number } = {
     "B": 1,
@@ -183,7 +122,7 @@ export function MetricsTable({
             filterFn: 'between',
           },
           {
-            accessorFn: (row) => {return formatBytes(row.totalBytesRead, testByteUnit)},
+            accessorFn: (row) => formatBytes(row.totalBytesRead, testByteUnit),
             id: 'totalBytesRead',
             header: 'Total Bytes Read',
             size: 50,
@@ -195,7 +134,7 @@ export function MetricsTable({
             )
           },
           {
-            accessorFn: (row) => {return formatBytes(row.totalBytesWritten, testByteUnit)},
+            accessorFn: (row) => formatBytes(row.totalBytesWritten, testByteUnit),
             id: 'totalBytesWritten',
             header: 'Total Bytes Written',
             size: 50,
@@ -207,7 +146,7 @@ export function MetricsTable({
             )
           },
           {
-            accessorFn: (row) => {return formatWork(row.work, testWorkUnit)},
+            accessorFn: (row) => formatWork(row.work, testWorkUnit),
             id: 'work',
             header: 'Total Work',
             size: 30,
