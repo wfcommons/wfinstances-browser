@@ -7,13 +7,14 @@ import {
   MRT_ToggleFiltersButton,
   MRT_ShowHideColumnsButton,
   MRT_Icons,
+  MRT_Row,
 } from 'mantine-react-table';
-import { Box, Button, Flex, Menu, Select } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { ActionIcon, Box, Button, Flex, Menu, Modal } from '@mantine/core';
 import { IconGraph } from '@tabler/icons-react';
-import classes from './style/Navbar.module.css';
-import cx from 'clsx';
 import 'mantine-react-table/styles.css';
 import { Download } from './Download';
+
 
 export type Metrics = {
   id: string;
@@ -64,9 +65,17 @@ export function MetricsTable({
 } : {
   data: Metrics[]
 }) {
-  // TODO
+  // TODO Replace these temporary filtering values with a way to sort based on ByteUnit and WorkUnit
   const testByteUnit = 'MB';
   const testWorkUnit = 'min';
+
+  const [opened, { open, close }] = useDisclosure(false);
+  const [selectedRow, setSelectedRow] = useState<MRT_Row<Metrics> | null>(null);
+
+  const handleRowMenuAction = (row: MRT_Row<Metrics>) => {
+    setSelectedRow(row);
+    open();
+  }
   
 // Columns to be used in the table.
   const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
@@ -175,14 +184,9 @@ export function MetricsTable({
     [],
   );
 
-  const faIcons: Partial<MRT_Icons> = {
-    IconDots: () => <IconGraph className={cx(classes.icon, classes.light)} stroke={1.5}/>
-  }
-
   const table = useMantineReactTable({
     columns,
     data,
-    icons: faIcons,
     enableColumnFilterModes: true,
     enableColumnDragging: false,
     enableFacetedValues:true,
@@ -215,11 +219,16 @@ export function MetricsTable({
     mantineSearchTextInputProps: {
       placeholder: 'Search Workflows',
     },
-    renderRowActionMenuItems: () => (
-      <>
-        <Menu.Item>Visualize Workflow</Menu.Item>
-      </>
-    ), 
+    renderRowActions: ({ row }) => (
+      <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
+          <ActionIcon
+            color="blue"
+            onClick={() => handleRowMenuAction(row)}
+          >
+            <IconGraph />
+          </ActionIcon>
+        </Box>
+    ),
     renderTopToolbar: ({ table }) => {
       return (
         <Flex p="md" justify="space-between">
@@ -227,7 +236,6 @@ export function MetricsTable({
             <Download table={table} />
           </Flex>
           <Flex gap="xs">
-            {/* import MRT sub-components */}
             <MRT_ToggleFiltersButton table={table} />
             <MRT_ShowHideColumnsButton table={table}/>
             <MRT_GlobalFilterTextInput table={table} />
@@ -237,5 +245,15 @@ export function MetricsTable({
     }
   });
 
-  return <MantineReactTable table={table} />;
+  return (
+    <>
+      <MantineReactTable table={table} />
+      {selectedRow && (<Modal title="WFInstance Visualization" opened={opened} onClose={close}>
+        <div>
+          {/* Utilize this selectedRow.original.[field] in order to display the individual Cytoscape Graph. */}
+          {selectedRow.original.id}
+        </div>
+      </Modal>)}
+    </>
+  );
 };
