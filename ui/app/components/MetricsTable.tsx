@@ -131,7 +131,7 @@ export function MetricsTable({
   const testByteUnit = 'MB';
   const testWorkUnit = 'min';
 
-  const [opened, { open, close}] = useDisclosure(false);
+  const [opened, { open, close }] = useDisclosure(false);
   
 // Columns to be used in the table.
   const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
@@ -280,10 +280,10 @@ export function MetricsTable({
     mantineSearchTextInputProps: {
       placeholder: 'Search Workflows',
     },
-    renderRowActionMenuItems: () => (
-      <>
-        <Menu.Item onClick={open}>Visualize Workflow</Menu.Item>
-      </>
+    renderRowActionMenuItems: ({ row }) => (
+        <div onClick={open}>
+          <Modal opened={opened} onClose={close} title="WfMetric Visualization" size="70%">{row.id}</Modal>
+        </div>
     ), 
     renderTopToolbar: ({ table }) => {
       return (
@@ -303,6 +303,6 @@ export function MetricsTable({
   });
 
   return (
-  <><Modal opened={opened} onClose={close} title="WfMetric Visualization" size="70%">TEST</Modal><MantineReactTable table={table} /></>
+  <MantineReactTable table={table} />
   );
 };
