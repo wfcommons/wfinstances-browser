@@ -5,7 +5,7 @@ from pymongo import MongoClient
 load_dotenv()
 
 uri = os.getenv('MONGO_URI')
-client = MongoClient(uri, tlsCAFile=certifi.where())
+client = MongoClient(uri, tlsCAFile=certifi.where()) if 'mongodb+srv://' in uri else MongoClient(uri)
 db = client.wf_instance_browser_db
 
 # Collections

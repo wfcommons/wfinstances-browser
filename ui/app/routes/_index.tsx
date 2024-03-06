@@ -16,7 +16,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const response = await fetch('http://localhost:8081/metrics');
+  const response = await fetch(`${process.env.API_URL_BASE}/metrics`);
   const jsonResponse: APIResponse = await response.json();
   const metrics: Metrics[] = await jsonResponse.result;
   return json({ metrics });
