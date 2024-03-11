@@ -29,7 +29,7 @@ MONGO_PASSWORD=
 ```
 
 #### Docker
-Using Docker, run the following command to launch the frontend, backend, and database altogether:
+Using Docker, run the following command to launch the UI, API, and database altogether:
 ```
 docker compose up
 ```
