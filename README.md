@@ -21,6 +21,12 @@ Users are able to filter and search within the above metrics to easily find and 
 You are able to find out more information on the WFCommons Project [here](https://wfcommons.org).
 
 ## Quickstart Installation
+#### MongoDB
+Define the username and password for MongoDB by creating a .env file with the following:
+```
+MONGO_USERNAME=
+MONGO_PASSWORD=
+```
 
 #### Docker
 Using Docker, run the following command to launch the frontend, backend, and database altogether:
@@ -31,7 +37,7 @@ Once Docker is finished building and starting the containers, you are able to vi
 [http://localhost:8081/docs](http://localhost:8081/docs).
 
 #### Populating the database
-Note that the database is empty the first time you launch the application which means the table displayed at [http://localhost:8080](http://localhost:8080) will be empty. Populate the database with WfInstances from the offical WfCommon GitHub repos by running the following commands in a terminal:
+Note that the database is empty the first time you launch the application which means the table displayed at [http://localhost:8080](http://localhost:8080) will be empty. Populate the database with WfInstances and their metrics from the offical WfCommon GitHub repos by running the following commands in a terminal:
 ```
 curl -X POST http://localhost:8081/wf-instances/github/wfcommons/nextflow-instances
 
