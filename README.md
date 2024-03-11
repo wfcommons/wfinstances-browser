@@ -22,7 +22,7 @@ You are able to find out more information on the WFCommons Project [here](https:
 
 ## Quickstart Installation
 #### MongoDB
-Define the username and password for MongoDB by creating a .env file with the following:
+Define the username and password for MongoDB by creating a `.env` file with the following:
 ```
 MONGO_USERNAME=
 MONGO_PASSWORD=
