@@ -91,7 +91,7 @@ export function Download({
     enabled: false,
     queryKey: ['ids', getIds()],
     queryFn: () => 
-      fetch(`http://localhost:8081/wf-instances`, {
+      fetch('http://localhost:8081/wf-instances', {
         method: 'POST',
         headers: {                              
           'Content-Type': 'application/json',
