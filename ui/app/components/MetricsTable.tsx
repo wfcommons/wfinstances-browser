@@ -254,7 +254,7 @@ export function MetricsTable({
           {/* Utilize this selectedRow.original.[field] in order to display the individual Cytoscape Graph. */}
           {selectedRow.original.id}
           <Container fluid>
-            <Visualizer/>
+            <Visualizer id={selectedRow.original.id}/>
           </Container>
         </div>
       </Modal>)}
