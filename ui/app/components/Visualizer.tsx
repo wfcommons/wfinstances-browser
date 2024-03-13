@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
 
@@ -10,9 +9,6 @@ export function Visualizer() {
     ];
 
     return(
-        <div>
-            <h1>Hello</h1>
-            <CytoscapeComponent elements={elements} style={{ width: '600px', height: '600px' }} />;
-        </div>
+        <CytoscapeComponent elements={elements} style={{ minWidth: '400px', maxWidth: '1250px', height: '700px' }} />
     )
 }

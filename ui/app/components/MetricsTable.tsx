@@ -1,4 +1,4 @@
-import { SetStateAction, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   MantineReactTable,
   useMantineReactTable,
@@ -10,10 +10,11 @@ import {
   MRT_Row,
 } from 'mantine-react-table';
 import { useDisclosure } from '@mantine/hooks';
-import { ActionIcon, Box, Button, Flex, Menu, Modal } from '@mantine/core';
+import { ActionIcon, Box, Flex, Modal, Container } from '@mantine/core';
 import { IconGraph } from '@tabler/icons-react';
 import 'mantine-react-table/styles.css';
 import { Download } from './Download';
+import { Visualizer } from "~/components/Visualizer";
 
 
 export type Metrics = {
@@ -248,10 +249,13 @@ export function MetricsTable({
   return (
     <>
       <MantineReactTable table={table} />
-      {selectedRow && (<Modal title="WFInstance Visualization" opened={opened} onClose={close}>
+      {selectedRow && (<Modal title="WFInstance Visualization" opened={opened} onClose={close} size='100%'>
         <div>
           {/* Utilize this selectedRow.original.[field] in order to display the individual Cytoscape Graph. */}
           {selectedRow.original.id}
+          <Container fluid>
+            <Visualizer/>
+          </Container>
         </div>
       </Modal>)}
     </>
