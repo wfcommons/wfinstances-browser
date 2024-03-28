@@ -18,7 +18,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/?retryWrites=true&w=majority
+      - MONGO_URI=mongodb://mongodb:27017/?retryWrites=true&w=majority
     ports:
       - 8081:8081
 
@@ -29,8 +29,6 @@ services:
       - 27017:27017
     environment:
       MONGO_INITDB_DATABASE: wf_instance_browser_db
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - db:/data/db
 
