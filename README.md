@@ -20,7 +20,27 @@ Users are able to filter and search within the above metrics to easily find and 
 
 You are able to find out more information on the WFCommons Project [here](https://wfcommons.org).
 
-## Installation
+## Quickstart Installation
+
+#### Docker
+Using Docker, run the following command to launch the UI, API, and database altogether:
+```
+docker compose up
+```
+Once Docker is finished building and starting the containers, you are able to view and use the application at [http://localhost:8080](http://localhost:8080). You can also view the API documentation at
+[http://localhost:8081/docs](http://localhost:8081/docs).
+
+#### Populating the database
+Note that the database is empty the first time you launch the application which means the table displayed at [http://localhost:8080](http://localhost:8080) will be empty. Populate the database with WfInstances and their metrics from the offical WfCommon GitHub repos by running the following commands in a terminal:
+```
+curl -X POST http://localhost:8081/wf-instances/github/wfcommons/nextflow-instances
+
+curl -X POST http://localhost:8081/wf-instances/github/wfcommons/makeflow-instance
+
+curl -X POST http://localhost:8081/wf-instances/github/wfcommons/pegasus-instances
+```
+
+## Manual Installation
 
 #### Mongo Database Setup:
 Setup your own MongoDB and provide the MONGO_URI in a .env file. The .env file should be placed in the /api folder. For example:
@@ -29,7 +49,7 @@ Setup your own MongoDB and provide the MONGO_URI in a .env file. The .env file s
 ```
 MONGO_URI=THE_URI_TO_YOUR_MONGODB
 ```
- A database named wf_instance_browser_db will be automatically generated upon launching the API.
+ A database named `wf_instance_browser_db` will be automatically generated upon launching the API.
 
 ---
 
@@ -37,9 +57,13 @@ MONGO_URI=THE_URI_TO_YOUR_MONGODB
 WfInstances Browser requires the usage of Python 3.11 or higher.
 You can download the latest versions of Python [here](https://www.python.org/downloads/).
 
-In the api directory, run the following in a terminal to deploy the backend:
+In the api directory, initialize the backend by running the following in a terminal:
 ```
-python main.py
+pip install -r requirements.txt
+```
+And then run the backend using:
+```
+uvicorn src.main:app --port 8081
 ```
 
 If you would like to view the API documentation following the deployment, you can visit:
@@ -61,7 +85,7 @@ npm run build
 ```
 And then run the application using:
 ```
-npm run dev
+npm run start
 ```
 You are able to view and use the application at [http://localhost:8080](http://localhost:8080).
 
