@@ -95,7 +95,7 @@ export function MetricsTable({
           },
           {
             accessorKey: 'githubRepo',
-            header: 'Github Repository',
+            header: 'Github Repo',
             size: 50,
             enableClickToCopy: true,
             filterVariant: 'multi-select',
@@ -110,14 +110,14 @@ export function MetricsTable({
         columns: [
           {
             accessorKey: 'numTasks',
-            header: 'Number of Tasks',
+            header: '# of Tasks',
             size: 40,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
           },
           {
             accessorKey: 'numFiles',
-            header: 'Number of Files',
+            header: '# of Files',
             size: 40,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
@@ -125,7 +125,7 @@ export function MetricsTable({
           {
             accessorFn: (row) => formatBytes(row.totalBytesRead, testByteUnit),
             id: 'totalBytesRead',
-            header: 'Total Bytes Read',
+            header: 'Total MB Read',
             size: 50,
             columnFilterModeOptions: ['fuzzy', 'contains', 'between', 'betweenInclusive'],
             Cell: ({ cell }) =>(
@@ -137,7 +137,7 @@ export function MetricsTable({
           {
             accessorFn: (row) => formatBytes(row.totalBytesWritten, testByteUnit),
             id: 'totalBytesWritten',
-            header: 'Total Bytes Written',
+            header: 'Total MB Written',
             size: 50,
             columnFilterModeOptions: ['fuzzy', 'contains', 'between', 'betweenInclusive'],
             Cell: ({ cell }) =>(
@@ -160,21 +160,21 @@ export function MetricsTable({
           },
           {
             accessorKey: 'depth',
-            header: 'Depth of Workflow',
+            header: 'Depth',
             size: 30,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
           },
           {
             accessorKey: 'minWidth',
-            header: 'Minimum Width',
+            header: 'Min Width',
             size: 30,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
           },
           {
             accessorKey: 'maxWidth',
-            header: 'Maximum Width',
+            header: 'Max Width',
             size: 30,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',

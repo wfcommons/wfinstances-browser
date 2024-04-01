@@ -21,6 +21,8 @@
     "@tabler/icons-react": "^2.46.0",
     "@tanstack/react-query": "^5.24.1",
     "cytoscape": "^3.23.0",
+    "cytoscape-cose-bilkent": "^4.1.0",
+    "cytoscape-dagre": "^2.5.0",
     "file-saver": "^2.0.5",
     "isbot": "^4.1.0",
     "jszip": "^3.10.1",
