@@ -1,6 +1,7 @@
-import { Button, Group } from '@mantine/core';
+import { Button, Group, Select } from '@mantine/core';
 import Cytoscape from 'cytoscape';
 import { useEffect, useState } from 'react';
+import { layouts } from './layouts';
 import CytoscapeComponent from 'react-cytoscapejs';
 // @ts-ignore
 import DAGRE from 'cytoscape-dagre';
@@ -54,6 +55,7 @@ export function Visualizer({ id }: { id: string }) {
   ] as cytoscape.Stylesheet[];
 
   const [elements, setElements] = useState<any[]>([]);
+  const [layout, setLayout] = useState(layouts.dagre)
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -96,10 +98,8 @@ export function Visualizer({ id }: { id: string }) {
   };
 
   const handlePickStyle = () => {
-    // Logic to pick style
+    setLayout(layouts.grid)
   };
-
-  const layout = { name: 'dagre', animate: true };
 
   return (
     <>
