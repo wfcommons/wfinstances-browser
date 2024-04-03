@@ -20,6 +20,16 @@ export function Visualizer({ id }: { id: string }) {
       }
     },
     {
+      selector: "node[type = 'file']",
+      style: {
+        "background-color": "#A9A9A9",
+        width: "label",
+        height: "label",
+        padding: "6px",
+        shape: "rectangle",
+      }
+    },
+    {
       selector: "node[label]",
       style: {
         label: "data(label)",
@@ -72,7 +82,7 @@ export function Visualizer({ id }: { id: string }) {
           task.files.forEach((file: any) => {
             if (!existingNode.has(file.name)) {
               existingNode.add(file.name);
-              graphElements.push({ data: { id: file.name, label: file.name } });
+              graphElements.push({ data: { id: file.name, label: file.name, type: 'file' } });
             }
             if (file.link === "input") {
               graphElements.push({ data: { source: file.name, target: task.id } });
