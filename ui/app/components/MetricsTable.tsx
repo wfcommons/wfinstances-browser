@@ -194,6 +194,12 @@ export function MetricsTable({
     enableGrouping: true,
     enablePinning: true,
     enableRowActions: true,
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        header: 'Visualize Workflow',
+        size: 10
+      },
+    },
     enableRowSelection: true,
     initialState: { 
       showGlobalFilter: true,
