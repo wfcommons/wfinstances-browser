@@ -194,6 +194,12 @@ export function MetricsTable({
     enableGrouping: true,
     enablePinning: true,
     enableRowActions: true,
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        header: 'Visualize Workflow',
+        size: 10
+      },
+    },
     enableRowSelection: true,
     initialState: { 
       showGlobalFilter: true,
@@ -249,7 +255,7 @@ export function MetricsTable({
   return (
     <>
       <MantineReactTable table={table} />
-      {selectedRow && (<Modal title="WFInstance Visualization" opened={opened} onClose={close} size='100%'>
+       <Modal title="WFInstance Visualization" opened={opened} onClose={close} size='100%'>
         <div>
           {/* Utilize this selectedRow.original.[field] in order to display the individual Cytoscape Graph. */}
           {selectedRow.original.id}
@@ -257,7 +263,7 @@ export function MetricsTable({
             <Visualizer id={selectedRow.original.id}/>
           </Container>
         </div>
-      </Modal>)}
+      </Modal>
     </>
   );
 };

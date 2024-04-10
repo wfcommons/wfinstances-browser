@@ -1,0 +1,36 @@
+version: '1.0'
+
+services:
+  ui:
+    container_name: wfinstances-browser-ui
+    build: ./ui
+    depends_on:
+      - api
+    environment:
+      - PORT=8080
+      - API_BASE_URL=http://api:8081
+    ports:
+      - 8080:8080
+
+  api:
+    container_name: wfinstances-browser-api
+    build: ./api
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/?retryWrites=true&w=majority
+    ports:
+      - 8081:8081
+
+  mongodb:
+    container_name: wfinstances-browser-mongodb
+    image: mongo:5.0.26
+    ports: 
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: wf_instance_browser_db
+    volumes:
+      - db:/data/db
+
+volumes:
+  db:

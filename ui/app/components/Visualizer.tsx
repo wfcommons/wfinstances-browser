@@ -1,6 +1,7 @@
-import { Button, Group } from '@mantine/core';
+import { Button, Group, Loader, Select } from '@mantine/core';
 import Cytoscape from 'cytoscape';
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
+import { layouts } from './layouts';
 import CytoscapeComponent from 'react-cytoscapejs';
 // @ts-ignore
 import DAGRE from 'cytoscape-dagre';
@@ -17,16 +18,6 @@ export function Visualizer({ id }: { id: string }) {
         height: "label",
         padding: "6px",
         shape: "round-rectangle"
-      }
-    },
-    {
-      selector: "node[type = 'file']",
-      style: {
-        "background-color": "#A9A9A9",
-        width: "label",
-        height: "label",
-        padding: "6px",
-        shape: "rectangle",
       }
     },
     {
@@ -64,6 +55,7 @@ export function Visualizer({ id }: { id: string }) {
   ] as cytoscape.Stylesheet[];
 
   const [elements, setElements] = useState<any[]>([]);
+  const [layout, setLayout] = useState(layouts.dagre)
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -75,14 +67,14 @@ export function Visualizer({ id }: { id: string }) {
         }
         const res = await response.json();
         const tasks = res.result.workflow.tasks;
-        const graphElements = [];
+        const graphElements: SetStateAction<any[]> = [];
         const existingNode = new Set<string>();
         tasks.forEach((task: any) => {
           graphElements.push({ data: { id: task.id, label: task.name } });
           task.files.forEach((file: any) => {
             if (!existingNode.has(file.name)) {
               existingNode.add(file.name);
-              graphElements.push({ data: { id: file.name, label: file.name, type: 'file' } });
+              graphElements.push({ data: { id: file.name, label: file.name } });
             }
             if (file.link === "input") {
               graphElements.push({ data: { source: file.name, target: task.id } });
@@ -101,20 +93,11 @@ export function Visualizer({ id }: { id: string }) {
     fetchData();
   }, [id]);
 
-  const handleRedraw = () => {
-    // Logic to redraw the graph
-  };
-
-  const handlePickStyle = () => {
-    // Logic to pick style
-  };
-
-  const layout = { name: 'dagre', animate: true };
 
   return (
     <>
       {isLoading ? (
-        <div>Loading...</div>
+        <Loader color="blue" />
       ) : (
         <CytoscapeComponent
           key={elements.length}
@@ -125,8 +108,7 @@ export function Visualizer({ id }: { id: string }) {
         />
       )}
       <Group justify="center">
-        <Button variant="default" onClick={handleRedraw}>Redraw</Button>
-        <Button onClick={handlePickStyle}>Pick Style</Button>
+        <Button variant="default">Toggle Files Only</Button>
       </Group>
     </>
   );
