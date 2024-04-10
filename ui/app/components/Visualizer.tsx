@@ -13,7 +13,7 @@ export function Visualizer({ id }: { id: string }) {
     {
       selector: "node",
       style: {
-        "background-color": "#43447a",
+        "background-color": "data(bg)",
         width: "label",
         height: "label",
         padding: "6px",
@@ -68,6 +68,15 @@ export function Visualizer({ id }: { id: string }) {
   const [layout, setLayout] = useState(layouts.dagre)
   const [isLoading, setIsLoading] = useState(true);
 
+  function getRandomColorHex(): string {
+    const red = Math.floor(Math.random() * 256);
+    const green = Math.floor(Math.random() * 256);
+    const blue = Math.floor(Math.random() * 256);
+
+    return "#" + red.toString(16) + green.toString(16) + blue.toString(16);
+  }
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -78,9 +87,23 @@ export function Visualizer({ id }: { id: string }) {
         const res = await response.json();
         const tasks = res.result.workflow.tasks;
         const graphElements: SetStateAction<any[]> = [];
-        const existingNode = new Set<string>();
+        const existingNode = new Set<string>(); //Set checking if a file has been added yet.
+        const colorMap = new Map<string, string>(); //Mapping of colors to filenames so all files have the same name.
+        var uniqueIdentify = 0; //Value to be added to the ids in order to create unique id names.
         tasks.forEach((task: any) => {
-          graphElements.push({ data: { id: task.id, label: task.name } });
+          var taskId = task.id;
+          if(colorMap.has(task.name)) {
+            //If the ColorMap already has the task name, create a unique ID for the node and use the same color as the previous task.
+            taskId = task.id + uniqueIdentify;
+            uniqueIdentify++;
+            graphElements.push({ data: { id: taskId, label: task.name, bg: colorMap.get(task.name) } });
+          } else {
+            //If the ColorMap does not have the task name yet use the original node id and map a color to that unique id.
+            const setColor = getRandomColorHex();
+            colorMap.set(task.name, setColor);
+            graphElements.push({ data: { id: task.id, label: task.name, bg: setColor } });
+          }
+          
           task.files.forEach((file: any) => {
             if (!existingNode.has(file.name)) {
               existingNode.add(file.name);
@@ -88,9 +111,9 @@ export function Visualizer({ id }: { id: string }) {
               graphElements.push({ data: { id: file.name, label: file.name, type: 'file', bg: '#A9A9A9' } });
             }
             if (file.link === "input") {
-              graphElements.push({ data: { source: file.name, target: task.id } });
+              graphElements.push({ data: { source: file.name, target: taskId } });
             } else {
-              graphElements.push({ data: { source: task.id, target: file.name } });
+              graphElements.push({ data: { source: taskId, target: file.name } });
             }
           });
         });
