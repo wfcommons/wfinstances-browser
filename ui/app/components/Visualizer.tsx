@@ -116,9 +116,9 @@ export function Visualizer({ id }: { id: string }) {
         const graphElements: SetStateAction<any[]> = [];
         const existingNode = new Set<string>(); //Set checking if a file has been added yet.
         const colorMap = new Map<string, string>(); //Mapping of colors to filenames so all files have the same name.
-        var uniqueIdentify = 0; //Value to be added to the ids in order to create unique id names.
+        let uniqueIdentify = 0; //Value to be added to the ids in order to create unique id names.
         tasks.forEach((task: any) => {
-          var taskId = task.id;
+          let taskId = task.id;
           if(colorMap.has(task.name)) {
             //If the ColorMap already has the task name, create a unique ID for the node and use the same color as the previous task.
             taskId = task.id + uniqueIdentify;
