@@ -255,7 +255,7 @@ export function MetricsTable({
   return (
     <>
       <MantineReactTable table={table} />
-       <Modal title="WFInstance Visualization" opened={opened} onClose={close} size='100%'>
+       {selectedRow && (<Modal title="WFInstance Visualization" opened={opened} onClose={close} size='100%'>
         <div>
           {/* Utilize this selectedRow.original.[field] in order to display the individual Cytoscape Graph. */}
           {selectedRow.original.id}
@@ -263,7 +263,7 @@ export function MetricsTable({
             <Visualizer id={selectedRow.original.id}/>
           </Container>
         </div>
-      </Modal>
+      </Modal>)}
     </>
   );
 };
