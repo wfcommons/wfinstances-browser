@@ -1,4 +1,4 @@
-import { SetStateAction, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   MantineReactTable,
   useMantineReactTable,
@@ -7,13 +7,15 @@ import {
   MRT_ToggleFiltersButton,
   MRT_ShowHideColumnsButton,
   MRT_Icons,
+  MRT_Row,
 } from 'mantine-react-table';
-import { Box, Button, Flex, Menu, Select } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { ActionIcon, Box, Flex, Modal, Container } from '@mantine/core';
 import { IconGraph } from '@tabler/icons-react';
-import classes from './style/Navbar.module.css';
-import cx from 'clsx';
 import 'mantine-react-table/styles.css';
 import { Download } from './Download';
+import { Visualizer } from "~/components/Visualizer";
+
 
 export type Metrics = {
   id: string;
@@ -64,9 +66,17 @@ export function MetricsTable({
 } : {
   data: Metrics[]
 }) {
-  // TODO
+  // TODO Replace these temporary filtering values with a way to sort based on ByteUnit and WorkUnit
   const testByteUnit = 'MB';
   const testWorkUnit = 'min';
+
+  const [opened, { open, close }] = useDisclosure(false);
+  const [selectedRow, setSelectedRow] = useState<MRT_Row<Metrics> | null>(null);
+
+  const handleRowMenuAction = (row: MRT_Row<Metrics>) => {
+    setSelectedRow(row);
+    open();
+  }
   
 // Columns to be used in the table.
   const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
@@ -85,7 +95,7 @@ export function MetricsTable({
           },
           {
             accessorKey: 'githubRepo',
-            header: 'Github Repository',
+            header: 'Github Repo',
             size: 50,
             enableClickToCopy: true,
             filterVariant: 'multi-select',
@@ -100,14 +110,14 @@ export function MetricsTable({
         columns: [
           {
             accessorKey: 'numTasks',
-            header: 'Number of Tasks',
+            header: '# of Tasks',
             size: 40,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
           },
           {
             accessorKey: 'numFiles',
-            header: 'Number of Files',
+            header: '# of Files',
             size: 40,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
@@ -115,7 +125,7 @@ export function MetricsTable({
           {
             accessorFn: (row) => formatBytes(row.totalBytesRead, testByteUnit),
             id: 'totalBytesRead',
-            header: 'Total Bytes Read',
+            header: 'Total MB Read',
             size: 50,
             columnFilterModeOptions: ['fuzzy', 'contains', 'between', 'betweenInclusive'],
             Cell: ({ cell }) =>(
@@ -127,7 +137,7 @@ export function MetricsTable({
           {
             accessorFn: (row) => formatBytes(row.totalBytesWritten, testByteUnit),
             id: 'totalBytesWritten',
-            header: 'Total Bytes Written',
+            header: 'Total MB Written',
             size: 50,
             columnFilterModeOptions: ['fuzzy', 'contains', 'between', 'betweenInclusive'],
             Cell: ({ cell }) =>(
@@ -150,21 +160,21 @@ export function MetricsTable({
           },
           {
             accessorKey: 'depth',
-            header: 'Depth of Workflow',
+            header: 'Depth',
             size: 30,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
           },
           {
             accessorKey: 'minWidth',
-            header: 'Minimum Width',
+            header: 'Min Width',
             size: 30,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
           },
           {
             accessorKey: 'maxWidth',
-            header: 'Maximum Width',
+            header: 'Max Width',
             size: 30,
             columnFilterModeOptions: [ 'fuzzy', 'between', 'greaterThan', 'lessThan', 'betweenInclusive', 'greaterThanOrEqualTo', 'lessThanOrEqualTo'],
             filterFn: 'between',
@@ -175,20 +185,21 @@ export function MetricsTable({
     [],
   );
 
-  const faIcons: Partial<MRT_Icons> = {
-    IconDots: () => <IconGraph className={cx(classes.icon, classes.light)} stroke={1.5}/>
-  }
-
   const table = useMantineReactTable({
     columns,
     data,
-    icons: faIcons,
     enableColumnFilterModes: true,
     enableColumnDragging: false,
     enableFacetedValues:true,
     enableGrouping: true,
     enablePinning: true,
     enableRowActions: true,
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        header: 'Visualize Workflow',
+        size: 10
+      },
+    },
     enableRowSelection: true,
     initialState: { 
       showGlobalFilter: true,
@@ -215,11 +226,16 @@ export function MetricsTable({
     mantineSearchTextInputProps: {
       placeholder: 'Search Workflows',
     },
-    renderRowActionMenuItems: () => (
-      <>
-        <Menu.Item>Visualize Workflow</Menu.Item>
-      </>
-    ), 
+    renderRowActions: ({ row }) => (
+      <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
+          <ActionIcon
+            color="blue"
+            onClick={() => handleRowMenuAction(row)}
+          >
+            <IconGraph />
+          </ActionIcon>
+        </Box>
+    ),
     renderTopToolbar: ({ table }) => {
       return (
         <Flex p="md" justify="space-between">
@@ -227,7 +243,6 @@ export function MetricsTable({
             <Download table={table} />
           </Flex>
           <Flex gap="xs">
-            {/* import MRT sub-components */}
             <MRT_ToggleFiltersButton table={table} />
             <MRT_ShowHideColumnsButton table={table}/>
             <MRT_GlobalFilterTextInput table={table} />
@@ -237,5 +252,18 @@ export function MetricsTable({
     }
   });
 
-  return <MantineReactTable table={table} />;
+  return (
+    <>
+      <MantineReactTable table={table} />
+       <Modal title="WFInstance Visualization" opened={opened} onClose={close} size='100%'>
+        <div>
+          {/* Utilize this selectedRow.original.[field] in order to display the individual Cytoscape Graph. */}
+          {selectedRow.original.id}
+          <Container fluid>
+            <Visualizer id={selectedRow.original.id}/>
+          </Container>
+        </div>
+      </Modal>
+    </>
+  );
 };
