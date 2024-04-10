@@ -1,6 +1,6 @@
-import { Button, Group, Select } from '@mantine/core';
+import { Button, Group, Loader, Select } from '@mantine/core';
 import Cytoscape from 'cytoscape';
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { layouts } from './layouts';
 import CytoscapeComponent from 'react-cytoscapejs';
 // @ts-ignore
@@ -23,7 +23,7 @@ export function Visualizer({ id }: { id: string }) {
     {
       selector: "node[type = 'file']",
       style: {
-        "background-color": "#A9A9A9",
+        "background-color": "data(bg)",
         width: "label",
         height: "label",
         padding: "6px",
@@ -77,14 +77,15 @@ export function Visualizer({ id }: { id: string }) {
         }
         const res = await response.json();
         const tasks = res.result.workflow.tasks;
-        const graphElements = [];
+        const graphElements: SetStateAction<any[]> = [];
         const existingNode = new Set<string>();
         tasks.forEach((task: any) => {
           graphElements.push({ data: { id: task.id, label: task.name } });
           task.files.forEach((file: any) => {
             if (!existingNode.has(file.name)) {
               existingNode.add(file.name);
-              graphElements.push({ data: { id: file.name, label: file.name, type: 'file' } });
+              //Begun Implementing File Coloration
+              graphElements.push({ data: { id: file.name, label: file.name, type: 'file', bg: '#A9A9A9' } });
             }
             if (file.link === "input") {
               graphElements.push({ data: { source: file.name, target: task.id } });
@@ -103,18 +104,11 @@ export function Visualizer({ id }: { id: string }) {
     fetchData();
   }, [id]);
 
-  const handleRedraw = () => {
-    // Logic to redraw the graph
-  };
-
-  const handlePickStyle = () => {
-    setLayout(layouts.grid)
-  };
 
   return (
     <>
       {isLoading ? (
-        <div>Loading...</div>
+        <Loader color="blue" />
       ) : (
         <CytoscapeComponent
           key={elements.length}
@@ -125,8 +119,7 @@ export function Visualizer({ id }: { id: string }) {
         />
       )}
       <Group justify="center">
-        <Button variant="default" onClick={handleRedraw}>Redraw</Button>
-        <Button onClick={handlePickStyle}>Change To Grid</Button>
+        <Button variant="default">Toggle Files Only</Button>
       </Group>
     </>
   );
