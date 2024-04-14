@@ -1,12 +1,12 @@
 import requests
 from fastapi import HTTPException
+from jsonschema import validate, ValidationError
 from src.database import wf_instance_collection, metrics_collection
 from src.metrics.service import generate_metrics
 from src.wfinstances.exceptions import InvalidWfInstanceException
-from wfcommons.wfinstances import SchemaValidator
 
 
-def insert_wf_instances_from_github(owner: str, repo: str, path='') -> tuple[list, list]:
+def insert_wf_instances_from_github(owner: str, repo: str) -> tuple[list, list]:
     """
     Insert WfInstances and generate their metrics from a GitHub repository into the MongoDB collections.
 
@@ -20,41 +20,46 @@ def insert_wf_instances_from_github(owner: str, repo: str, path='') -> tuple[lis
 
     Returns: Valid and invalid JSON filenames that match and mismatches the WfInstance schema
     """
-    url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=response.json().get('message'))
-
     valid_wf_instances, invalid_wf_instances = [], []
-    for file in response.json():
-        if file['download_url'] is None:
-            insert_wf_instances_from_github(owner, repo, file['path'])
-        elif str.endswith(file['name'], '.json'):
-            wf_instance = requests.get(file['download_url']).json()
-            try:
-                _validate_wf_instance(wf_instance)
-            except InvalidWfInstanceException as e:
-                invalid_wf_instances.append(file['name'])
-                continue
 
-            valid_wf_instances.append(file['name'])
+    def recurse_dir(path='') -> None:
+        url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
+        response = requests.get(url)
 
-            wf_instance['_id'] = file['name']
-            wf_instance_collection.find_one_and_update(
-                {'_id': wf_instance['_id']},
-                {'$set': wf_instance},
-                upsert=True)
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get('message'))
 
-            # Add/replace if already exists in metrics_collection
-            wf_instance_metrics = generate_metrics(wf_instance)
-            wf_instance_metrics['_id'] = file['name']
-            wf_instance_metrics['_githubRepo'] = f'{owner}/{repo}'
-            metrics_collection.find_one_and_update(
-                {'_id': wf_instance_metrics['_id']},
-                {'$set': wf_instance_metrics},
-                upsert=True)
+        for file in response.json():
+            if file['type'] == 'dir':
+                recurse_dir(file['path'])
+            elif str.endswith(file['name'], '.json'):
+                wf_instance = requests.get(file['download_url']).json()
 
+                try:
+                    _validate_wf_instance(wf_instance)
+                except InvalidWfInstanceException:
+                    invalid_wf_instances.append(file['name'])
+                    continue
+
+                valid_wf_instances.append(file['name'])
+
+                # Replace if already exists, otherwise add into wf_instances_collection
+                wf_instance['_id'] = file['name']
+                wf_instance_collection.find_one_and_update(
+                    {'_id': wf_instance['_id']},
+                    {'$set': wf_instance},
+                    upsert=True)
+
+                # Replace if already exists, otherwise add into  metrics_collection
+                metrics = generate_metrics(wf_instance)
+                metrics['_id'] = file['name']
+                metrics['_githubRepo'] = f'{owner}/{repo}'
+                metrics_collection.find_one_and_update(
+                    {'_id': metrics['_id']},
+                    {'$set': metrics},
+                    upsert=True)
+
+    recurse_dir()
     return valid_wf_instances, invalid_wf_instances
 
 
@@ -96,8 +101,8 @@ def _validate_wf_instance(wf_instance: dict) -> None:
     Raises:
         InvalidWfInstanceException: The WfInstance does not match the expected schema
     """
+    schema = requests.get('https://raw.githubusercontent.com/wfcommons/WfFormat/main/wfcommons-schema.json').json()
     try:
-        validator = SchemaValidator()
-        validator.validate_instance(wf_instance)
-    except RuntimeError as e:
+        validate(wf_instance, schema=schema)
+    except ValidationError as e:
         raise InvalidWfInstanceException(str(e))

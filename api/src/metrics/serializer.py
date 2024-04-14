@@ -12,9 +12,9 @@ def serialize_metric(metric: dict) -> dict | None:
         'githubRepo': metric.get('_githubRepo'),
         'numTasks': metric.get('numTasks'),
         'numFiles': metric.get('numFiles'),
-        'totalBytesRead': metric.get('totalBytesRead'),
-        'totalBytesWritten': metric.get('totalBytesWritten'),
-        'work': metric.get('work'),
+        'totalReadBytes': metric.get('totalReadBytes'),
+        'totalWrittenBytes': metric.get('totalWrittenBytes'),
+        'totalRuntimeInSeconds': metric.get('totalRuntimeInSeconds'),
         'depth': metric.get('depth'),
         'minWidth': metric.get('minWidth'),
         'maxWidth': metric.get('maxWidth')

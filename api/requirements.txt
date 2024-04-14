@@ -1,5 +1,6 @@
 certifi
 fastapi
+jsonschema
 pydantic
 python-dotenv
 python-multipart
@@ -7,4 +8,3 @@ pymongo[srv]
 requests
 starlette
 uvicorn
-wfcommons

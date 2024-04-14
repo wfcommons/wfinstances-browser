@@ -13,8 +13,7 @@ def serialize_wf_instance(wf_instance: dict) -> dict | None:
         'description': wf_instance.get('description', ''),
         'createdAt': wf_instance.get('createdAt', ''),
         'schemaVersion': wf_instance.get('schemaVersion'),
-        'wms': wf_instance.get('wms', None),
-        'author': wf_instance.get('author', None),
+        'author': wf_instance.get('author', ''),
         'workflow': wf_instance.get('workflow')
     } if wf_instance else None
 
