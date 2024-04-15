@@ -18,7 +18,7 @@ async def post_query_wf_instances(ids: list[str]) -> dict:
     return {
         'detail': ('WfInstances retrieved.'
                    if len(ids) == len(wf_instances) else
-                   'Some or all of the WfInstances were not retrieved.'),
+                   'Some of the WfInstances were not retrieved.'),
         'result': wf_instances
     }
 

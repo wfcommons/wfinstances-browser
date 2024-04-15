@@ -1,6 +1,6 @@
 import requests
 from jsonschema import validate, ValidationError
-from src.wfinstances.exceptions import InvalidWfInstanceException
+from src.exceptions import InvalidWfInstanceException, GithubResourceNotFoundException
 
 
 def retrieve_wf_instances(metrics: list[dict]) -> list[dict]:
@@ -13,16 +13,22 @@ def retrieve_wf_instances(metrics: list[dict]) -> list[dict]:
     return [retrieve_wf_instance(metric) for metric in metrics]
 
 
-def retrieve_wf_instance(metric: dict) -> dict:
+def retrieve_wf_instance(metric: dict) -> dict | None:
     """
     Retrieve a WfInstance from the download URL stored in a metric.
 
     Args:
         metric: The metric
     """
+    if not metric:
+        return None
+
     download_url = metric['downloadUrl']
-    wf_instance = requests.get(download_url).json()
-    return wf_instance
+    response = requests.get(download_url)
+
+    if response.status_code != 200:
+        return None
+    return response.json()
 
 
 def validate_wf_instance(wf_instance: dict) -> None:
@@ -35,7 +41,13 @@ def validate_wf_instance(wf_instance: dict) -> None:
     Raises:
         InvalidWfInstanceException: The WfInstance does not match the expected schema
     """
-    schema = requests.get('https://raw.githubusercontent.com/wfcommons/WfFormat/main/wfcommons-schema.json').json()
+    schema_url = 'https://raw.githubusercontent.com/wfcommons/WfFormat/main/wfcommons-schema.json'
+
+    response = requests.get(schema_url)
+    if response.status_code != 200:
+        raise GithubResourceNotFoundException(schema_url)
+    schema = response.json()
+
     try:
         validate(wf_instance, schema=schema)
     except ValidationError as e:

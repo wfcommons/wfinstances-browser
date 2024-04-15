@@ -1,9 +1,8 @@
 import requests
 from collections import Counter, defaultdict, deque
-from fastapi import HTTPException
 from src.database import metrics_collection
 from src.metrics.graph import Graph
-from src.wfinstances.exceptions import InvalidWfInstanceException
+from src.exceptions import InvalidWfInstanceException, GithubResourceNotFoundException
 from src.wfinstances.service import validate_wf_instance
 
 
@@ -23,23 +22,29 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
     valid_wf_instances, invalid_wf_instances = [], []
 
     def recurse_dir(path='') -> None:
-        url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
-        response = requests.get(url)
+        if path == 'pegasus' or path == 'nextflow':
+            return
 
+        response = requests.get(f'https://api.github.com/repos/{owner}/{repo}/contents/{path}')
         if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=response.json().get('message'))
+            raise GithubResourceNotFoundException('repository')
+        files = response.json()
 
-        for file in response.json():
+        for file in files:
             if file['type'] == 'dir':
                 recurse_dir(file['path'])
             elif str.endswith(file['name'], '.json'):
-                wf_instance = requests.get(file['download_url']).json()
+                response = requests.get(file['download_url'])
+                if response.status_code != 200:
+                    raise GithubResourceNotFoundException('download_url')
+                wf_instance = response.json()
 
                 try:
                     validate_wf_instance(wf_instance)
                 except InvalidWfInstanceException:
                     invalid_wf_instances.append(file['name'])
                     continue
+
                 valid_wf_instances.append(file['name'])
 
                 # Replace if already exists, otherwise add into  metrics_collection

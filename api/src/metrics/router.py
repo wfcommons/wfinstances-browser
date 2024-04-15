@@ -44,17 +44,17 @@ async def post_query_metrics(ids: list[str]) -> dict:
 
    - **Request body**: The ids of each metric, usually stored in the collection as a filename that ends in .json
     """
-    metrics = serialize_metric(metrics_collection.find({'_id': {'$in': ids}}))
+    metrics = serialize_metrics(metrics_collection.find({'_id': {'$in': ids}}))
     return {
         'detail': ('Metrics retrieved.'
                    if len(ids) == len(metrics) else
-                   'Some or all of the metrics were not retrieved.'),
+                   'Some of the metrics were not retrieved.'),
         'result': metrics
     }
 
 
-@router.post('/github/{owner}/{repo}', response_model=ApiResponse)
-async def post_metrics_github(owner: str, repo: str) -> dict:
+@router.put('/github/{owner}/{repo}', response_model=ApiResponse)
+async def put_metrics_github(owner: str, repo: str) -> dict:
     """
     Insert metrics generated from WfInstances contained in a GitHub repository into the MongoDB collections.
 
@@ -68,34 +68,23 @@ async def post_metrics_github(owner: str, repo: str) -> dict:
                    'All metrics were successfully generated.'),
         'result': {
             'successes': valid_wf_instances,
-            'errors': invalid_wf_instances
+            'failures': invalid_wf_instances
         }
     }
 
 
 @router.delete('/', response_model=ApiResponse)
-async def delete_metrics(ids: list[str]) -> dict:
+async def delete_metrics_github(owner: str, repo: str) -> dict:
     """
-    Delete a list of metrics.
+    Delete all the metrics in the collection associated with a GitHub repository.
 
     - **Request body**: List of ids to delete, usually stored in the collection as a filename that ends in .json
     """
-    metrics_collection.delete({'_id': {'$in': ids}})
+    metrics = list(map(lambda metric: metric['_id'], metrics_collection.find({'_githubRepo': f'{owner}/{repo}'})))
+    metrics_collection.delete_many({'_githubRepo': f'{owner}/{repo}'})
     return {
-        'detail': 'The metrics were deleted successfully.',
-        'result': ids
-    }
-
-
-@router.delete('/{id}', response_model=ApiResponse)
-async def delete_metric(id: str) -> dict:
-    """
-    Delete a single metric.
-
-    - **id**: The id to delete, usually stored in the collection as a filename that ends in .json
-    """
-    metrics_collection.delete_one({'_id': id})
-    return {
-        'detail': 'The metric was deleted successfully.',
-        'result': id
+        'detail': ('No metrics to delete.'
+                   if len(metrics) == 0 else
+                   'All metrics were deleted successfully.'),
+        'result': metrics
     }
