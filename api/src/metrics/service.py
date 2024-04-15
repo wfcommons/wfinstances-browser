@@ -22,9 +22,6 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
     valid_wf_instances, invalid_wf_instances = [], []
 
     def recurse_dir(path='') -> None:
-        if path == 'pegasus' or path == 'nextflow':
-            return
-
         response = requests.get(f'https://api.github.com/repos/{owner}/{repo}/contents/{path}')
         if response.status_code != 200:
             raise GithubResourceNotFoundException('repository')
