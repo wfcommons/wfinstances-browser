@@ -1,8 +1,62 @@
+import requests
 from collections import Counter, defaultdict, deque
+from fastapi import HTTPException
+from src.database import metrics_collection
 from src.metrics.graph import Graph
+from src.wfinstances.exceptions import InvalidWfInstanceException
+from src.wfinstances.service import validate_wf_instance
 
 
-def generate_metrics(wf_instance: dict) -> dict:
+def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
+    """
+    Insert WfInstances and generate their metrics from a GitHub repository into the MongoDB collections.
+
+    Args:
+        owner: The owner of the GitHub repository
+        repo: The name of the GitHub repository
+
+    Raises:
+        HTTPException: GitHub repository does not exist
+
+    Returns: Valid and invalid JSON filenames that match and mismatches the WfInstance schema
+    """
+    valid_wf_instances, invalid_wf_instances = [], []
+
+    def recurse_dir(path='') -> None:
+        url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json().get('message'))
+
+        for file in response.json():
+            if file['type'] == 'dir':
+                recurse_dir(file['path'])
+            elif str.endswith(file['name'], '.json'):
+                wf_instance = requests.get(file['download_url']).json()
+
+                try:
+                    validate_wf_instance(wf_instance)
+                except InvalidWfInstanceException:
+                    invalid_wf_instances.append(file['name'])
+                    continue
+                valid_wf_instances.append(file['name'])
+
+                # Replace if already exists, otherwise add into  metrics_collection
+                metrics = _generate_metrics(wf_instance)
+                metrics['_id'] = file['name']
+                metrics['_githubRepo'] = f'{owner}/{repo}'
+                metrics['_downloadUrl'] = file['download_url']
+                metrics_collection.find_one_and_update(
+                    {'_id': metrics['_id']},
+                    {'$set': metrics},
+                    upsert=True)
+
+    recurse_dir()
+    return valid_wf_instances, invalid_wf_instances
+
+
+def _generate_metrics(wf_instance: dict) -> dict:
     """
     Generate the num_tasks, num_files, total_bytes_read, total_bytes_written, depth, min_width, max_width metrics.
 

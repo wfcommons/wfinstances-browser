@@ -9,5 +9,4 @@ client = MongoClient(uri, tlsCAFile=certifi.where()) if 'mongodb+srv://' in uri 
 db = client.wf_instance_browser_db
 
 # Collections
-wf_instance_collection = db['wf_instance_collection']
 metrics_collection = db['metrics_collection']
