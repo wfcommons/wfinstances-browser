@@ -74,7 +74,7 @@ def _generate_metrics(wf_instance: dict) -> dict:
 
 def _generate_execution_metrics(execution: dict) -> dict:
     """
-    Generate the total_runtime_in_seconds, total_bytes_read, total_bytes_written metrics.
+    Generate the total_runtime_in_seconds, total_read_bytes, total_written_bytes metrics.
 
     Args:
         execution: The execution property of a WfInstance
