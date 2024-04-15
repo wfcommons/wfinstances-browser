@@ -6,59 +6,34 @@ import {
   MRT_GlobalFilterTextInput,
   MRT_ToggleFiltersButton,
   MRT_ShowHideColumnsButton,
-  MRT_Icons,
   MRT_Row,
 } from 'mantine-react-table';
+import 'mantine-react-table/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIcon, Box, Flex, Modal, Container } from '@mantine/core';
 import { IconGraph } from '@tabler/icons-react';
-import 'mantine-react-table/styles.css';
 import { Download } from './Download';
-import { Visualizer } from "~/components/Visualizer";
-
+import { Visualizer } from '~/components/Visualizer';
 
 export type Metrics = {
   id: string;
   githubRepo: string;
   numTasks: number;
   numFiles: number;
-  totalBytesRead: number;
-  totalBytesWritten: number;
-  work: number;
+  totalReadBytes: number;
+  totalWrittenBytes: number;
+  totalRuntimeInSeconds: number;
   depth: number;
   minWidth: number;
   maxWidth: number;
 };
 
-function formatBytes(bytes: number, unit: string) {
-  const units: { [ key: string ]: number } = {
-    "B": 1,
-    "KB": 1024,
-    "MB": 1024 **2,
-    "GB": 1024 **3,
-    "TB": 1024 **4
-  };
-
-  if (unit in units) {
-    return (bytes / units[unit]).toFixed(2);
-  } else {
-    throw new Error("Invalid Unit provided to function: " + unit + " needs to be changed.");
-  }
+function formatBytes(bytes: number) {
+  return `${(bytes /  (1024 ** 2)).toFixed(2)} MB`;
 }
 
-function formatWork(work: number, unit: string) {
-  const unitsInSeconds:{[key: string]: number} = {
-    'sec': 1,
-    'min': 60,
-    'hr': 3600,
-    'day(s)':86400
-  }
-
-  if(unit in unitsInSeconds) {
-    return (work / unitsInSeconds[unit]).toFixed(2);
-  } else {
-    throw new Error("Invalid unit provided to function: " + unit + " needs to be changed.")
-  }
+function formatRuntime(work: number) {
+  return `${(work / 60).toFixed(2)} S`;
 }
 
 export function MetricsTable({
@@ -66,10 +41,6 @@ export function MetricsTable({
 } : {
   data: Metrics[]
 }) {
-  // TODO Replace these temporary filtering values with a way to sort based on ByteUnit and WorkUnit
-  const testByteUnit = 'MB';
-  const testWorkUnit = 'min';
-
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedRow, setSelectedRow] = useState<MRT_Row<Metrics> | null>(null);
 
@@ -78,7 +49,7 @@ export function MetricsTable({
     open();
   }
   
-// Columns to be used in the table.
+  // Columns to be used in the table.
   const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
     () => [
       {
@@ -123,40 +94,25 @@ export function MetricsTable({
             filterFn: 'between',
           },
           {
-            accessorFn: (row) => formatBytes(row.totalBytesRead, testByteUnit),
-            id: 'totalBytesRead',
+            accessorFn: (row) => formatBytes(row.totalReadBytes),
+            id: 'totalReadBytes',
             header: 'Total MB Read',
             size: 50,
             columnFilterModeOptions: ['fuzzy', 'contains', 'between', 'betweenInclusive'],
-            Cell: ({ cell }) =>(
-              <Box>
-                {cell.getValue<number>() + " " + testByteUnit}
-              </Box>
-            )
           },
           {
-            accessorFn: (row) => formatBytes(row.totalBytesWritten, testByteUnit),
-            id: 'totalBytesWritten',
+            accessorFn: (row) => formatBytes(row.totalWrittenBytes),
+            id: 'totalWrittenBytes',
             header: 'Total MB Written',
             size: 50,
             columnFilterModeOptions: ['fuzzy', 'contains', 'between', 'betweenInclusive'],
-            Cell: ({ cell }) =>(
-              <Box>
-                {cell.getValue<number>() + " " + testByteUnit}
-              </Box>
-            )
           },
           {
-            accessorFn: (row) => formatWork(row.work, testWorkUnit),
-            id: 'work',
-            header: 'Total Work',
+            accessorFn: (row) => formatRuntime(row.totalRuntimeInSeconds),
+            id: 'totalRuntimeInSeconds',
+            header: 'Runtime',
             size: 30,
             columnFilterModeOptions: ['fuzzy', 'contains', 'startsWith',],
-            Cell: ({ cell }) =>(
-              <Box>
-                {cell.getValue<number>() + " " + testWorkUnit}
-              </Box>
-            )
           },
           {
             accessorKey: 'depth',
@@ -228,13 +184,13 @@ export function MetricsTable({
     },
     renderRowActions: ({ row }) => (
       <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
-          <ActionIcon
-            color="blue"
-            onClick={() => handleRowMenuAction(row)}
-          >
-            <IconGraph />
-          </ActionIcon>
-        </Box>
+        <ActionIcon
+          color="blue"
+          onClick={() => handleRowMenuAction(row)}
+        >
+          <IconGraph />
+        </ActionIcon>
+      </Box>
     ),
     renderTopToolbar: ({ table }) => {
       return (
@@ -255,7 +211,7 @@ export function MetricsTable({
   return (
     <>
       <MantineReactTable table={table} />
-       {selectedRow && (<Modal title="WFInstance Visualization" opened={opened} onClose={close} size='100%'>
+      {selectedRow && (<Modal title="WFInstance Visualization" opened={opened} onClose={close} size='100%'>
         <div>
           {/* Utilize this selectedRow.original.[field] in order to display the individual Cytoscape Graph. */}
           {selectedRow.original.id}

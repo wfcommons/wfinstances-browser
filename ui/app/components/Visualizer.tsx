@@ -111,39 +111,39 @@ export function Visualizer({ id }: { id: string }) {
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
-        const res = await response.json();
-        const tasks = res.result.workflow.tasks;
+        const { result } = await response.json();
+
+        const workflowSpec = result.workflow.specification;
+        const tasks = workflowSpec.tasks;
+        const files = workflowSpec.files;
+
         const graphElements: SetStateAction<any[]> = [];
-        const existingNode = new Set<string>(); //Set checking if a file has been added yet.
-        const colorMap = new Map<string, string>(); //Mapping of colors to filenames so all files have the same name.
-        let uniqueIdentify = 0; //Value to be added to the ids in order to create unique id names.
+        const colorMap = new Map<string, string>(); // Mapping of colors to filenames so all files have the same name.
+
+        files.forEach((file: any) => {
+          graphElements.push({ data: { id: file.id, label: file.id, bg: '#A9A9A9', type: 'file' } });
+        });
+
         tasks.forEach((task: any) => {
-          let taskId = task.id;
-          if(colorMap.has(task.name)) {
-            //If the ColorMap already has the task name, create a unique ID for the node and use the same color as the previous task.
-            taskId = task.id + uniqueIdentify;
-            uniqueIdentify++;
-            graphElements.push({ data: { id: taskId, label: task.name, bg: colorMap.get(task.name), type: 'task' } });
+          let bgColor;
+          if (colorMap.has(task.id)) {
+            bgColor = colorMap.get(task.id);
           } else {
-            //If the ColorMap does not have the task name yet use the original node id and map a color to that unique id.
-            const setColor = getRandomColorHex();
-            colorMap.set(task.name, setColor);
-            graphElements.push({ data: { id: task.id, label: task.name, bg: setColor, type: 'task' } });
+            bgColor = getRandomColorHex();
+            colorMap.set(task.name, bgColor);
           }
-          
-          task.files.forEach((file: any) => {
-            if (!existingNode.has(file.name)) {
-              existingNode.add(file.name);
-              //Begun Implementing File Coloration
-              graphElements.push({ data: { id: file.name, label: file.name, type: 'file', bg: '#A9A9A9' } });
-            }
-            if (file.link === "input") {
-              graphElements.push({ data: { source: file.name, target: taskId, type: 'edge' } });
-            } else {
-              graphElements.push({ data: { source: taskId, target: file.name, type: 'edge' } });
-            }
+
+          graphElements.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task' } });
+        
+          task.inputFiles.forEach((fileId: string) => {
+            graphElements.push({ data: { source: fileId, target: task.id, type: 'edge' } });
+          });
+
+          task.outputFiles.forEach((fileId: string) => {
+            graphElements.push({ data: { source: task.id, target: fileId, type: 'edge' } });
           });
         });
+        
         setElements(graphElements);
         setIsLoading(false);
       } catch (error) {

@@ -67,13 +67,11 @@ type WfInstance = {
   }
 };
 
-function download(wfInstances: WfInstance[]) {
+function download(wfInstances: WfInstance[], ids: string[]) {
   const zip = new JSZip();
 
-  wfInstances.forEach((wfInstance: WfInstance, i: number) => {
-    const id = wfInstance.id ?? `wfinstance${i !== 0 ? ` (${i})` : ''}.json`;
-    delete wfInstance.id;
-    zip.file(id, JSON.stringify(wfInstance, null, 4));
+  wfInstances.forEach((wfInstance: WfInstance, index: number) => {
+    zip.file(ids[index], JSON.stringify(wfInstance, null, 4));
   });
 
   zip.generateAsync({type: 'blob'}).then((content) => {
@@ -86,10 +84,10 @@ export function Download({
 }: {
   table: MRT_TableInstance<Metrics>
 }) {
-  const getIds = () => table.getSelectedRowModel().flatRows.map((row) => row.getValue('id'));
+  const ids = table.getSelectedRowModel().flatRows.map((row) => row.getValue('id')) as string[];
   const { isFetching, refetch } = useQuery({
     enabled: false,
-    queryKey: ['ids', getIds()],
+    queryKey: ['ids', ids],
     queryFn: () => 
       fetch('http://localhost:8081/wf-instances', {
         method: 'POST',
@@ -97,10 +95,10 @@ export function Download({
           'Content-Type': 'application/json',
           'accept': 'application/json'
         },
-        body: JSON.stringify(getIds())
+        body: JSON.stringify(ids)
       }).then(res => res.json())
         .then(res => {
-          download(res.result);
+          download(res.result, ids);
           return res.result;
         })
   });
