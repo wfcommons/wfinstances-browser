@@ -82,7 +82,7 @@ export function Visualizer({ id }: { id: string }) {
     const newColorMap = new Map<string, string>();
     const updatedElements = elements.map((element) => {
       if (element.data.type === 'task') {
-        var newColor = getRandomColorHex();
+        let newColor = getRandomColorHex();
         // TODO: Modify to allow for different tasks to have the same color.
         if (newColorMap.has(element.data.label)) {
           newColor = newColorMap.get(element.data.label) || '';
@@ -126,8 +126,8 @@ export function Visualizer({ id }: { id: string }) {
 
         tasks.forEach((task: any) => {
           let bgColor;
-          if (colorMap.has(task.id)) {
-            bgColor = colorMap.get(task.id);
+          if (colorMap.has(task.name)) {
+            bgColor = colorMap.get(task.name);
           } else {
             bgColor = getRandomColorHex();
             colorMap.set(task.name, bgColor);
