@@ -1,12 +1,27 @@
 import { Button, Group, Loader, Select } from '@mantine/core';
 import Cytoscape from 'cytoscape';
-import { SetStateAction, useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState, useRef } from 'react';
 import { layouts } from './layouts';
 import CytoscapeComponent from 'react-cytoscapejs';
+import { Modal, Container } from '@mantine/core';
 // @ts-ignore
 import DAGRE from 'cytoscape-dagre';
+// import { isEmpty } from 'lodash';
 
 Cytoscape.use(DAGRE);
+
+function Popup({ open, close }) {
+  
+  return (
+    <div>
+      <Modal title="Node Details" opened={open} onClose={close} size='50%'>
+        <Container>
+          hello
+        </Container>
+      </Modal>
+    </div>
+  );
+}
 
 export function Visualizer({ id }: { id: string }) {
   const cytoscapeStylesheet = [
@@ -94,6 +109,10 @@ export function Visualizer({ id }: { id: string }) {
     // Set the updated elements with shuffled colors
     setElements(updatedElements);
   }
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -143,19 +162,38 @@ export function Visualizer({ id }: { id: string }) {
     fetchData();
   }, [id]);
 
+  const cyRef = useRef(null);
+  let modalObj = {};
+
 
   return (
     <>
       {isLoading ? (
         <Loader color="blue" />
       ) : (
-        <CytoscapeComponent
-          key={elements.length}
-          elements={elements}
-          layout={layout}
-          style={{ minWidth: '400px', maxWidth: '1300px', height: '700px' }}
-          stylesheet={cytoscapeStylesheet}
-        />
+        <>
+          <Popup open={open} close={handleClose} />
+          <CytoscapeComponent
+            key={elements.length}
+            elements={elements}
+            layout={layout}
+            style={{ minWidth: '400px', maxWidth: '1300px', height: '700px' }}
+            stylesheet={cytoscapeStylesheet}
+            cy={cy => {
+              // cyRef.current = cy;
+              cy.on("tap", evt => {
+                try {
+                  modalObj = evt.target.data();
+                  if (!(isEmpty(modalObj))) {
+                      handleOpen();
+                  }
+              } catch (error) {
+                  console.log("Error; Not a node")
+              }
+              })
+          }}
+          />
+        </>
       )}
       <Group justify="center">
         <Button variant="default" onClick={shuffleColors}>Shuffle Colors</Button>
