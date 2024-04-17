@@ -14,16 +14,29 @@ Cytoscape.use(DAGRE);
 function Popup({ obj, open, close }) {
   console.log(obj);
   return (
-    <div>
-      <Modal title="Node Details" opened={open} onClose={close} size='50%'>
-        <Container>
-          <div>Name: {obj.label}</div>
-          <div>ID: {obj.taskId}</div>
-          <div>Read Bytes: {obj.readBytes}</div>
-          <div>Written Bytes: {obj.writtenBytes}</div>
-        </Container>
-      </Modal>
-    </div>
+    <>
+    {obj.type === "task" ? (
+      <div>
+        <Modal title="Node Details" opened={open} onClose={close} size='50%'>
+          <Container>
+            <div>Name: {obj.label}</div>
+            <div>ID: {obj.taskId}</div>
+            <div>Read Bytes: {(obj.readBytes > 10485) ? `${(obj.readBytes / (1024 **2)).toFixed(2)} MB` : `${obj.readBytes} Bytes`}</div>
+            <div>Written Bytes: {(obj.writtenBytes > 10485) ? `${(obj.writtenBytes / (1024 **2)).toFixed(2)} MB` : `${obj.writtenBytes} Bytes`}</div>
+          </Container>
+        </Modal>
+      </div>
+    ) : (
+      <div>
+        <Modal title="Node Details" opened={open} onClose={close} size='50%'>
+          <Container>
+            <div>Name: {obj.label}</div>
+            <div>Size: {(obj.size > 10485) ? `${(obj.size / (1024 **2)).toFixed(2)} MB` : `${obj.size} Bytes`} </div>
+          </Container>
+        </Modal>
+      </div>
+    )}
+    </>
   );
 }
 
@@ -149,7 +162,7 @@ export function Visualizer({ id }: { id: string }) {
           task.files.forEach((file: any) => {
             if (!existingNode.has(file.name)) {
               existingNode.add(file.name);
-              graphElements.push({ data: { id: file.name, label: file.name, type: 'file' } });
+              graphElements.push({ data: { id: file.name, label: file.name, type: 'file', size: file.sizeInBytes } });
             }
             if (file.link === "input") {
               graphElements.push({ data: { source: file.name, target: taskId, type: 'edge' } });
