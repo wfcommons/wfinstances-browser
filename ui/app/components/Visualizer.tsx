@@ -12,12 +12,15 @@ const { isEmpty } = pkg;
 Cytoscape.use(DAGRE);
 
 function Popup({ obj, open, close }) {
-  
+  console.log(obj);
   return (
     <div>
       <Modal title="Node Details" opened={open} onClose={close} size='50%'>
-        <Container>
-          hello
+        <Container style = {{ }}>
+          <h1>{obj.name}</h1>
+          <div>id: {obj.id}</div>
+          <div>Read Bytes: {obj.readBytes}</div>
+          <div>Written Bytes: {obj.writtenBytes}</div>
         </Container>
       </Modal>
     </div>
@@ -138,13 +141,13 @@ export function Visualizer({ id }: { id: string }) {
             //If the ColorMap does not have the task name yet use the original node id and map a color to that unique id.
             const setColor = getRandomColorHex();
             colorMap.set(task.name, setColor);
-            graphElements.push({ data: { id: task.id, label: task.name, bg: setColor, type: 'task' } });
+            graphElements.push({ data: { id: task.id, label: task.name, bg: setColor, type: 'task', readBytes: task.readBytes, writtenBytes: task.writtenBytes } });
           }
           
           task.files.forEach((file: any) => {
             if (!existingNode.has(file.name)) {
               existingNode.add(file.name);
-              graphElements.push({ data: { id: file.name, label: file.name } });
+              graphElements.push({ data: { id: file.name, label: file.name, type: 'file' } });
             }
             if (file.link === "input") {
               graphElements.push({ data: { source: file.name, target: taskId, type: 'edge' } });
@@ -185,7 +188,7 @@ export function Visualizer({ id }: { id: string }) {
               cy.on("tap", evt => {
                 try {
                   modalObj = evt.target.data();
-                  if (!(isEmpty(modalObj))) {
+                  if (!(isEmpty(modalObj)) && !(modalObj.type === "edge")) {
                     console.log(modalObj);
                     handleOpen();
                   }
