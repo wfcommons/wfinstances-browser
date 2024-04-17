@@ -6,11 +6,12 @@ import CytoscapeComponent from 'react-cytoscapejs';
 import { Modal, Container } from '@mantine/core';
 // @ts-ignore
 import DAGRE from 'cytoscape-dagre';
-// import { isEmpty } from 'lodash';
+import pkg from 'lodash';
+const { isEmpty } = pkg;
 
 Cytoscape.use(DAGRE);
 
-function Popup({ open, close }) {
+function Popup({ obj, open, close }) {
   
   return (
     <div>
@@ -172,7 +173,7 @@ export function Visualizer({ id }: { id: string }) {
         <Loader color="blue" />
       ) : (
         <>
-          <Popup open={open} close={handleClose} />
+          <Popup obj = {modalObj} open={open} close={handleClose} />
           <CytoscapeComponent
             key={elements.length}
             elements={elements}
@@ -185,7 +186,8 @@ export function Visualizer({ id }: { id: string }) {
                 try {
                   modalObj = evt.target.data();
                   if (!(isEmpty(modalObj))) {
-                      handleOpen();
+                    console.log(modalObj);
+                    handleOpen();
                   }
               } catch (error) {
                   console.log("Error; Not a node")
