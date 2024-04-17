@@ -16,9 +16,9 @@ function Popup({ obj, open, close }) {
   return (
     <div>
       <Modal title="Node Details" opened={open} onClose={close} size='50%'>
-        <Container style = {{ }}>
-          <h1>{obj.name}</h1>
-          <div>id: {obj.id}</div>
+        <Container>
+          <div>Name: {obj.label}</div>
+          <div>ID: {obj.taskId}</div>
           <div>Read Bytes: {obj.readBytes}</div>
           <div>Written Bytes: {obj.writtenBytes}</div>
         </Container>
@@ -26,6 +26,8 @@ function Popup({ obj, open, close }) {
     </div>
   );
 }
+
+let modalObj = {};
 
 export function Visualizer({ id }: { id: string }) {
   const cytoscapeStylesheet = [
@@ -136,12 +138,12 @@ export function Visualizer({ id }: { id: string }) {
             //If the ColorMap already has the task name, create a unique ID for the node and use the same color as the previous task.
             taskId = task.id + uniqueIdentify;
             uniqueIdentify++;
-            graphElements.push({ data: { id: taskId, label: task.name, bg: colorMap.get(task.name), type: 'task' } });
+            graphElements.push({ data: { id: taskId, label: task.name, bg: colorMap.get(task.name), type: 'task', taskId: task.id, readBytes: task.readBytes, writtenBytes: task.writtenBytes } });
           } else {
             //If the ColorMap does not have the task name yet use the original node id and map a color to that unique id.
             const setColor = getRandomColorHex();
             colorMap.set(task.name, setColor);
-            graphElements.push({ data: { id: task.id, label: task.name, bg: setColor, type: 'task', readBytes: task.readBytes, writtenBytes: task.writtenBytes } });
+            graphElements.push({ data: { id: task.id, label: task.name, bg: setColor, type: 'task', taskId: task.id, readBytes: task.readBytes, writtenBytes: task.writtenBytes } });
           }
           
           task.files.forEach((file: any) => {
@@ -167,7 +169,6 @@ export function Visualizer({ id }: { id: string }) {
   }, [id]);
 
   const cyRef = useRef(null);
-  let modalObj = {};
 
 
   return (
@@ -189,7 +190,6 @@ export function Visualizer({ id }: { id: string }) {
                 try {
                   modalObj = evt.target.data();
                   if (!(isEmpty(modalObj)) && !(modalObj.type === "edge")) {
-                    console.log(modalObj);
                     handleOpen();
                   }
               } catch (error) {
