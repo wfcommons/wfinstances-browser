@@ -33,7 +33,7 @@ function formatBytes(bytes: number) {
 }
 
 function formatRuntime(work: number) {
-  return `${(work / 60).toFixed(2)} S`;
+  return `${(work / 60).toFixed(2)} min`;
 }
 
 export function MetricsTable({

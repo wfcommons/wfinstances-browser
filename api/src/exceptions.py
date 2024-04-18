@@ -6,12 +6,25 @@ class InvalidWfInstanceException(Exception):
     """Exception to be raised when an WfInstance does not match the expected schema."""
 
     def __init__(self, detail: str):
-        """Raise the exception with a detail message."""
+        """
+        Raise the exception with a detail message.
+
+        Args:
+            detail: The detail message
+        """
         self.detail = detail
 
 
 class GithubResourceNotFoundException(Exception):
+    """Exception to be raised when a resource from the GitHub API is not found."""
+
     def __init__(self, resource_type: str):
+        """
+        Raise the exception with a detail message.
+
+        Args:
+            resource_type: The resource
+        """
         self.detail = f'Github {resource_type} resource not found'
 
 
