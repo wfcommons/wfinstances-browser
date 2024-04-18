@@ -31,13 +31,9 @@ Once Docker is finished building and starting the containers, you are able to vi
 [http://localhost:8081/docs](http://localhost:8081/docs).
 
 #### Populating the database
-Note that the database is empty the first time you launch the application which means the table displayed at [http://localhost:8080](http://localhost:8080) will be empty. Populate the database with WfInstances and their metrics from the offical WfCommon GitHub repos by running the following commands in a terminal:
+Note that the database is empty the first time you launch the application which means the table displayed at [http://localhost:8080](http://localhost:8080) will be empty. Populate the database with metrics from the offical WfCommons WfInstances GitHub repo in a terminal:
 ```
-curl -X POST http://localhost:8081/wf-instances/github/wfcommons/nextflow-instances
-
-curl -X POST http://localhost:8081/wf-instances/github/wfcommons/makeflow-instance
-
-curl -X POST http://localhost:8081/wf-instances/github/wfcommons/pegasus-instances
+curl -X PUT http://localhost:8081/wf-instances/github/wfcommons/WfInstances
 ```
 
 ## Manual Installation
