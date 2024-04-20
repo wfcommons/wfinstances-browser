@@ -12,10 +12,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react';
-import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const theme = createTheme({
+  primaryColor: 'green'
+});
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref
@@ -39,7 +43,7 @@ export default function App() {
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>
+        <MantineProvider theme={theme}>
           <QueryClientProvider client={queryClient}>
             <Navbar/>
             <Outlet />

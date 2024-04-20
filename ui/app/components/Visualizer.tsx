@@ -158,7 +158,7 @@ export function Visualizer({ id }: { id: string }) {
   return (
     <>
       {isLoading ? (
-        <Loader color="blue" />
+        <Loader />
       ) : (
         <CytoscapeComponent
           key={elements.length}
