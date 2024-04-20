@@ -9,5 +9,5 @@ export type Metrics = {
     depth: number;
     minWidth: number;
     maxWidth: number;
-  };
+}
   
