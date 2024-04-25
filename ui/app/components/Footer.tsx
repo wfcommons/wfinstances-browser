@@ -25,7 +25,7 @@ export function Footer() {
 
   return (
     <div className={classes.footer}>
-      <Container size="md" className={classes.inner}>
+      <Container className={classes.inner} size="xl">
 
         <Group className={classes.links}>{items}</Group>
 

@@ -105,7 +105,6 @@ export function Download({
   
   return (
     <Button
-      color="blue"
       disabled={!table.getIsSomeRowsSelected()}
       onClick={() => refetch()}
       variant="filled"

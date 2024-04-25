@@ -185,7 +185,6 @@ export function MetricsTable({
     renderRowActions: ({ row }) => (
       <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
         <ActionIcon
-          color="blue"
           onClick={() => handleRowMenuAction(row)}
         >
           <IconGraph />
