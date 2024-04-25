@@ -14,19 +14,7 @@ import { ActionIcon, Box, Flex, Modal, Container } from '@mantine/core';
 import { IconGraph } from '@tabler/icons-react';
 import { Download } from './Download';
 import { Visualizer } from '~/components/Visualizer';
-
-export type Metrics = {
-  id: string;
-  githubRepo: string;
-  numTasks: number;
-  numFiles: number;
-  totalReadBytes: number;
-  totalWrittenBytes: number;
-  totalRuntimeInSeconds: number;
-  depth: number;
-  minWidth: number;
-  maxWidth: number;
-};
+import { Metrics } from '~/types/Metrics';
 
 function formatBytes(bytes: number) {
   return `${(bytes /  (1024 ** 2)).toFixed(2)} MB`;

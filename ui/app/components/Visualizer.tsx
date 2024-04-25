@@ -1,10 +1,9 @@
-import { Button, Group, Loader, Select } from '@mantine/core';
-import Cytoscape from 'cytoscape';
-import { SetStateAction, useEffect, useState } from 'react';
-import { layouts } from './layouts';
+import { Button, Group, Loader } from '@mantine/core';
+import Cytoscape, { ElementDefinition } from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
-// @ts-ignore
 import DAGRE from 'cytoscape-dagre';
+import { useQuery } from '@tanstack/react-query';
+import { Task, File, WfInstance } from '~/types/WfInstance';
 
 Cytoscape.use(DAGRE);
 
@@ -64,96 +63,61 @@ export function Visualizer({ id }: { id: string }) {
     }
   ] as cytoscape.Stylesheet[];
 
-  const [elements, setElements] = useState<any[]>([]);
-  const [layout, setLayout] = useState(layouts.dagre)
-  const [isLoading, setIsLoading] = useState(true);
+  const layout = {
+    name: "dagre",
+    animate: true
+  };
 
+  
   function getRandomColorHex(): string {
-    const red = Math.floor(Math.random() * 256);
-    const green = Math.floor(Math.random() * 256);
-    const blue = Math.floor(Math.random() * 256);
+    const randomize = () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+    const [red, green, blue] = [randomize(), randomize(), randomize()];
 
-    return "#" + (red < 16 ? "0" : "") + red.toString(16) + 
-    (green < 16 ? "0" : "") + green.toString(16) + 
-    (blue < 16 ? "0" : "") + blue.toString(16);
+    return `#${red}${green}${blue}`;
   }
-  //Shuffles the Colors for the Graph
-  function shuffleColors() {
-    const newColorMap = new Map<string, string>();
-    const updatedElements = elements.map((element) => {
-      if (element.data.type === 'task') {
-        let newColor = getRandomColorHex();
-        // TODO: Modify to allow for different tasks to have the same color.
-        if (newColorMap.has(element.data.label)) {
-          newColor = newColorMap.get(element.data.label) || '';
-        } else {
-          newColorMap.set(element.data.label, newColor);
-          console.log("Label: " + element.data.label + " | Color: " + newColor);
-        }
-        // Update the background color of the task node
-        return {
-          ...element,
-          data: {
-            ...element.data,
-            bg: newColor,
-          },
-        };
-      }
-      return element;
+
+  function buildGraphElements(wfInstance: WfInstance): ElementDefinition[] {
+    const workflowSpec = wfInstance.workflow.specification;
+    const tasks = workflowSpec.tasks;
+    const files = workflowSpec.files ?? [];
+
+    const graphElements: ElementDefinition[] = [];
+    const colorMap = new Map<string, string>();
+
+    files.forEach((file: File) => {
+      graphElements.push({ data: { id: file.id, label: file.id, bg: '#A9A9A9', type: 'file' } });
     });
-    // Set the updated elements with shuffled colors
-    setElements(updatedElements);
-  }
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`http://localhost:8081/wf-instances/${id}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const { result } = await response.json();
 
-        const workflowSpec = result.workflow.specification;
-        const tasks = workflowSpec.tasks;
-        const files = workflowSpec.files;
-
-        const graphElements: SetStateAction<any[]> = [];
-        const colorMap = new Map<string, string>(); // Mapping of colors to filenames so all files have the same name.
-
-        files.forEach((file: any) => {
-          graphElements.push({ data: { id: file.id, label: file.id, bg: '#A9A9A9', type: 'file' } });
-        });
-
-        tasks.forEach((task: any) => {
-          let bgColor;
-          if (colorMap.has(task.name)) {
-            bgColor = colorMap.get(task.name);
-          } else {
-            bgColor = getRandomColorHex();
-            colorMap.set(task.name, bgColor);
-          }
-
-          graphElements.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task' } });
-        
-          task.inputFiles.forEach((fileId: string) => {
-            graphElements.push({ data: { source: fileId, target: task.id, type: 'edge' } });
-          });
-
-          task.outputFiles.forEach((fileId: string) => {
-            graphElements.push({ data: { source: task.id, target: fileId, type: 'edge' } });
-          });
-        });
-        
-        setElements(graphElements);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setIsLoading(false);
+    tasks.forEach((task: Task) => {
+      let bgColor;
+      if (colorMap.has(task.name)) {
+        bgColor = colorMap.get(task.name);
+      } else {
+        bgColor = getRandomColorHex();
+        colorMap.set(task.name, bgColor);
       }
-    };
-    fetchData();
-  }, [id]);
 
+      graphElements.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task' } });
+    
+      task.inputFiles?.forEach((fileId: string) => {
+        graphElements.push({ data: { source: fileId, target: task.id, type: 'edge' } });
+      });
+
+      task.outputFiles?.forEach((fileId: string) => {
+        graphElements.push({ data: { source: task.id, target: fileId, type: 'edge' } });
+      });
+    })
+
+    return graphElements;
+  }
+
+  const { isLoading, data: elements, refetch } = useQuery({
+    queryKey: ['id', id],
+    queryFn: () => 
+      fetch(`http://localhost:8081/wf-instances/${id}`)
+        .then(res => res.json())
+        .then(res => buildGraphElements(res.result))
+  });
 
   return (
     <>
@@ -161,15 +125,15 @@ export function Visualizer({ id }: { id: string }) {
         <Loader />
       ) : (
         <CytoscapeComponent
-          key={elements.length}
-          elements={elements}
+          key={elements?.length}
+          elements={elements ?? []}
           layout={layout}
           style={{ minWidth: '400px', maxWidth: '1300px', height: '700px' }}
           stylesheet={cytoscapeStylesheet}
         />
       )}
       <Group justify="center">
-        <Button variant="default" onClick={shuffleColors}>Shuffle Colors</Button>
+        <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
       </Group>
     </>
   );
