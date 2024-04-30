@@ -1,8 +1,64 @@
+import requests
 from collections import Counter, defaultdict, deque
+from src.database import metrics_collection
 from src.metrics.graph import Graph
+from src.exceptions import InvalidWfInstanceException, GithubResourceNotFoundException
+from src.wfinstances.service import validate_wf_instance
 
 
-def generate_metrics(wf_instance: dict) -> dict:
+def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
+    """
+    Insert WfInstances and generate their metrics from a GitHub repository into the MongoDB collections.
+
+    Args:
+        owner: The owner of the GitHub repository
+        repo: The name of the GitHub repository
+
+    Raises:
+        HTTPException: GitHub repository does not exist
+
+    Returns: Valid and invalid JSON filenames that match and mismatches the WfInstance schema
+    """
+    valid_wf_instances, invalid_wf_instances = [], []
+
+    def recurse_dir(path='') -> None:
+        response = requests.get(f'https://api.github.com/repos/{owner}/{repo}/contents/{path}')
+        if response.status_code != 200:
+            raise GithubResourceNotFoundException('repository')
+        files = response.json()
+
+        for file in files:
+            if file['type'] == 'dir':
+                recurse_dir(file['path'])
+            elif str.endswith(file['name'], '.json'):
+                response = requests.get(file['download_url'])
+                if response.status_code != 200:
+                    raise GithubResourceNotFoundException('download_url')
+                wf_instance = response.json()
+
+                try:
+                    validate_wf_instance(wf_instance)
+                except InvalidWfInstanceException:
+                    invalid_wf_instances.append(file['name'])
+                    continue
+
+                valid_wf_instances.append(file['name'])
+
+                # Replace if already exists, otherwise add into  metrics_collection
+                metrics = _generate_metrics(wf_instance)
+                metrics['_id'] = file['name']
+                metrics['_githubRepo'] = f'{owner}/{repo}'
+                metrics['_downloadUrl'] = file['download_url']
+                metrics_collection.find_one_and_update(
+                    {'_id': metrics['_id']},
+                    {'$set': metrics},
+                    upsert=True)
+
+    recurse_dir()
+    return valid_wf_instances, invalid_wf_instances
+
+
+def _generate_metrics(wf_instance: dict) -> dict:
     """
     Generate the num_tasks, num_files, total_bytes_read, total_bytes_written, depth, min_width, max_width metrics.
 
@@ -11,73 +67,50 @@ def generate_metrics(wf_instance: dict) -> dict:
 
     Returns: The metrics generated using the list and graph data structures
     """
-    tasks = wf_instance['workflow']['tasks']
-    return _generate_list_metrics(tasks) | _generate_graph_metrics(tasks)
+    execution = wf_instance['workflow']['execution']
+    specification = wf_instance['workflow']['specification']
+    return _generate_execution_metrics(execution) | _generate_specification_metrics(specification)
 
 
-def _generate_list_metrics(tasks: list[dict]) -> dict:
+def _generate_execution_metrics(execution: dict) -> dict:
     """
-    Generate the num_tasks, num_files, total_bytes_read, total_bytes_written metrics.
+    Generate the total_runtime_in_seconds, total_read_bytes, total_written_bytes metrics.
 
     Args:
-        tasks: The list of tasks of an WfInstance to generate metrics on
+        execution: The execution property of a WfInstance
 
     Returns: The metrics generated using the list data structure
     """
-    files, total_bytes_read, total_bytes_written, work = set(), 0, 0, 0
+    total_runtime_in_seconds, total_read_bytes, total_written_bytes = 0, 0, 0
 
-    for task in tasks:
-        if 'files' in task:
-            files.update(list(map(lambda file: file['name'], task['files'])))
-        work += task.get('runtimeInSeconds', 0)
-        total_bytes_read += task.get('bytesRead', 0)
-        total_bytes_written += task.get('bytesWritten', 0)
+    for task in execution['tasks']:
+        total_runtime_in_seconds += task.get('runtimeInSeconds', 0)
+        total_read_bytes += task.get('readBytes', 0)
+        total_written_bytes += task.get('writtenBytes', 0)
 
     return {
-        'numTasks': len(tasks),
-        'numFiles': len(files),
-        'totalBytesRead': total_bytes_read,
-        'totalBytesWritten': total_bytes_written,
-        'work': work,
+        'totalReadBytes': total_read_bytes,
+        'totalWrittenBytes': total_written_bytes,
+        'totalRuntimeInSeconds': total_runtime_in_seconds,
     }
 
 
-def _generate_graph_metrics(tasks: list[dict]) -> dict:
+def _generate_specification_metrics(specification: dict) -> dict:
     """
-    Generate the depth, min_width, max_width metrics.
+    Generate the num_tasks, num_files, depth, min_width, max_width metrics.
 
     Args:
-        tasks: The list of tasks of an WfInstance to generate metrics on
+        specification: The specification property of a WfInstance
 
     Returns: The metrics generated using the graph data structure
     """
-    # Build graph of tasks and files
-    graph = Graph()
-    for index, task in enumerate(tasks):
-        task_name = f'task{str(index)}:{task["name"]}'
-        graph.add_node(task_name)
-
-        for file in task['files']:
-            file_name = f'file:{file.get("path", "")}{file["name"]}'
-            if file['link'] == 'input':
-                graph.add_edge(file_name, task_name)
-            elif file['link'] == 'output':
-                graph.add_edge(task_name, file_name)
-
-    # Build graph of only tasks
-    task_graph = Graph()
-    all_children = set()
-    for node in list(graph.adj_dict.keys()):
-        if str.startswith(node, 'file:'):
-            continue
-        for file_node in graph.adj_dict[node]:
-            for task_node in graph.adj_dict[file_node]:
-                task_graph.add_edge(node, task_node)
-                all_children.add(task_node)
-
-    # Find top-level nodes
-    all_nodes = set(graph.adj_dict.keys())
-    top_level_nodes = list(all_nodes.difference(all_children))
+    # Build graph of tasks
+    graph, top_level_nodes = Graph(), set()
+    for task in specification['tasks']:
+        if len(task['parents']) == 0:
+            top_level_nodes.add(task['id'])
+        for child in task['children']:
+            graph.add_edge(task['id'], child)
 
     # Calculate levels and depth
     depth, levels = 0, defaultdict(int)
@@ -85,7 +118,7 @@ def _generate_graph_metrics(tasks: list[dict]) -> dict:
         queue = deque([node])
         while queue:
             task = queue.popleft()
-            for child_node in task_graph.adj_dict[task]:
+            for child_node in graph.adj_dict[task]:
                 levels[child_node] = max(1 + levels[task], levels[child_node])
                 queue.append(child_node)
                 depth = max(depth, levels[child_node])
@@ -95,9 +128,12 @@ def _generate_graph_metrics(tasks: list[dict]) -> dict:
     counter = Counter()
     for level in levels.values():
         counter[level] += 1
-    min_width, max_width = counter.most_common()[-1][1], counter.most_common()[0][1]
+    most_common = counter.most_common()
+    min_width, max_width = most_common[-1][1], most_common[0][1]
 
     return {
+        'numTasks': len(specification['tasks']),
+        'numFiles': len(specification['files']),
         'depth': depth,
         'minWidth': min_width,
         'maxWidth': max_width

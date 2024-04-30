@@ -1,19 +1,17 @@
-import { Container, Group, Burger, Image, Text, useMantineColorScheme, ActionIcon, useComputedColorScheme } from '@mantine/core';
+import { Container, Group, Image, Text, useMantineColorScheme, ActionIcon, useComputedColorScheme } from '@mantine/core';
 import { IconSun, IconMoon } from '@tabler/icons-react';
 import cx from 'clsx';
-import { useDisclosure } from '@mantine/hooks';
 import classes from './style/Navbar.module.css';
 import logo from '../../public/images/wflogo.png';
 
 
 export function Navbar() {
-  const [opened, { toggle }] = useDisclosure(false);
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme( 'light', { getInitialValueInEffect: true});
 
   return (
     <header className={classes.header}>
-      <Container size="md" className={classes.inner}>
+      <Container className={classes.inner} size="xl">
         <Group gap={5}>
           <Image
             radius='xs'

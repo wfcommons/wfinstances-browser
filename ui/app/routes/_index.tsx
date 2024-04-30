@@ -26,7 +26,7 @@ export default function Index() {
   const { metrics } = useLoaderData<typeof loader>();
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <Container fluid>
+      <Container size="xl">
         <MetricsTable data={metrics} />
       </Container>
     </div>

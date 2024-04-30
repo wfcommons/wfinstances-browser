@@ -10,11 +10,12 @@ def serialize_metric(metric: dict) -> dict | None:
     return {
         'id': metric.get('_id'),
         'githubRepo': metric.get('_githubRepo'),
+        'downloadUrl': metric.get('_downloadUrl'),
         'numTasks': metric.get('numTasks'),
         'numFiles': metric.get('numFiles'),
-        'totalBytesRead': metric.get('totalBytesRead'),
-        'totalBytesWritten': metric.get('totalBytesWritten'),
-        'work': metric.get('work'),
+        'totalReadBytes': metric.get('totalReadBytes'),
+        'totalWrittenBytes': metric.get('totalWrittenBytes'),
+        'totalRuntimeInSeconds': metric.get('totalRuntimeInSeconds'),
         'depth': metric.get('depth'),
         'minWidth': metric.get('minWidth'),
         'maxWidth': metric.get('maxWidth')
@@ -30,4 +31,4 @@ def serialize_metrics(metrics: list[dict]) -> list[dict]:
 
     Returns: The serialized list of metrics
     """
-    return [serialize_metric(metrics) for metrics in metrics if metrics]
+    return [serialize_metric(metric) for metric in metrics if metric]
