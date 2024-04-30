@@ -14,7 +14,6 @@ const { isEmpty } = pkg;
 Cytoscape.use(DAGRE);
 
 function Popup({ obj, open, close }) {
-  console.log(obj);
   return (
     <>
     {obj.type === "task" ? (
@@ -43,6 +42,9 @@ function Popup({ obj, open, close }) {
 }
 
 let modalObj = {};
+const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
 export function Visualizer({ id }: { id: string }) {
   const cytoscapeStylesheet = [
