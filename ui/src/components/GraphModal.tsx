@@ -21,6 +21,13 @@ export function GraphModal({
 }) {
     const [openedNodeModal, { open: openNodeModal, close: closeNodeModal }] = useDisclosure(false);
     const [node, setNode] = useState<NodeDataDefinition>({});
+    const [elementsWithFiles, setElementsWithFiles] = useState<ElementDefinition[]>([]);
+    const [elementsNoFiles, setElementsNoFiles] = useState<ElementDefinition[]>([]);
+    const [useElementsWithFiles, setUseElementsWithFiles] = useState(true);
+
+    function swapElements() {
+        setUseElementsWithFiles(prev => !prev);
+    }
 
     const cytoscapeStylesheet = [
         {
@@ -84,11 +91,12 @@ export function GraphModal({
         const tasks = workflowSpec.tasks;
         const files = workflowSpec.files ?? [];
 
-        const graphElements: ElementDefinition[] = [];
+        const graphElementsWithFiles: ElementDefinition[] = [];
+        const graphElementsNoFiles: ElementDefinition[] = [];
         const colorMap = new Map<string, string>();
 
         files.forEach((file: File) => {
-            graphElements.push({ data: { id: file.id, label: file.id, bg: '#A9A9A9', type: 'file', obj: file } });
+            graphElementsWithFiles.push({ data: { id: file.id, label: file.id, bg: '#A9A9A9', type: 'file', obj: file } });
         });
 
         tasks.forEach((task: Task) => {
@@ -100,18 +108,24 @@ export function GraphModal({
                 colorMap.set(task.name, bgColor);
             }
 
-            graphElements.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task', obj: task } });
+            graphElementsWithFiles.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task', obj: task } });
+            graphElementsNoFiles.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task', obj: task } });
     
             task.inputFiles?.forEach((fileId: string) => {
-                graphElements.push({ data: { source: fileId, target: task.id, type: 'edge' } });
+                graphElementsWithFiles.push({ data: { source: fileId, target: task.id, type: 'edge' } });
             });
 
             task.outputFiles?.forEach((fileId: string) => {
-                graphElements.push({ data: { source: task.id, target: fileId, type: 'edge' } });
+                graphElementsWithFiles.push({ data: { source: task.id, target: fileId, type: 'edge' } });
+            });
+
+            task.children?.forEach((childId: string) => {
+                graphElementsNoFiles.push({ data: {source: task.id, target: childId, type: 'edge' }});
             });
         })
-
-        return graphElements;
+        setElementsWithFiles(graphElementsWithFiles);
+        setElementsNoFiles(graphElementsNoFiles);
+        return graphElementsWithFiles;
     }
 
     const { isLoading, data: elements, refetch } = useQuery({
@@ -133,8 +147,8 @@ export function GraphModal({
                 <>
                     <NodeModal node={node} opened={openedNodeModal} onClose={closeNodeModal} />
                     <CytoscapeComponent
-                        key={elements?.length}
-                        elements={elements ?? []}
+                        key={useElementsWithFiles ? elementsWithFiles.length : elementsNoFiles.length}
+                        elements={useElementsWithFiles? elementsWithFiles : elementsNoFiles}
                         layout={layout}
                         style={{ width: '100%', height: '700px' }}
                         stylesheet={cytoscapeStylesheet}
@@ -151,6 +165,7 @@ export function GraphModal({
             )}
             <Group justify="center">
                 <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
+                <Button variant="success" onClick={swapElements}>Display Type: {useElementsWithFiles ? "Tasks and Files" : "Tasks Only"}</Button>
             </Group>
         </Modal>
     );
