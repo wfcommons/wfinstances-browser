@@ -128,7 +128,8 @@ export function GraphModal({
         return graphElementsWithFiles;
     }
 
-    const { isLoading, data: elements, refetch } = useQuery({
+    const { isLoading, refetch } = useQuery({
+        refetchOnWindowFocus: false,
         queryKey: ['id', id],
         queryFn: () => 
             fetch(`http://localhost:8081/wf-instances/${id}`)
@@ -163,7 +164,7 @@ export function GraphModal({
                     />
                 </>
             )}
-            <Group justify="center">
+            <Group justify="center" pt={15}>
                 <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
                 <Button variant="success" onClick={swapElements}>Display Type: {useElementsWithFiles ? "Tasks and Files" : "Tasks Only"}</Button>
             </Group>
