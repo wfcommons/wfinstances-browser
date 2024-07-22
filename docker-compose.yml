@@ -1,6 +1,16 @@
-version: '1.0'
-
 services:
+
+  nginx:
+    container_name: wfinstances-browser-nginx
+    build: ./nginx
+    depends_on:
+      - ui
+      - stupid_app
+    ports:
+      - 80:80
+    networks:
+      - nginx-network
+
 
   stupid_app:
     container_name: stupid_app
@@ -44,17 +54,6 @@ services:
       MONGO_INITDB_DATABASE: wf_instance_browser_db
     volumes:
       - db:/data/db
-    networks:
-      - nginx-network
-
-  nginx:
-    container_name: wfinstances-browser-nginx
-    build: ./nginx
-    depends_on:
-      - ui
-      - stupid_app
-    ports:
-      - 80:80
     networks:
       - nginx-network
 
