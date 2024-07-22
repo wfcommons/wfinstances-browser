@@ -1,6 +1,15 @@
 version: '1.0'
 
 services:
+
+  stupid_app:
+    container_name: stupid_app
+    build: stupid_app
+    ports:
+      - 3000:3000
+    networks:
+      - nginx-network
+
   ui:
     container_name: wfinstances-browser-ui
     build: ./ui
@@ -11,6 +20,8 @@ services:
       - API_BASE_URL=http://api:8081
     ports:
       - 8080:8080
+    networks:
+      - nginx-network
 
   api:
     container_name: wfinstances-browser-api
@@ -21,6 +32,8 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/?retryWrites=true&w=majority
     ports:
       - 8081:8081
+    networks:
+      - nginx-network
 
   mongodb:
     container_name: wfinstances-browser-mongodb
@@ -31,6 +44,26 @@ services:
       MONGO_INITDB_DATABASE: wf_instance_browser_db
     volumes:
       - db:/data/db
+    networks:
+      - nginx-network
+
+  nginx:
+    container_name: wfinstances-browser-nginx
+    build: ./nginx
+    depends_on:
+      - ui
+      - stupid_app
+    ports:
+      - 80:80
+    networks:
+      - nginx-network
+
 
 volumes:
   db:
+
+networks:
+  nginx-network:
+    name: nginx-network
+    driver: bridge
+
