@@ -3,6 +3,7 @@ export type Metrics = {
     githubRepo: string;
     numTasks: number;
     numFiles: number;
+    sumFileSizes: number,
     totalReadBytes: number;
     totalWrittenBytes: number;
     totalRuntimeInSeconds: number;

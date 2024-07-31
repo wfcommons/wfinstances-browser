@@ -13,6 +13,7 @@ def serialize_metric(metric: dict) -> dict | None:
         'downloadUrl': metric.get('_downloadUrl'),
         'numTasks': metric.get('numTasks'),
         'numFiles': metric.get('numFiles'),
+        'sumFileSizes': metric.get('sumFileSizes'),
         'totalReadBytes': metric.get('totalReadBytes'),
         'totalWrittenBytes': metric.get('totalWrittenBytes'),
         'totalRuntimeInSeconds': metric.get('totalRuntimeInSeconds'),
