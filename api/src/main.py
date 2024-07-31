@@ -11,7 +11,7 @@ app.include_router(metrics_router, prefix='/metrics')
 app.add_exception_handler(GithubResourceNotFoundException, github_resource_not_found_exception_handler)
 
 # origins=['http://localhost:8080']  # Original code
-origins = ["http://wfinstances-browser-ui:8080", "http://localhost:8080", "http://wfinstances-browser-nginx:80", "http://wfinstances-browser-nginx"]
+origins = ["http://wfinstances-browser-ui:8080", "http://wfinstances-browser-ui:80", "http://localhost:8080", "http://localhost", "http://wfinstances-browser-nginx:80", "http://wfinstances-browser-nginx"]
 # origins = ["*"]
 
 app.add_middleware(
