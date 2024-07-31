@@ -4,6 +4,7 @@ from src.database import metrics_collection
 from src.metrics.graph import Graph
 from src.exceptions import InvalidWfInstanceException, GithubResourceNotFoundException
 from src.wfinstances.service import validate_wf_instance
+import sys
 
 
 def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
@@ -97,7 +98,7 @@ def _generate_execution_metrics(execution: dict) -> dict:
 
 def _generate_specification_metrics(specification: dict) -> dict:
     """
-    Generate the num_tasks, num_files, depth, min_width, max_width metrics.
+    Generate the num_tasks, num_files, depth, min_width, max_width, sum_file_sizes metrics.
 
     Args:
         specification: The specification property of a WfInstance
@@ -131,9 +132,18 @@ def _generate_specification_metrics(specification: dict) -> dict:
     most_common = counter.most_common()
     min_width, max_width = most_common[-1][1], most_common[0][1]
 
+    # Calculate the sum of file sum_file_sizes (in bytes)
+    sum_file_sizes = 0
+    for file in specification['files']:
+        sys.stderr.write(f"FILE: {file["id"]} : {file['sizeInBytes']}\n")
+        sum_file_sizes += file.get('sizeInBytes', 0)
+    sys.stderr.write(f"TOTAL SIZE: {sum_file_sizes}")
+
+
     return {
         'numTasks': len(specification['tasks']),
         'numFiles': len(specification['files']),
+        'sumFileSizes': sum_file_sizes,
         'depth': depth,
         'minWidth': min_width,
         'maxWidth': max_width
