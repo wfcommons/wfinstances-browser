@@ -10,8 +10,11 @@ import { WfInstance } from '~/types/WfInstance';
 function download(wfInstances: WfInstance[], ids: string[]) {
     const zip = new JSZip();
 
+    const root_folder = zip.folder("WfInstances");
+
     wfInstances.forEach((wfInstance: WfInstance, index: number) => {
-        zip.file(ids[index], JSON.stringify(wfInstance, null, 4));
+        root_folder!.file(ids[index], JSON.stringify(wfInstance, null, 4));
+        // zip.file(ids[index], JSON.stringify(wfInstance, null, 4));
     });
 
     zip.generateAsync({type: 'blob'}).then((content) => {
