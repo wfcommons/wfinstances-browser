@@ -23,6 +23,5 @@ app.add_middleware(
 )
 
 if __name__ == '__main__':
-    import sys
     #TODO: DONT'T HARDCODE 8081 (use env)
     uvicorn.run('main:app', host='localhost', port=8081, reload=True)
