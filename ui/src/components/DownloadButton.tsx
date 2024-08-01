@@ -32,7 +32,7 @@ export function DownloadButton({
         enabled: false,
         queryKey: ['ids', ids],
         queryFn: () => 
-            fetch('http://localhost:8081/wf-instances', {
+            fetch('http://dirt02.ics.hawaii.edu:8081/wf-instances', {
                 method: 'POST',
                 headers: {                              
                     'Content-Type': 'application/json',
