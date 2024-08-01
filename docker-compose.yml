@@ -30,7 +30,7 @@ services:
     environment:
       MONGO_INITDB_DATABASE: wf_instance_browser_db
     volumes:
-      - db:/data/db
+      - ~/mongodata:/data/db
 
 volumes:
   db:
