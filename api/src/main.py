@@ -10,6 +10,7 @@ app.include_router(wf_instances_router, prefix='/wf-instances')
 app.include_router(metrics_router, prefix='/metrics')
 app.add_exception_handler(GithubResourceNotFoundException, github_resource_not_found_exception_handler)
 
+#TODO: DONT'T HARDCODE origins (use env)
 # origins=['http://localhost:8080']  # Original code
 origins = ["http://localhost"]
 
@@ -22,5 +23,5 @@ app.add_middleware(
 )
 
 if __name__ == '__main__':
-    import sys
+    #TODO: DONT'T HARDCODE 8081 (use env)
     uvicorn.run('main:app', host='localhost', port=8081, reload=True)
