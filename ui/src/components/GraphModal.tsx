@@ -132,7 +132,8 @@ export function GraphModal({
         refetchOnWindowFocus: false,
         queryKey: ['id', id],
         queryFn: () => 
-            fetch(`http://wfinstances-browser-api:8081/wf-instances/${id}`)
+            // fetch(`http://wfinstances-browser-api:8081/wf-instances/${id}`)
+            fetch(`http://localhost:8081/wf-instances/${id}`)
                 .then(res => res.json())
                 .then(res => buildGraphElements(res.result))
     });
