@@ -32,7 +32,6 @@ export function DownloadButton({
         enabled: false,
         queryKey: ['ids', ids],
         queryFn: () => 
-            //fetch('http://dirt02.ics.hawaii.edu:8081/wf-instances', {
             fetch('http://dirt02.ics.hawaii.edu/wf-instances', {
                 method: 'POST',
                 headers: {                              
