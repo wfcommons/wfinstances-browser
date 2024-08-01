@@ -27,7 +27,7 @@ services:
       - api
     environment:
       - PORT=8080
-      - API_BASE_URL=http://wfinstances-browser-api:8081
+      - API_BASE_URL=http://api:8081
     ports:
       - 8080:8080
     networks:
