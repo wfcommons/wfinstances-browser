@@ -47,7 +47,7 @@ services:
 
   mongodb:
     container_name: wfinstances-browser-mongodb
-    image: mongo:4.4.6
+    image: mongo:5.0.26
     ports: 
       - 27017:27017
     environment:

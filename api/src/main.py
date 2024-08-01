@@ -11,7 +11,7 @@ app.include_router(metrics_router, prefix='/metrics')
 app.add_exception_handler(GithubResourceNotFoundException, github_resource_not_found_exception_handler)
 
 # origins=['http://localhost:8080']  # Original code
-origins = ["http://dirt02.ics.hawaii.edu"]
+origins = ["http://localhost"]
 
 app.add_middleware(
     CORSMiddleware,
