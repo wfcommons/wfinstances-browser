@@ -7,7 +7,7 @@ from src.wfinstances.service import retrieve_wf_instances, retrieve_wf_instance
 router = APIRouter()
 
 
-@router.post('/', response_model=ApiResponse)
+@router.post('/public/', response_model=ApiResponse)
 async def post_query_wf_instances(ids: list[str]) -> dict:
     """
     Get a list of WfInstances.
@@ -23,7 +23,7 @@ async def post_query_wf_instances(ids: list[str]) -> dict:
     }
 
 
-@router.get('/{id}', response_model=ApiResponse)
+@router.get('/public/{id}', response_model=ApiResponse)
 async def get_wf_instance(id: str) -> dict:
     """
     Get a single WfInstance
