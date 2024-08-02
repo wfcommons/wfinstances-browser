@@ -29,7 +29,7 @@ services:
       - PORT=8080
       - API_BASE_URL=http://api:8081
     ports:
-      - 8080:8080
+      - 127.0.0.1:8080:8080
     networks:
       - nginx-network
 
@@ -41,7 +41,7 @@ services:
     environment:
       - MONGO_URI=mongodb://mongodb:27017/?retryWrites=true&w=majority
     ports:
-      - 8081:8081
+      - 127.0.0.1:8081:8081
     networks:
       - nginx-network
 
