@@ -5,7 +5,7 @@ import sys
 
 router = APIRouter()
 
-@router.get('/', response_model=ApiResponse)
+@router.get('/public/', response_model=ApiResponse)
 async def get_number_of_instances_downloaded() -> int:
     """
     Get all the number_of_instances_downloaded.
@@ -18,7 +18,7 @@ async def get_number_of_instances_downloaded() -> int:
         'result': usage["count"]
     }
 
-@router.put('/increment/{increment}', response_model=ApiResponse)
+@router.put('/private/increment/{increment}', response_model=ApiResponse)
 async def increment_number_of_instances_downloaded(increment: int) -> int:
     """
     Increment the number of downloads

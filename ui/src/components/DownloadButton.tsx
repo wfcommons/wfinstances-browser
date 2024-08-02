@@ -22,7 +22,7 @@ function download(wfInstances: WfInstance[], ids: string[]) {
     });
 
     const num_downloaded_instances = wfInstances.length;
-    fetch(`http://localhost/usage/increment/${num_downloaded_instances}`, {
+    fetch(`http://${process.env.API_BASE_URL}/usage/private/increment/${num_downloaded_instances}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
