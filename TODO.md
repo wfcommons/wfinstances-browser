@@ -1,21 +1,24 @@
   - [X] Deploy behind nginx
-     Download wih Chrome asks for "insecure?" - see https below
+     - Download wih Chrome asks for "insecure?" - see https below
 
-  - [ ] Make it all configurable using a .env file, so that there are no branches for different servers
-    - Using: https://forums.docker.com/t/passing-command-line-arguments-in-docker-compose/137996/2
-    - Problem: Some of the environment has to be passed from the server to the client, which is super annoying (likely have to use the Window clientside stuff to which the server adds the relevant env stuff)
 
   - [ ] Create usage database on Mongo
     - [ ] Do a POC
       - [X] Do a bogus thing api route
       - [ ] Call that api route from the ui
-    - [ ] Come up with a Schema
+    - [ ] Come up with a Schema for the usage
     - [ ] Implement the full functionality
 
 
   - [ ] Create tiny server that can download some usage JSON
-    - Modify the app2 stuff to do this
+    - Modify the app2 stuff to do this? Or just have a route on the main app?
 
-  - [ ] HTTPS?
+
+  - [ ] Make it all configurable using a .env file, so that there are no branches for different servers
+    - Using: https://forums.docker.com/t/passing-command-line-arguments-in-docker-compose/137996/2
+    - Problem: Some of the environment has to be passed from the server to the client, which is super annoying (likely have to use the Window clientside stuff to which the server adds the relevant env stuff)
+
+
+  - [ ] Make it all be behind HTTPS
     - Problem:  remix-server.js doesn't do HTTPS
 
