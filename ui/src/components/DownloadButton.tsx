@@ -45,7 +45,7 @@ export function DownloadButton({
         enabled: false,
         queryKey: ['ids', ids],
         queryFn: () => 
-            fetch('http://localhost:8081/wf-instances', {
+            fetch('http://localhost/wf-instances', {
                 method: 'POST',
                 headers: {                              
                     'Content-Type': 'application/json',
