@@ -5,13 +5,13 @@
   - [ ] Create usage database on Mongo
     - [ ] Do a POC
       - [X] Do a bogus thing api route
-      - [ ] Call that api route from the ui
+      - [X] Call that api route from the ui and make sure it updates the database
+      - [ ] Create tiny server that can download some usage JSON
+        - Modify the app2 stuff to do this? Or just have a route on the main app?
     - [ ] Come up with a Schema for the usage
     - [ ] Implement the full functionality
 
 
-  - [ ] Create tiny server that can download some usage JSON
-    - Modify the app2 stuff to do this? Or just have a route on the main app?
 
 
   - [ ] Make it all configurable using a .env file, so that there are no branches for different servers
