@@ -12,7 +12,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-    const response = await fetch(`${process.env.API_BASE_URL}/metrics`);
+    const response = await fetch(`${process.env.API_BASE_URL}/metrics/private`);
     const jsonResponse = await response.json();
     const metrics: Metrics[] = await jsonResponse.result;
     return json({ metrics });

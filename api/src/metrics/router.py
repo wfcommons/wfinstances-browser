@@ -7,7 +7,7 @@ from src.models import ApiResponse
 router = APIRouter()
 
 
-@router.get('/', response_model=ApiResponse)
+@router.get('/private/', response_model=ApiResponse)
 async def get_all_metrics() -> dict:
     """
     Get all the metrics from the collection.
@@ -21,7 +21,7 @@ async def get_all_metrics() -> dict:
     }
 
 
-@router.get('/{id}', response_model=ApiResponse)
+@router.get('/private/{id}', response_model=ApiResponse)
 async def get_metric(id: str) -> dict:
     """
     Get a metric from the collection.
@@ -37,7 +37,7 @@ async def get_metric(id: str) -> dict:
     }
 
 
-@router.post('/', response_model=ApiResponse)
+@router.post('/private/', response_model=ApiResponse)
 async def post_query_metrics(ids: list[str]) -> dict:
     """
     Get a list of metrics from the collection.
@@ -53,7 +53,7 @@ async def post_query_metrics(ids: list[str]) -> dict:
     }
 
 
-@router.put('/github/{owner}/{repo}', response_model=ApiResponse)
+@router.put('/private/github/{owner}/{repo}', response_model=ApiResponse)
 async def put_metrics_github(owner: str, repo: str) -> dict:
     """
     Insert metrics generated from WfInstances contained in a GitHub repository into the MongoDB collections.
@@ -73,7 +73,7 @@ async def put_metrics_github(owner: str, repo: str) -> dict:
     }
 
 
-@router.delete('/', response_model=ApiResponse)
+@router.delete('/private/', response_model=ApiResponse)
 async def delete_metrics_github(owner: str, repo: str) -> dict:
     """
     Delete all the metrics in the collection associated with a GitHub repository.

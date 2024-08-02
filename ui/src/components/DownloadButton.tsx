@@ -32,7 +32,7 @@ export function DownloadButton({
         enabled: false,
         queryKey: ['ids', ids],
         queryFn: () => 
-            fetch('http://dirt02.ics.hawaii.edu/wf-instances', {
+            fetch('http://dirt02.ics.hawaii.edu/wf-instances/public/', {
                 method: 'POST',
                 headers: {                              
                     'Content-Type': 'application/json',

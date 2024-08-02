@@ -31,9 +31,9 @@ Once Docker is finished building and starting the containers, you are able to vi
 [http://localhost:8081/docs](http://localhost:8081/docs).
 
 #### Populating the database
-Note that the database is empty the first time you launch the application which means the table displayed at [http://localhost:8080](http://localhost:8080) will be empty. Populate the database with metrics from the offical WfCommons WfInstances GitHub repo in a terminal:
+Note that the database is empty the first time you launch the application which means the table displayed at [http://localhost:8080](http://localhost:8080) will be empty. Populate the database with metrics from the officoal WfCommons WfInstances GitHub repo in a terminal on the deployment server:
 ```
-curl -X PUT http://localhost:8081/metrics/github/wfcommons/WfInstances
+curl -X PUT http://localhost:8081/metrics/private/github/wfcommons/WfInstances
 ```
 
 ## Manual Installation
