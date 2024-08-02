@@ -22,17 +22,14 @@ function download(wfInstances: WfInstance[], ids: string[]) {
     });
 
     const num_downloaded_instances = wfInstances.length;
-    fetch('http://localhost:8081/usage/stuff', {
+    fetch(`http://localhost/usage/increment/${num_downloaded_instances}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'accept': 'application/json'
-        },
-        body: JSON.stringify(num_downloaded_instances)
+        }
     }).then(res => res.json())
-        .then(res => {
-            console.log(res.result);
-        })
+
 }
 
 export function DownloadButton({ 
