@@ -132,7 +132,7 @@ export function GraphModal({
         refetchOnWindowFocus: false,
         queryKey: ['id', id],
         queryFn: () => 
-            fetch(`http://dirt02.ics.hawaii.edu/wf-instances/public/${id}`)
+            fetch(`http://dirt02.ics.hawaii.edu/wf-instances/public/viz/${id}`)
                 .then(res => res.json())
                 .then(res => buildGraphElements(res.result))
     });

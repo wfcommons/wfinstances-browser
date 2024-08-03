@@ -45,7 +45,7 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
 
                 valid_wf_instances.append(file['name'])
 
-                # Replace if already exists, otherwise add into  metrics_collection
+                # Replace if already exists, otherwise add into metrics_collection
                 metrics = _generate_metrics(wf_instance)
                 metrics['_id'] = file['name']
                 metrics['_githubRepo'] = f'{owner}/{repo}'

@@ -20,6 +20,7 @@ function download(wfInstances: WfInstance[], ids: string[]) {
     zip.generateAsync({type: 'blob'}).then((content) => {
         FileSaver.saveAs(content, 'WfInstances.zip');
     });
+
 }
 
 export function DownloadButton({ 
