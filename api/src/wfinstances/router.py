@@ -23,13 +23,16 @@ async def post_query_wf_instances(ids: list[str]) -> dict:
     }
 
 
-@router.get('/public/{id}', response_model=ApiResponse)
+@router.get('/public/viz/{id}', response_model=ApiResponse)
 async def get_wf_instance(id: str) -> dict:
     """
-    Get a single WfInstance
+    Get a single WfInstance for visualization purposes
 
     - **id**: The id to retrieve, usually stored in the collection as a filename that ends in .json
     """
+
+    print("SOMEBODY REQUESTED A VIZ, I SHOULD INCREMENT USAGE\m")
+
     wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
     return {
         'detail': ('WfInstance retrieved.'
