@@ -10,8 +10,6 @@ import { WfInstance } from '~/types/WfInstance';
 function download(wfInstances: WfInstance[], ids: string[]) {
     const zip = new JSZip();
 
-    // console.log("IN DOWNLOAD FUNCTION()");
-
     const root_folder = zip.folder("WfInstances");
 
     wfInstances.forEach((wfInstance: WfInstance, index: number) => {
@@ -22,16 +20,6 @@ function download(wfInstances: WfInstance[], ids: string[]) {
     zip.generateAsync({type: 'blob'}).then((content) => {
         FileSaver.saveAs(content, 'WfInstances.zip');
     });
-
-    const num_downloaded_instances = wfInstances.length;
-    // console.log("CALLING FETCH ON PRIVATE URL")
-    fetch(`http://${process.env.API_BASE_URL}/usage/private/increment/${num_downloaded_instances}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'accept': 'application/json'
-        }
-    }).then(res => res.json())
 
 }
 

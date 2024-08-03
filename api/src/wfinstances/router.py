@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from src.database import metrics_collection
+from src.usage.service import increment_download_count
+from src.usage.service import increment_viz_count
 from src.metrics.serializer import serialize_metrics, serialize_metric
 from src.models import ApiResponse
 from src.wfinstances.service import retrieve_wf_instances, retrieve_wf_instance
@@ -14,6 +16,11 @@ async def post_query_wf_instances(ids: list[str]) -> dict:
 
     - **Request body**: List of ids to retrieve, usually stored in the collection as a filename that ends in .json
     """
+
+    # Update the usage database
+    increment_download_count(len(ids))
+
+    # Return the instances to the client
     wf_instances = retrieve_wf_instances(serialize_metrics(metrics_collection.find({'_id': {'$in': ids}})))
     return {
         'detail': ('WfInstances retrieved.'
@@ -31,7 +38,8 @@ async def get_wf_instance(id: str) -> dict:
     - **id**: The id to retrieve, usually stored in the collection as a filename that ends in .json
     """
 
-    print("SOMEBODY REQUESTED A VIZ, I SHOULD INCREMENT USAGE\m")
+    # Update the usage database
+    increment_viz_count()
 
     wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
     return {
