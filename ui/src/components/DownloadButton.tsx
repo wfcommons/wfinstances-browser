@@ -33,7 +33,6 @@ export function DownloadButton({
         enabled: false,
         queryKey: ['ids', ids],
         queryFn: () => 
-            //fetch('http://localhost/wf-instances/public/', {
             fetch('/wf-instances/public/', {
                 method: 'POST',
                 headers: {                              
