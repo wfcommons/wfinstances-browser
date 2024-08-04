@@ -28,7 +28,7 @@ curl -X PUT http://localhost:8081/metrics/private/github/wfcommons/WfInstances
 ## Running in production on a server
 
 Modify the `.env` file at the root of the directory to customize the configuration (including using https). 
-See comments in that file for more information.  After modifying this file, you may want to rebuild all
+See comments in that file for more information and examples.  After modifying this file, you may want to rebuild all
 images:
 
 ```
