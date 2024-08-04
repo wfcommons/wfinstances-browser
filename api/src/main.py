@@ -5,6 +5,7 @@ from src.exceptions import GithubResourceNotFoundException, github_resource_not_
 from src.wfinstances.router import router as wf_instances_router
 from src.metrics.router import router as metrics_router
 from src.usage.router import router as usage_router
+import os
 
 app = FastAPI(swagger_ui_parameters={"displayRequestDuration": True})
 app.include_router(wf_instances_router, prefix='/wf-instances')
@@ -14,7 +15,7 @@ app.add_exception_handler(GithubResourceNotFoundException, github_resource_not_f
 
 #TODO: DONT'T HARDCODE origins (use env)
 # origins=['http://localhost:8080']  # Original code
-origins = ["http://localhost"]
+origins = [f"http://{os.getenv('NGINX_SERVER_HOSTNAME')}"]
 
 app.add_middleware(
     CORSMiddleware,

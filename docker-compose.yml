@@ -37,6 +37,7 @@ services:
       - mongodb
     environment:
       - MONGO_URI=mongodb://mongodb:27017/?retryWrites=true&w=majority
+      - NGINX_SERVER_HOSTNAME=${NGINX_SERVER_HOSTNAME}
     ports:
       - 127.0.0.1:8081:8081
     networks:
