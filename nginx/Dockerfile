@@ -30,6 +30,10 @@ RUN apt -y install curl
 # Copy nginx custom config file
 COPY ./custom-nginx.conf /etc/nginx/
 
+# Copy certificate and key
+COPY ./cert.pem /etc/nginx/ssl/
+COPY ./privkey_no_pass.pem /etc/nginx/ssl/
+
 # Chck its correctness (doesn't work because it checks for hosts!)
 #RUN nginx -t -c /etc/nginx/custom-nginx.conf
 
