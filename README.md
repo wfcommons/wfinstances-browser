@@ -9,6 +9,7 @@ As such, the current implementation of the WFInstances Browser allows the user t
 - Github Repository
 - Number of Tasks
 - Number of Files
+- Total sum of file sizes (MB)
 - Total Bytes Read (MB)
 - Total Bytes Written (MB)
 - Total Work (min)
@@ -18,98 +19,33 @@ As such, the current implementation of the WFInstances Browser allows the user t
 
 Users are able to filter and search within the above metrics to easily find and download the Workflow Instance(s) that fit their respective needs.
 
-You are able to find out more information on the WFCommons Project [here](https://wfcommons.org).
+You can find out more information on the WFCommons Project [here](https://wfcommons.org).
 
-## Quickstart Installation
+---
 
-#### Docker
-Using Docker, run the following command to launch the UI, API, and database altogether:
+## Running WFInstance Browser
+
+Running the browser on localhost or on a server requires [Docker](https://docker.com).
+
+### Development deployment on localhost using http
+
+This is done as:
+
 ```
-docker compose up
+docker-compose up
 ```
-Once Docker is finished building and starting the containers, you are able to view and use the application at [http://localhost:8080](http://localhost:8080). You can also view the API documentation at
-[http://localhost:8081/docs](http://localhost:8081/docs).
 
-#### Populating the database
-Note that the database is empty the first time you launch the application which means the table displayed at [http://localhost:8080](http://localhost:8080) will be empty. Populate the database with metrics from the officoal WfCommons WfInstances GitHub repo in a terminal on the deployment server:
+which will build Docker images, run containers, eventually making the browser accessible
+at [http://localhost](http://localhost).
+
+The database is empty the first time you launch the browser. To populate the database with metrics from the official WfCommons WfInstances GitHub repo, run this command in a terminal on the server:
 ```
 curl -X PUT http://localhost:8081/metrics/private/github/wfcommons/WfInstances
 ```
 
-## Manual Installation
+### Production deployment on a server using https (or http if you really want to)
 
-#### Mongo Database Setup:
-Setup your own MongoDB and provide the MONGO_URI in a .env file. The .env file should be placed in the /api folder. For example:
-
-`/api/.env`
-```
-MONGO_URI=THE_URI_TO_YOUR_MONGODB
-```
- A database named `wf_instance_browser_db` will be automatically generated upon launching the API.
+Modify the `.env` file at the root of the directory to customize the configuration. 
+See comments in that file for more information.
 
 ---
-
-#### Python API Backend:
-WfInstances Browser requires the usage of Python 3.11 or higher.
-You can download the latest versions of Python [here](https://www.python.org/downloads/).
-
-In the api directory, initialize the backend by running the following in a terminal:
-```
-pip install -r requirements.txt
-```
-And then run the backend using:
-```
-uvicorn src.main:app --port 8081
-```
-
-If you would like to view the API documentation following the deployment, you can visit:
-[http://localhost:8081/docs](http://localhost:8081/docs).
-
----
-
-#### Remix UI Frontend:
-WfInstances Browser requires the LTS version of Node.js.
-You can download the latest versions of Node.js [here](https://nodejs.org/en).
-
-In the ui directory, initialize the application by running the following in a terminal:
-```
-npm install
-```
-Following this, you can build the application using:
-```
-npm run build
-```
-And then run the application using:
-```
-npm run start
-```
-You are able to view and use the application at [http://localhost:8080](http://localhost:8080).
-
----
-
-## Usage
-
-Here is the initial screen you should see upon starting the application:
-<img width="1250" alt="LightMode" src="https://github.com/ICS496WfCommons/wfinstances-browser/assets/97561440/eec654e2-3f2e-48c4-a3e5-fba8354436e6">
-
-There is a button on the top right of the NavBar that allows you to change the theme of the site to dark mode:
-<img width="1249" alt="DarkMode" src="https://github.com/ICS496WfCommons/wfinstances-browser/assets/97561440/327d9070-1988-4d37-991c-6862495859cb">
-
-#### Filtering Instances:
-Besides searching for instances, you are able to filter Workflow instances upon many different categories.
-Below is an example of sorting the "Number of Files" column between the values of 200 and 300.
-<img width="1229" alt="Filters_1" src="https://github.com/ICS496WfCommons/wfinstances-browser/assets/97561440/50a21d29-3a15-4453-95c6-e91a689ad3c2">
-<img width="1232" alt="Filters_2" src="https://github.com/ICS496WfCommons/wfinstances-browser/assets/97561440/ee5dc724-4f2a-48ea-914f-381488e9dc9a">
-<img width="403" alt="Filters_3" src="https://github.com/ICS496WfCommons/wfinstances-browser/assets/97561440/d49d9086-123d-465a-9284-30f7a4e1c6c1">
-
-#### Column Visibility:
-Users are able to show/hide columns based on their needs:
-<img width="1240" alt="Column_Visibility" src="https://github.com/ICS496WfCommons/wfinstances-browser/assets/97561440/324e6fbd-b60c-41e8-9d17-3d4082c255d7">
-
-#### Download Workflow Instances:
-Users are able to select one or more workflow instances after sorting and download them for their own personal use cases.
-<img width="637" alt="Download1" src="https://github.com/ICS496WfCommons/wfinstances-browser/assets/97561440/3ef2f98d-e519-4cdf-9aa3-a97c40d2b5a0">
-
-These are automatically compressed and the user is able to find it in their downloads folder.
-
-<img width="329" alt="Download2" src="https://github.com/ICS496WfCommons/wfinstances-browser/assets/97561440/3e0d3a35-437e-4bbd-a074-f1dd74f8c230">
