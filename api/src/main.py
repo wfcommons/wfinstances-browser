@@ -13,8 +13,6 @@ app.include_router(metrics_router, prefix='/metrics')
 app.include_router(usage_router, prefix='/usage')
 app.add_exception_handler(GithubResourceNotFoundException, github_resource_not_found_exception_handler)
 
-#TODO: DONT'T HARDCODE origins (use env)
-# origins=['http://localhost:8080']  # Original code
 origins = [f"http://{os.getenv('NGINX_SERVER_HOSTNAME')}"]
 
 app.add_middleware(
@@ -26,5 +24,4 @@ app.add_middleware(
 )
 
 if __name__ == '__main__':
-    #TODO: DONT'T HARDCODE 8081 (use env)
     uvicorn.run('main:app', host='localhost', port=8081, reload=True)
