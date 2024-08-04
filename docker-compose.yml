@@ -7,13 +7,13 @@ services:
     build:
       context: ./nginx
       args:
-        PORT: 80
-        SERVER_NAME: localhost
+        PORT: ${NGINX_PORT}
+        SERVER_NAME: ${NGINX_SERVER_HOSTNAME}
     secrets:
       - nginx_certificate
       - nginx_private_key
     ports:
-      - 80:80
+      - ${NGINX_PORT}:${NGINX_PORT}
     networks:
       - nginx-network
 
@@ -56,9 +56,9 @@ services:
 
 secrets:
   nginx_certificate:
-    file: ~/WRENCH/WFCOMMONS/wfinstances-browser/nginx/cert.pem
+    file: ${NGINX_SSL_CERTIFICATE_PATH:-/dev/null}
   nginx_private_key:
-    file: ~/WRENCH/WFCOMMONS/wfinstances-browser/nginx/privkey_no_pass.pem
+    file: ${NGINX_SSL_PRIVATE_KEY_PATH:-/dev/null}
 
 volumes:
   db:
