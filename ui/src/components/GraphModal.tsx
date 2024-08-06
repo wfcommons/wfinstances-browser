@@ -140,6 +140,10 @@ export function GraphModal({
     return (
         <Modal title="WfInstance Visualization" opened={opened} onClose={onClose} size='100%'>
             <i>{id}</i>
+            <Group justify="center" pt={15}>
+                <Button variant="success" onClick={swapElements}>Display Type: {useElementsWithFiles ? "Hide Files" : "Show Files"}</Button>
+                <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
+            </Group>
             {isLoading ? (
                 <Center>
                     <Loader my={300} />
@@ -151,7 +155,7 @@ export function GraphModal({
                         key={useElementsWithFiles ? elementsWithFiles.length : elementsNoFiles.length}
                         elements={useElementsWithFiles? elementsWithFiles : elementsNoFiles}
                         layout={layout}
-                        style={{ width: '100%', height: '700px' }}
+                        style={{ width: '100%', height: '100vh' }}
                         stylesheet={cytoscapeStylesheet}
                         cy={cy => {
                             cy.on("tap", evt => {
@@ -159,15 +163,18 @@ export function GraphModal({
                                 if (node.type !== "edge") {
                                     openNodeModal();
                                 }
-                            })
+                            });
+                            cy.on('layoutstop', () => {
+                                // cy.fit();  // Fit the graph to the viewport
+                                cy.zoom(2);  // Adjust zoom level
+                                cy.center()
+                                // cy.resize()
+                                // cy.fit()
+                            });
                         }}
                     />
                 </>
             )}
-            <Group justify="center" pt={15}>
-                <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
-                <Button variant="success" onClick={swapElements}>Display Type: {useElementsWithFiles ? "Hide Files" : "Show Files"}</Button>
-            </Group>
         </Modal>
     );
 }
