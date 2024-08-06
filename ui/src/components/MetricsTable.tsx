@@ -10,8 +10,8 @@ import {
 } from 'mantine-react-table';
 import 'mantine-react-table/styles.css';
 import { useDisclosure } from '@mantine/hooks';
-import { ActionIcon, Box, Flex } from '@mantine/core';
-import { IconGraph } from '@tabler/icons-react';
+import { ActionIcon, Tooltip, Box, Flex } from '@mantine/core';
+import { IconEye } from '@tabler/icons-react';
 import { DownloadButton } from './DownloadButton';
 import { GraphModal } from '~/components/GraphModal';
 import { Metrics } from '~/types/Metrics';
@@ -147,7 +147,7 @@ export function MetricsTable({
         enableRowActions: true,
         displayColumnDefOptions: {
             'mrt-row-actions': {
-                header: 'Visualize Workflow',
+                header: '',
                 size: 10
             },
         },
@@ -180,11 +180,11 @@ export function MetricsTable({
         },
         renderRowActions: ({ row }) => (
             <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
-                <ActionIcon
-                    onClick={() => handleRowMenuAction(row)}
-                >
-                    <IconGraph />
-                </ActionIcon>
+                <Tooltip label="Visualize workflow" position="top">
+                    <ActionIcon onClick={() => handleRowMenuAction(row)}>
+                        <IconEye />
+                    </ActionIcon>
+                </Tooltip>
             </Box>
         ),
         renderTopToolbar: ({ table }) => {
