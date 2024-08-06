@@ -15,10 +15,11 @@ export function Navbar() {
                 <Group gap={5}>
                     <Image
                         radius='xs'
-                        h={25}
+                        h={50}
+                        w={50}
                         src={logo}
                     />
-                    <Text fw={500}>WfInstances Browser</Text>
+                    <Text fw={500} style={{ fontSize: '24px' }}>WfInstances Browser</Text>
                 </Group>
                 <Group gap={5} visibleFrom="xs">
                     <ActionIcon
