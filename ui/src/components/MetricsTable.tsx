@@ -167,7 +167,7 @@ export function MetricsTable({
                 minWidth: false,
                 maxWidth: false,
             },
-            pagination: { pageIndex: 0, pageSize: 10 }
+            pagination: { pageIndex: 0, pageSize: 50 }
         },
         paginationDisplayMode: 'pages',
         positionToolbarAlertBanner: 'bottom',
