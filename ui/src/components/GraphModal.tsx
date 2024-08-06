@@ -141,7 +141,7 @@ export function GraphModal({
         <Modal title="WfInstance Visualization" opened={opened} onClose={onClose} size='100%'>
             <i>{id}</i>
             <Group justify="center" pt={15}>
-                <Button variant="success" onClick={swapElements}>Display Type: {useElementsWithFiles ? "Hide Files" : "Show Files"}</Button>
+                <Button variant="success" onClick={swapElements}>{useElementsWithFiles ? "Hide Files" : "Show Files"}</Button>
                 <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
             </Group>
             {isLoading ? (
