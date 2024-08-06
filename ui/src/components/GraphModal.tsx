@@ -23,7 +23,7 @@ export function GraphModal({
     const [node, setNode] = useState<NodeDataDefinition>({});
     const [elementsWithFiles, setElementsWithFiles] = useState<ElementDefinition[]>([]);
     const [elementsNoFiles, setElementsNoFiles] = useState<ElementDefinition[]>([]);
-    const [useElementsWithFiles, setUseElementsWithFiles] = useState(true);
+    const [useElementsWithFiles, setUseElementsWithFiles] = useState(false);
 
     function swapElements() {
         setUseElementsWithFiles(prev => !prev);
@@ -166,7 +166,7 @@ export function GraphModal({
             )}
             <Group justify="center" pt={15}>
                 <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
-                <Button variant="success" onClick={swapElements}>Display Type: {useElementsWithFiles ? "Tasks and Files" : "Tasks Only"}</Button>
+                <Button variant="success" onClick={swapElements}>Display Type: {useElementsWithFiles ? "Hide Files" : "Show Files"}</Button>
             </Group>
         </Modal>
     );
