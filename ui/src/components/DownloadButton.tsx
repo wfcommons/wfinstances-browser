@@ -1,4 +1,4 @@
-import { Box, Button, Loader } from '@mantine/core';
+import { Box, Button, Tooltip, Loader } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import FileSaver from 'file-saver';
@@ -23,19 +23,19 @@ function download(wfInstances: WfInstance[], ids: string[]) {
 
 }
 
-export function DownloadButton({ 
+export function DownloadButton({
     table,
 }: {
-  table: MRT_TableInstance<Metrics>
+    table: MRT_TableInstance<Metrics>
 }) {
     const ids = table.getSelectedRowModel().flatRows.map((row) => row.getValue('id')) as string[];
     const { isFetching, refetch } = useQuery({
         enabled: false,
         queryKey: ['ids', ids],
-        queryFn: () => 
+        queryFn: () =>
             fetch('/wf-instances/public/', {
                 method: 'POST',
-                headers: {                              
+                headers: {
                     'Content-Type': 'application/json',
                     'accept': 'application/json'
                 },
@@ -46,21 +46,28 @@ export function DownloadButton({
                     return res.result;
                 })
     });
-  
+
+    const isButtonDisabled = !table.getIsSomeRowsSelected()
+    const tooltipLabel= isButtonDisabled ?
+        "Select workflows for download" :
+        "Download " + table.getSelectedRowModel().rows.length + " workflows as a .zip archive";
+
     return (
-        <Button
-            disabled={!table.getIsSomeRowsSelected()}
-            onClick={() => refetch()}
-            variant="filled"
-        >
-      Download 
-            <Box ml={3}>
-                {isFetching ? (
-                    <Loader type="dots" color="white" size="xs" />
-                ) : (
-                    <IconDownload size={20}/>
-                )}
-            </Box>
-        </Button>
+        <Tooltip label={tooltipLabel} position="top">
+            <Button
+                disabled={isButtonDisabled}
+                onClick={() => refetch()}
+                variant="filled"
+            >
+                Download
+                <Box ml={3}>
+                    {isFetching ? (
+                        <Loader type="dots" color="white" size="xs" />
+                    ) : (
+                        <IconDownload size={20}/>
+                    )}
+                </Box>
+            </Button>
+        </Tooltip>
     );
 }
