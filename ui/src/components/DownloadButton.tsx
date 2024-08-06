@@ -24,8 +24,8 @@ function download(wfInstances: WfInstance[], ids: string[]) {
 }
 
 export function DownloadButton({
-                                   table,
-                               }: {
+    table,
+}: {
     table: MRT_TableInstance<Metrics>
 }) {
     const ids = table.getSelectedRowModel().flatRows.map((row) => row.getValue('id')) as string[];
