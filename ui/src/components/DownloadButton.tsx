@@ -24,8 +24,8 @@ function download(wfInstances: WfInstance[], ids: string[]) {
 }
 
 export function DownloadButton({
-    table,
-}: {
+                                   table,
+                               }: {
     table: MRT_TableInstance<Metrics>
 }) {
     const ids = table.getSelectedRowModel().flatRows.map((row) => row.getValue('id')) as string[];
@@ -47,15 +47,17 @@ export function DownloadButton({
                 })
     });
 
-    const isButtonDisabled = !table.getIsSomeRowsSelected()
-    const tooltipLabel= isButtonDisabled ?
-        "Select workflows for download" :
-        "Download " + table.getSelectedRowModel().rows.length + " workflows as a .zip archive";
+    const numRowsSelected = table.getSelectedRowModel().rows.length
+
+    const tooltipLabel= (numRowsSelected == 0) ?
+        "First select some workflows for download" :
+        "Download zip archive with " + table.getSelectedRowModel().rows.length +
+        (numRowsSelected == 1 ? " workflow" : " workflows");
 
     return (
         <Tooltip label={tooltipLabel} position="top">
             <Button
-                disabled={isButtonDisabled}
+                disabled={numRowsSelected == 0}
                 onClick={() => refetch()}
                 variant="filled"
             >
