@@ -178,15 +178,31 @@ export function MetricsTable({
         mantineSearchTextInputProps: {
             placeholder: 'Search Workflows',
         },
-        renderRowActions: ({ row }) => (
-            <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
-                <Tooltip label="Visualize workflow" position="top">
-                    <ActionIcon onClick={() => handleRowMenuAction(row)}>
-                        <IconEye />
-                    </ActionIcon>
-                </Tooltip>
-            </Box>
-        ),
+        renderRowActions: ({ row }) => {
+            // Access the metrics object from the row
+            const metrics = row.original;
+
+            // Determine whether the ActionIcon should be disabled
+            const isDisabled = (metrics.numTasks > 250);
+
+            // Tooltip message
+            const tooltipMessage = isDisabled
+                ? 'Workflow viz disabled for >= 250 tasks' // Message when disabled
+                : 'Visualize workflow'; // Message when enabled
+
+            return (
+                <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
+                    <Tooltip label={tooltipMessage} position="top">
+                        <ActionIcon
+                            onClick={() => handleRowMenuAction(row)}
+                            disabled={isDisabled} // Apply the condition here
+                        >
+                            <IconEye />
+                        </ActionIcon>
+                    </Tooltip>
+                </Box>
+            );
+        },
         renderTopToolbar: ({ table }) => {
             return (
                 <Flex p="md" justify="space-between">
