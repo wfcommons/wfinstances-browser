@@ -168,8 +168,6 @@ export function GraphModal({
                                 // cy.fit();  // Fit the graph to the viewport
                                 cy.zoom(2);  // Adjust zoom level
                                 cy.center()
-                                // cy.resize()
-                                // cy.fit()
                             });
                         }}
                     />
