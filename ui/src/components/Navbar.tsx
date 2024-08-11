@@ -3,6 +3,7 @@ import { IconSun, IconMoon } from '@tabler/icons-react';
 import cx from 'clsx';
 import classes from './style/Navbar.module.css';
 import logo from '../../public/images/wflogo.png';
+import { AboutModal } from "~/components/AboutModal";
 
 
 export function Navbar() {
@@ -22,6 +23,7 @@ export function Navbar() {
                     <Text fw={500} style={{ fontSize: '24px' }}>WfInstances Browser</Text>
                 </Group>
                 <Group gap={5} visibleFrom="xs">
+                    {/*<AboutModal  opened={true} onClose={close} />*/}
                     <ActionIcon
                         onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
                         variant='default'
