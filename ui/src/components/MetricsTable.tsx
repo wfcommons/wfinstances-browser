@@ -42,7 +42,7 @@ export function MetricsTable({
         () => [
             {
                 id: 'workflow',
-                header: 'Workflow',
+                header: 'Workflow instance',
                 columns: [
                     {
                         accessorKey: 'id',
@@ -176,7 +176,7 @@ export function MetricsTable({
             size: 'lg',
         },
         mantineSearchTextInputProps: {
-            placeholder: 'Search Workflows',
+            placeholder: 'Search workflow instances',
         },
         renderRowActions: ({ row }) => {
             // Access the metrics object from the row
@@ -187,8 +187,8 @@ export function MetricsTable({
 
             // Tooltip message
             const tooltipMessage = isDisabled
-                ? 'Workflow viz disabled for >= 250 tasks' // Message when disabled
-                : 'Visualize workflow'; // Message when enabled
+                ? 'Viz disabled for workflow instances with >= 250 tasks' // Message when disabled
+                : 'Visualize workflow instance'; // Message when enabled
 
             return (
                 <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
