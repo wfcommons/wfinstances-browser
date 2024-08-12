@@ -34,10 +34,6 @@ export function AboutModal({
                         These instances are described using the <a rel="noreferrer" target="_blank" href={"https://github.com/wfcommons/wfformat"}>WfFormat schema</a> and
                         are hosted on the <a rel="noreferrer" target="_blank" href={"https://github.com/wfcommons/wfinstances"}> WfInstances GitHub repository</a>.
                     </p>
-                    <p>
-                        <strong>The WfInstances browser is a convenient front-end to the WfInstances repository and makes it convenient to browse,
-                            select, inspect, and even visualize (small) workflow instances.</strong>
-                    </p>
                 </Container>
                 <Container className={classes.logoboxouter}>
                     <Container className={classes.logoboxinner}>

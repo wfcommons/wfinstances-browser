@@ -1,0 +1,57 @@
+.header {
+    height: rem(56px);
+    margin-bottom: rem(30px);
+    background-color: var(--mantine-color-body);
+    border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.inner {
+    height: rem(56px);
+    display: flex;
+    justify-content: space-between;
+    align-items: left;
+}
+
+.icon {
+    width: rem(22px);
+    height: rem(22px);
+}
+
+.logo {
+    width: rem(180px);
+    align-items: center;
+}
+
+.logoboxouter {
+    margin-top: rem(50px);
+    background: light-dark(#ffffff, #dddddd);
+}
+
+.logoboxinner {
+    /*height: rem(56px);*/
+    width: rem(500px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: light-dark(#ffffff, #dddddd);
+}
+
+/*.dark {*/
+/*    @mixin dark {*/
+/*        display: none*/
+/*    }*/
+
+/*    @mixin light {*/
+/*        display:block*/
+/*    }*/
+/*}*/
+
+/*.light {*/
+/*    @mixin light {*/
+/*        display: none*/
+/*    }*/
+
+/*    @mixin dark {*/
+/*        display: block;*/
+/*    }*/
+/*}*/

@@ -10,11 +10,12 @@ import {
 } from 'mantine-react-table';
 import 'mantine-react-table/styles.css';
 import { useDisclosure } from '@mantine/hooks';
-import { ActionIcon, Tooltip, Box, Flex } from '@mantine/core';
-import { IconEye } from '@tabler/icons-react';
+import {ActionIcon, Tooltip, Box, Flex} from '@mantine/core';
+import {IconEye} from '@tabler/icons-react';
 import { DownloadButton } from './DownloadButton';
 import { GraphModal } from '~/components/GraphModal';
 import { Metrics } from '~/types/Metrics';
+import classes from "~/components/style/Navbar.module.css";
 
 function formatBytes(bytes: number) {
     return `${(bytes /  (1024 ** 2)).toFixed(2)} MB`;
@@ -25,9 +26,9 @@ function formatRuntime(work: number) {
 }
 
 export function MetricsTable({
-    data
-} : {
-  data: Metrics[]
+                                 data
+                             } : {
+    data: Metrics[]
 }) {
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedRow, setSelectedRow] = useState<MRT_Row<Metrics> | null>(null);
@@ -36,7 +37,7 @@ export function MetricsTable({
         setSelectedRow(row);
         open();
     }
-  
+
     // Columns to be used in the table.
     const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
         () => [
@@ -152,7 +153,7 @@ export function MetricsTable({
             },
         },
         enableRowSelection: true,
-        initialState: { 
+        initialState: {
             showGlobalFilter: true,
             columnVisibility: {
                 id: true,

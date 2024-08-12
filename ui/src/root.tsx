@@ -12,10 +12,11 @@ import {
     Scripts,
     ScrollRestoration,
 } from '@remix-run/react';
-import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
+import {ColorSchemeScript, MantineProvider, createTheme, Accordion, Container} from '@mantine/core';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import classes from "~/components/style/Navbar.module.css";
 
 const theme = createTheme({
     primaryColor: 'green'
@@ -32,7 +33,7 @@ export default function App() {
   
     return (
         <html lang="en">
-            <head>
+            <head title={"WfInstances browser"}>
                 <meta charSet="utf-8" />
                 <meta
                     name="viewport"
