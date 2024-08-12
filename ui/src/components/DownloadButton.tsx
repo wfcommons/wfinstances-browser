@@ -50,9 +50,9 @@ export function DownloadButton({
     const numRowsSelected = table.getSelectedRowModel().rows.length
 
     const tooltipLabel= (numRowsSelected == 0) ?
-        "First select some workflows for download" :
+        "First select some workflow instances for download" :
         "Download zip archive with " + table.getSelectedRowModel().rows.length +
-        (numRowsSelected == 1 ? " workflow" : " workflows");
+        (numRowsSelected == 1 ? " workflow" : " workflow instances");
 
     return (
         <Tooltip label={tooltipLabel} position="top">
