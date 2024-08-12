@@ -29,13 +29,13 @@ export function AboutModal({
                     <p>
                         The WfInstances browser is part of the <a rel="noreferrer" target="_blank" href={"https://wfcommons.org"}>WfCommons project</a>,
                         which aims to provide datasets and tools for <strong>scientific workflows research and development</strong>.
-                        These datasets consists of <i>workflow instances</i>, i.e.,
+                        These datasets consist of <i>workflow instances</i>, i.e.,
                         JSON descriptions of the specification and past execution of scientific workflow applications.
                         These instances are described using the <a rel="noreferrer" target="_blank" href={"https://github.com/wfcommons/wfformat"}>WfFormat schema</a> and
                         are hosted on the <a rel="noreferrer" target="_blank" href={"https://github.com/wfcommons/wfinstances"}> WfInstances GitHub repository</a>.
                     </p>
                     <p>
-                        <strong>The WfInstances browser is a convenient front-end to that repo and makes it convenient to browse,
+                        <strong>The WfInstances browser is a convenient front-end to the WfInstances repository and makes it convenient to browse,
                             select, inspect, and even visualize (small) workflow instances.</strong>
                     </p>
                 </Container>
