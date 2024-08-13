@@ -7,7 +7,7 @@ import { Metrics } from "~/types/Metrics";
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "WFInstances browser" },
+        { title: "WfInstances browser" },
     ];
 };
 
