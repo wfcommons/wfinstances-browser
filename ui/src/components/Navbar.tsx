@@ -6,9 +6,10 @@ import {
     useMantineColorScheme,
     ActionIcon,
     useComputedColorScheme,
-    Button
+    Button,
+    Tooltip
 } from '@mantine/core';
-import {IconSun, IconMoon, IconHelpSquareRounded, IconInfoSquareRounded} from '@tabler/icons-react';
+import {IconSun, IconMoon, IconHelpSmall, IconInfoSmall} from '@tabler/icons-react';
 import cx from 'clsx';
 import classes from './style/Navbar.module.css';
 import logo from '../../public/images/wfcommons-vertical.png';
@@ -24,6 +25,11 @@ export function Navbar() {
     const [openedAboutModal, { open:openAboutModal, close:closeAboutModal}] = useDisclosure(false);
     const [openedHelpModal, { open:openHelpModal, close:closeHelpModal}] = useDisclosure(false);
 
+    const otherLightDarkMode = (computedColorScheme === 'light' ? 'dark' : 'light');
+
+    const lightDarkTooltipMessage= "Switch to " + otherLightDarkMode + " mode";
+
+
     return (
         <header className={classes.header}>
             <AboutModal opened={openedAboutModal} onClose={closeAboutModal} />
@@ -33,20 +39,27 @@ export function Navbar() {
                     <a href={"https://wfcommons.org"} target={"_blank"} rel={"noreferrer"}>
                         <Image className={classes.logo} src={logo} />
                     </a>
-                    <Text fw={500} style={{ fontSize: '32px', marginBottom: '30px', marginLeft: '20px' }}>WfInstances browser</Text>
+                    <Text fw={500} style={{ fontSize: '32px', marginBottom: '30px', marginLeft: '10px'}}>WfInstances browser</Text>
                 </Group>
                 <Group gap={5} visibleFrom="xs">
-                    <Button variant="default" onClick={() => {openHelpModal();}}>Help &nbsp;<IconHelpSquareRounded size={25}/></Button>
-                    <Button variant="default" onClick={() => {openAboutModal();}}>About &nbsp;<IconInfoSquareRounded size={25}/></Button>
-                    <ActionIcon
-                        onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
-                        variant='default'
-                        size='lg'
-                        aria-label='Toggle site color scheme'
-                    >
-                        <IconSun className={cx(classes.icon, classes.light)} stroke={1.5}/>
-                        <IconMoon className={cx(classes.icon, classes.dark)} stroke={1.5}/>
-                    </ActionIcon>
+
+                    <Tooltip label="Help..." position="bottom">
+                        <ActionIcon variant="default" size='lg' onClick={() => {openHelpModal();}} ><IconHelpSmall size={50} /></ActionIcon>
+                    </Tooltip>
+                    <Tooltip label="About..." position="bottom">
+                        <ActionIcon variant="default" size='lg' onClick={() => {openAboutModal();}}><IconInfoSmall size={50}/></ActionIcon>
+                    </Tooltip>
+                    <Tooltip label={lightDarkTooltipMessage} position="bottom">
+                        <ActionIcon
+                            onClick={() => setColorScheme(otherLightDarkMode)}
+                            variant='default'
+                            size='lg'
+                            aria-label='Toggle site color scheme'
+                        >
+                            <IconSun className={cx(classes.icon, classes.light)} stroke={1.5}/>
+                            <IconMoon className={cx(classes.icon, classes.dark)} stroke={1.5}/>
+                        </ActionIcon>
+                    </Tooltip>
                 </Group>
             </Container>
         </header>
