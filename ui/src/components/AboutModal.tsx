@@ -4,6 +4,7 @@ import wfcommonslogo from "../../public/images/wfcommons-horizontal.png";
 import uhmlogo from "../../public/images/logo-uhm.png";
 import ornlogo from "../../public/images/logo-ornl.png";
 import nsflogo from "../../public/images/logo-nsf.png";
+import sdsclogo from "../../public/images/logo-sdsc.png";
 
 export function AboutModal({
                                opened,
@@ -37,14 +38,17 @@ export function AboutModal({
                 </Container>
                 <Container className={classes.logoboxouter}>
                     <Container className={classes.logoboxinner}>
-                        <a href={"https://hawaii.edu"} target={"_blank"} rel={"noreferrer"}>
-                            <Image className={classes.uhmlogo} src={uhmlogo} />
-                        </a>
                         <a href={"https://ornl.gov"} target={"_blank"} rel={"noreferrer"}>
-                            <Image className={classes.ornllogo} src={ornlogo} />
+                            <Image className={classes.ornllogo} src={ornlogo}/>
+                        </a>
+                        <a href={"https://hawaii.edu"} target={"_blank"} rel={"noreferrer"}>
+                            <Image className={classes.uhmlogo} src={uhmlogo}/>
+                        </a>
+                        <a href={"https://sdsc.edu"} target={"_blank"} rel={"noreferrer"}>
+                            <Image className={classes.sdsclogo} src={sdsclogo}/>
                         </a>
                         <a href={"https://nsf.gov"} target={"_blank"} rel={"noreferrer"}>
-                            <Image className={classes.nsflogo} src={nsflogo} />
+                            <Image className={classes.nsflogo} src={nsflogo}/>
                         </a>
                     </Container>
                 </Container>

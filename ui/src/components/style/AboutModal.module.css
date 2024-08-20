@@ -28,6 +28,12 @@
     background: light-dark(#ffffff, #dddddd);
 }
 
+.sdsclogo {
+    width: rem(120px);
+    align-items: left;
+    background: light-dark(#ffffff, #dddddd);
+}
+
 .ornllogo {
     width: rem(130px);
     align-items: left;
@@ -48,7 +54,7 @@
 
 .logoboxinner {
     /*height: rem(56px);*/
-    width: rem(500px);
+    width: rem(600px);
     display: flex;
     justify-content: space-between;
     align-items: center;
