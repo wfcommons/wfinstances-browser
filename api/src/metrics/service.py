@@ -32,6 +32,7 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
             if file['type'] == 'dir':
                 recurse_dir(file['path'])
             elif str.endswith(file['name'], '.json'):
+                sys.stderr.write(f"Inspecting file {file['name']}\n")
                 response = requests.get(file['download_url'])
                 if response.status_code != 200:
                     raise GithubResourceNotFoundException('download_url')
@@ -135,7 +136,7 @@ def _generate_specification_metrics(specification: dict) -> dict:
     # Calculate the sum of file sum_file_sizes (in bytes)
     sum_file_sizes = 0
     for file in specification['files']:
-        sys.stderr.write(f"FILE: {file["id"]} : {file['sizeInBytes']}\n")
+        #sys.stderr.write(f"FILE: {file["id"]} : {file['sizeInBytes']}\n")
         sum_file_sizes += file.get('sizeInBytes', 0)
     sys.stderr.write(f"TOTAL SIZE: {sum_file_sizes}")
 

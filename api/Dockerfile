@@ -12,10 +12,9 @@ RUN echo '#!/bin/sh\ncurl -X PUT http://localhost:8081/metrics/private/github/wf
 
 RUN chmod +x /usr/local/bin/workflowInjection.sh
 
-# Copy CRON scheduling
-ARG CRON_INTERVAL_IN_MINUTES
+ARG WFINSTANCES_CRAWL_PERIOD_IN_DAYS
 
-RUN echo "*/${CRON_INTERVAL_IN_MINUTES} * * * *  /usr/local/bin/workflowInjection.sh" > /etc/cron.d/run-curl-job
+RUN echo "0 0 */${WFINSTANCES_CRAWL_PERIOD_IN_DAYS} * *  /usr/local/bin/workflowInjection.sh" > /etc/cron.d/run-curl-job
 
 RUN chmod 0644 /etc/cron.d/run-curl-job
 
