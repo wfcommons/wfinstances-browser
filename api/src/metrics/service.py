@@ -138,7 +138,7 @@ def _generate_specification_metrics(specification: dict) -> dict:
     for file in specification['files']:
         #sys.stderr.write(f"FILE: {file["id"]} : {file['sizeInBytes']}\n")
         sum_file_sizes += file.get('sizeInBytes', 0)
-    sys.stderr.write(f"TOTAL SIZE: {sum_file_sizes}")
+    #sys.stderr.write(f"TOTAL SIZE: {sum_file_sizes}")
 
 
     return {
