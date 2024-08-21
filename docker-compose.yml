@@ -32,9 +32,12 @@ services:
 
   api:
     container_name: wfinstances-browser-api
-    build: ./api
     depends_on:
       - mongodb
+    build:
+      context: ./api
+      args:
+        WFINSTANCES_CRAWL_PERIOD_IN_DAYS: ${WFINSTANCES_CRAWL_PERIOD_IN_DAYS}
     environment:
       - MONGO_URI=mongodb://mongodb:27017/?retryWrites=true&w=majority
       - NGINX_SERVER_HOSTNAME=${NGINX_SERVER_HOSTNAME}
@@ -46,7 +49,7 @@ services:
   mongodb:
     container_name: wfinstances-browser-mongodb
     image: mongo:5.0.26
-    ports: 
+    ports:
       - 27017:27017
     environment:
       MONGO_INITDB_DATABASE: wf_instance_browser_db
