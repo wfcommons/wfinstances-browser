@@ -27,6 +27,8 @@ The database is empty the first time you launch the browser. To populate the dat
 curl -X PUT http://localhost:8081/metrics/private/github/wfcommons/WfInstances
 ```
 
+REST API documentation is available at: [http://localhost:8081/docs](http://localhost:8081/docs)
+
 ## Running in production
 
 Modify the `.env` file at the root of the directory to customize the configuration (including using https) desired for your server. 
