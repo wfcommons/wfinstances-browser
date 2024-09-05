@@ -1,16 +1,15 @@
 from fastapi import APIRouter, Request
-from src.usage.service import update_download_collection, update_visualization_collection, update_simulation_collection
-from src.wfinstances.service import retrieve_wf_instance
+from src.wfinstances.service import retrieve_wf_instance, retrieve_wf_instances
 from src.metrics.serializer import serialize_metrics, serialize_metric
 from src.models import ApiResponse
-from src.database import metrics_collection
+from src.database import metrics_collection, update_download_collection, update_visualization_collection, update_simulation_collection
 
 router = APIRouter()
 
 @router.post('/public/', response_model=ApiResponse)
 async def post_query_wf_instances(request: Request, ids: list[str]) -> dict:
     # Call the function to update the download collection
-    update_download_collection(ids, request.state.client_ip)
+    update_download_collection(ids, request.client.host)
 
     wf_instances = retrieve_wf_instances(serialize_metrics(metrics_collection.find({'_id': {'$in': ids}})))
     return {

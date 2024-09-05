@@ -1,36 +1,33 @@
-from datetime import datetime
-from src.database import add_to_collection
+from datetime import datetime, timedelta
+from collections import defaultdict
 
-def update_download_collection(wf_ids: list[str], client_ip: str):
-    collection_name = "downloads"
+def get_week_range(date):
+    # Get the start (Sunday) and end (Saturday) of the week
+    start_of_week = date - timedelta(days=date.weekday() + 1)
+    end_of_week = start_of_week + timedelta(days=6)
+    return start_of_week.strftime('%Y-%m-%d'), end_of_week.strftime('%Y-%m-%d')
 
-    data = {
-        "date": datetime.utcnow().date().isoformat(),
-        "ip": client_ip,
-        "wfinstances": wf_ids,
-        "num_instances": len(wf_ids)
-    }
+def group_by_week(data, field_name):
+    # Using a default dictionary to group data by week
+    weekly_data = defaultdict(lambda: {field_name: 0, "ips": set()})
 
-    add_to_collection(collection_name, data)
+    for item in data:
+        date = datetime.strptime(item['date'], '%Y-%m-%d')
+        week_start, week_end = get_week_range(date)
+        week = f"{week_start} - {week_end}"
 
-def update_visualization_collection(wf_id: str, client_ip: str):
-    collection_name = "visualizations"
+        # Check if 'num_instances' exists, if not count as 1 (for _id-based counting)
+        num_instances = item.get('num_instances', 1)  # Defaults to 1 if not present
 
-    data = {
-        "date": datetime.utcnow().date().isoformat(),
-        "ip": client_ip,
-        "wfinstance": wf_id,
-    }
+        # Increment the appropriate field (downloads, visualizations, etc.)
+        weekly_data[week][field_name] += num_instances
+        weekly_data[week]["ips"].add(item["ip"])  # Add the IP to the set
 
-    add_to_collection(collection_name, data)
+    # Format the output, converting the IP sets to lists
+    result = [{
+        "week": week,
+        field_name: weekly_data[week][field_name],
+        "ips": list(weekly_data[week]["ips"])
+    } for week in weekly_data]
 
-def update_simulation_collection(wf_id: str, client_ip: str):
-    collection_name = "simulations"
-
-    data = {
-        "date": datetime.utcnow().date().isoformat(),
-        "ip": client_ip3,
-        "wfinstance": wf_id,
-    }
-
-    add_to_collection(collection_name, data)
+    return result
