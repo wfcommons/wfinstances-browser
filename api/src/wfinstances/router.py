@@ -1,26 +1,16 @@
-from fastapi import APIRouter
-from src.database import metrics_collection
-from src.usage.service import increment_download_count
-from src.usage.service import increment_viz_count
+from fastapi import APIRouter, Request
+from src.wfinstances.service import update_download_collection, update_visualization_collection, update_simulation_collection
 from src.metrics.serializer import serialize_metrics, serialize_metric
 from src.models import ApiResponse
-from src.wfinstances.service import retrieve_wf_instances, retrieve_wf_instance
+from src.database import metrics_collection
 
 router = APIRouter()
 
-
 @router.post('/public/', response_model=ApiResponse)
-async def post_query_wf_instances(ids: list[str]) -> dict:
-    """
-    Get a list of WfInstances.
+async def post_query_wf_instances(request: Request, ids: list[str]) -> dict:
+    # Call the function to update the download collection
+    update_download_collection(ids, request.state.client_ip)
 
-    - **Request body**: List of ids to retrieve, usually stored in the collection as a filename that ends in .json
-    """
-
-    # Update the usage database
-    increment_download_count(len(ids))
-
-    # Return the instances to the client
     wf_instances = retrieve_wf_instances(serialize_metrics(metrics_collection.find({'_id': {'$in': ids}})))
     return {
         'detail': ('WfInstances retrieved.'
@@ -29,17 +19,23 @@ async def post_query_wf_instances(ids: list[str]) -> dict:
         'result': wf_instances
     }
 
-
 @router.get('/public/viz/{id}', response_model=ApiResponse)
-async def get_wf_instance(id: str) -> dict:
-    """
-    Get a single WfInstance for visualization purposes
+async def get_wf_instance(request: Request, id: str) -> dict:
+    # Call the function to update the visualization collection
+    update_visualization_collection(id, request.state.client_ip)
 
-    - **id**: The id to retrieve, usually stored in the collection as a filename that ends in .json
-    """
+    wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
+    return {
+        'detail': ('WfInstance retrieved.'
+                   if wf_instance else
+                   'WfInstance not found.'),
+        'result': wf_instance
+    }
 
-    # Update the usage database
-    increment_viz_count()
+@router.get('/public/simulate/{id}', response_model=ApiResponse)
+async def get_wf_instance(request: Request, id: str) -> dict:
+    # Call the function to update the simulation collection
+    update_simulation_collection(id, request.state.client_ip)
 
     wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
     return {

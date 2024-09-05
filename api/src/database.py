@@ -11,8 +11,15 @@ db = client.wf_instance_browser_db
 # Metrics collections
 metrics_collection = db['metrics_collection']
 
-# Usage collection (and initialization)
-usage_collection = db['usage_collection']
-# if usage_collection.find_one({}) == None:
-if usage_collection.count_documents({}) == 0:
-    usage_collection.insert_one({"download_count":0, "viz_count": 0})
+# New collections for detailed logs
+downloads_collection = db['downloads']
+visualizations_collection = db['visualizations']
+simulations_collection = db['simulations']
+
+def update_collection(collection_name: str, data: dict):
+    collection = db[collection_name]
+    collection.update_one(
+        {"_id": data.get("_id", None)},
+        {"$set": data},
+        upsert=True
+    )
