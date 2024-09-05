@@ -21,7 +21,7 @@ async def get_number_of_instances_downloaded() -> dict:
     downloads_list = [{
         "id": download['_id'],
         "date": download['date'],
-        "ip_list": download['ips'],
+        "ip": download['ip'],
         "wfinstances": download['wfinstances'],
         "num_instances": download['num_instances'],
     } for download in downloads_data]
@@ -29,14 +29,14 @@ async def get_number_of_instances_downloaded() -> dict:
     visualizations_list = [{
         "id": visualization['_id'],
         "date": visualization['date'],
-        "ip_list": visualization['ips'],
+        "ip": visualization['ip'],
         "wfinstance": visualization['wfinstance'],
     } for visualization in visualizations_data]
 
     simulations_list = [{
         "id": simulation['_id'],
         "date": simulation['date'],
-        "ip_list": simulation['ips'],
+        "ip": simulation['ip'],
         "wfinstance": simulation['wfinstance'],
     } for simulation in simulations_data]
 

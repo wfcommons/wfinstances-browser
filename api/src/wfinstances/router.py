@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
-from src.wfinstances.service import update_download_collection, update_visualization_collection, update_simulation_collection
+from src.usage.service import update_download_collection, update_visualization_collection, update_simulation_collection
+from src.wfinstances.service import retrieve_wf_instance
 from src.metrics.serializer import serialize_metrics, serialize_metric
 from src.models import ApiResponse
 from src.database import metrics_collection
@@ -22,7 +23,7 @@ async def post_query_wf_instances(request: Request, ids: list[str]) -> dict:
 @router.get('/public/viz/{id}', response_model=ApiResponse)
 async def get_wf_instance(request: Request, id: str) -> dict:
     # Call the function to update the visualization collection
-    update_visualization_collection(id, request.state.client_ip)
+    update_visualization_collection(id, request.client.host)
 
     wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
     return {
@@ -35,7 +36,7 @@ async def get_wf_instance(request: Request, id: str) -> dict:
 @router.get('/public/simulate/{id}', response_model=ApiResponse)
 async def get_wf_instance(request: Request, id: str) -> dict:
     # Call the function to update the simulation collection
-    update_simulation_collection(id, request.state.client_ip)
+    update_simulation_collection(id, request.client.host)
 
     wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
     return {
