@@ -19,13 +19,7 @@ simulations_collection = db['simulations']
 
 
 def add_to_collection(collection_name: str, data: dict):
-    collection = db[collection_name]
-    # collection.update_one(
-    #     {"_id": data.get("_id", None)},
-    #     {"$set": data},
-    #     upsert=True
-    # )
-    collection.insert_one(data)
+    db[collection_name].insert_one(data)
 
 def update_download_collection(wf_ids: list[str], client_ip: str):
     collection_name = "downloads"
@@ -55,7 +49,7 @@ def update_simulation_collection(wf_id: str, client_ip: str):
 
     data = {
         "date": datetime.utcnow().date().isoformat(),
-        "ip": client_ip3,
+        "ip": client_ip,
         "wfinstance": wf_id,
     }
 
