@@ -1,14 +1,33 @@
-from src.database import usage_collection
+from datetime import datetime, timedelta
+from collections import defaultdict
 
-def _increment_count(key: str, increment: int):
-    current_count = usage_collection.find_one({})[key]
-    usage_collection.find_one_and_update(
-        {},
-        {'$set': {key: current_count + increment}},
-        upsert=True)
+def get_week_range(date):
+    # Get the start (Sunday) and end (Saturday) of the week
+    start_of_week = date - timedelta(days=date.weekday() + 1)
+    end_of_week = start_of_week + timedelta(days=6)
+    return start_of_week.strftime('%Y-%m-%d'), end_of_week.strftime('%Y-%m-%d')
 
-def increment_download_count(increment: int):
-    _increment_count("download_count", increment)
+def group_by_week(data, field_name):
+    # Using a default dictionary to group data by week
+    weekly_data = defaultdict(lambda: {field_name: 0, "ips": set()})
 
-def increment_viz_count():
-    _increment_count("viz_count", 1)
+    for item in data:
+        date = datetime.strptime(item['date'], '%Y-%m-%d')
+        week_start, week_end = get_week_range(date)
+        week = f"{week_start} - {week_end}"
+
+        # Check if 'num_instances' exists, if not count as 1 (for _id-based counting)
+        num_instances = item.get('num_instances', 1)  # Defaults to 1 if not present
+
+        # Increment the appropriate field (downloads, visualizations, etc.)
+        weekly_data[week][field_name] += num_instances
+        weekly_data[week]["ips"].add(item["ip"])  # Add the IP to the set
+
+    # Format the output, converting the IP sets to lists
+    result = [{
+        "week": week,
+        field_name: weekly_data[week][field_name],
+        "ips": list(weekly_data[week]["ips"])
+    } for week in weekly_data]
+
+    return result

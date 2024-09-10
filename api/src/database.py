@@ -1,4 +1,5 @@
 import os, certifi
+from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
@@ -11,8 +12,45 @@ db = client.wf_instance_browser_db
 # Metrics collections
 metrics_collection = db['metrics_collection']
 
-# Usage collection (and initialization)
-usage_collection = db['usage_collection']
-# if usage_collection.find_one({}) == None:
-if usage_collection.count_documents({}) == 0:
-    usage_collection.insert_one({"download_count":0, "viz_count": 0})
+# New collections for detailed logs
+downloads_collection = db['downloads']
+visualizations_collection = db['visualizations']
+simulations_collection = db['simulations']
+
+
+def add_to_collection(collection_name: str, data: dict):
+    db[collection_name].insert_one(data)
+
+def update_download_collection(wf_ids: list[str], client_ip: str):
+    collection_name = "downloads"
+
+    data = {
+        "date": datetime.utcnow().date().isoformat(),
+        "ip": client_ip,
+        "wfinstances": wf_ids,
+        "num_instances": len(wf_ids)
+    }
+
+    add_to_collection(collection_name, data)
+
+def update_visualization_collection(wf_id: str, client_ip: str):
+    collection_name = "visualizations"
+
+    data = {
+        "date": datetime.utcnow().date().isoformat(),
+        "ip": client_ip,
+        "wfinstance": wf_id,
+    }
+
+    add_to_collection(collection_name, data)
+
+def update_simulation_collection(wf_id: str, client_ip: str):
+    collection_name = "simulations"
+
+    data = {
+        "date": datetime.utcnow().date().isoformat(),
+        "ip": client_ip,
+        "wfinstance": wf_id,
+    }
+
+    add_to_collection(collection_name, data)
