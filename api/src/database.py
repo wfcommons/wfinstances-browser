@@ -21,7 +21,7 @@ simulations_collection = db['simulations']
 def add_to_collection(collection_name: str, data: dict):
     db[collection_name].insert_one(data)
 
-def update_download_collection(wf_ids: list[str], client_ip: str):
+def add_item_to_downloads_collection(wf_ids: list[str], client_ip: str):
     collection_name = "downloads"
 
     data = {
@@ -33,7 +33,7 @@ def update_download_collection(wf_ids: list[str], client_ip: str):
 
     add_to_collection(collection_name, data)
 
-def update_visualization_collection(wf_id: str, client_ip: str):
+def add_item_to_visualizations_collection(wf_id: str, client_ip: str):
     collection_name = "visualizations"
 
     data = {
