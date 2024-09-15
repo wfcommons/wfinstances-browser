@@ -12,8 +12,10 @@ import 'mantine-react-table/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import {ActionIcon, Tooltip, Box, Flex} from '@mantine/core';
 import {IconEye} from '@tabler/icons-react';
+import {IconHourglass} from '@tabler/icons-react';
 import { DownloadButton } from './DownloadButton';
 import { GraphModal } from '~/components/GraphModal';
+import { SimulateModal } from '~/components/SimulateModal';
 import { Metrics } from '~/types/Metrics';
 import classes from "~/components/style/Navbar.module.css";
 
@@ -31,6 +33,7 @@ export function MetricsTable({
     data: Metrics[]
 }) {
     const [opened, { open, close }] = useDisclosure(false);
+    const [openedSimulateModal, { open:openSimulateModal, close:closeSimulateModal}] = useDisclosure(false);
     const [selectedRow, setSelectedRow] = useState<MRT_Row<Metrics> | null>(null);
 
     const handleRowMenuAction = (row: MRT_Row<Metrics>) => {
@@ -201,6 +204,12 @@ export function MetricsTable({
                             <IconEye />
                         </ActionIcon>
                     </Tooltip>
+                    <SimulateModal opened={openedSimulateModal} onClose={closeSimulateModal} />
+                    <ActionIcon
+                            onClick={() => {openSimulateModal();}}
+                        >
+                            <IconHourglass />
+                    </ActionIcon>
                 </Box>
             );
         },
