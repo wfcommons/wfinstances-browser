@@ -205,11 +205,13 @@ export function MetricsTable({
                         </ActionIcon>
                     </Tooltip>
                     <SimulateModal opened={openedSimulateModal} onClose={closeSimulateModal} />
-                    <ActionIcon
+                    <Tooltip label='Simulate workflow instance' position="top">
+                        <ActionIcon
                             onClick={() => {openSimulateModal();}}
                         >
                             <IconHourglass />
-                    </ActionIcon>
+                        </ActionIcon>
+                    </Tooltip>
                 </Box>
             );
         },
