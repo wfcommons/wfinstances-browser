@@ -11,8 +11,7 @@ import {
 import 'mantine-react-table/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import {ActionIcon, Tooltip, Box, Flex} from '@mantine/core';
-import {IconEye} from '@tabler/icons-react';
-import {IconHourglass} from '@tabler/icons-react';
+import {IconEye, IconHourglass} from '@tabler/icons-react';
 import { DownloadButton } from './DownloadButton';
 import { GraphModal } from '~/components/GraphModal';
 import { SimulateModal } from '~/components/SimulateModal';
