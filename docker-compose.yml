@@ -1,13 +1,5 @@
 
 services:
-  wrench:
-    container_name: wfinstances-browser-wrench
-    build: ./wrench
-    ports:
-      - 127.0.0.1:2345:2345
-    networks:
-      - nginx-network
-
   nginx:
     container_name: wfinstances-browser-nginx
     depends_on:
@@ -64,6 +56,14 @@ services:
       MONGO_INITDB_DATABASE: wf_instance_browser_db
     volumes:
       - ~/mongodata:/data/db
+    networks:
+      - nginx-network
+
+  wrench:
+    container_name: wfinstances-browser-wrench
+    build: ./wrench
+    ports:
+      - 127.0.0.1:2345:2345
     networks:
       - nginx-network
 
