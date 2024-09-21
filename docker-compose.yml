@@ -1,5 +1,13 @@
 
 services:
+  wrench:
+    container_name: wfinstances-browser-wrench
+    build: ./wrench
+    ports:
+      - 127.0.0.1:2345:2345
+    networks:
+      - nginx-network
+
   nginx:
     container_name: wfinstances-browser-nginx
     depends_on:
@@ -34,6 +42,7 @@ services:
     container_name: wfinstances-browser-api
     depends_on:
       - mongodb
+      - wrench
     build:
       context: ./api
       args:
