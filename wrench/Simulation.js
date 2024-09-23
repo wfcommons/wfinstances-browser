@@ -86,6 +86,11 @@ class Simulation {
     }
   }
 
+  sleep(seconds) {
+    const data = { increment: seconds };
+    this.__send_request_to_daemon(requests.post, `${this.daemonUrl}/${this.simid}/advanceTime`, data);
+  }
+
   get_simulated_time() {
     const r = this.__send_request_to_daemon(requests.get, `${this.daemon_url}/${this.simid}/getTime`, json_data = {});
 
