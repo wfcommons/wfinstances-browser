@@ -26,7 +26,7 @@ class Simulation {
     this.daemon_url = `http://${daemon_host}:${daemon_port}`;
     this.started = false;
 
-    atexit.register(this.terminate);
+    atexit.register(this.terminate); //????
     this.terminated = false;
     this.spec = null;
 
@@ -44,45 +44,40 @@ class Simulation {
 
   start(platform_file_path, controller_hostname) {
     if(this.terminated) {
-      raise WRENCHException("This simulation has been terminated.");
+      throw WRENCHException("This simulation has been terminated.");
     }
 
     if (!this.started) {
       try {
-        with (open(platform_file_path, "r") as platform_file) {xml = platform_file.read()};
+        //read in xml file
+      } catch (e) {
+        throw WRENCHException(`Cannot read platform file '${platform_file_path.absolute().name}' (${e.toString()})`);
       }
-      catch(e) {
-        raise WRENCHException(`Cannot read platform file '${platform_file_path.absolute().name}' (${e.toString()})`);
-      }
-    }
-    this.spec = {"platform_xml": xml, "controller_hostname": controller_hostname};
-    try {
-      const r = requests.post(`${this.daemon_url}/startSimulation`, json = this.spec)
-    }
-    catch(e) {
-      raise WRENCHException(`Cannot connect to WRENCH daemon (${this.daemon_host}:${this.daemon_port}). Perhaps it needs to be started?`)
-    }
 
-    const response = r.json()
-    if (!response["wrench_api_request_success"]) {
-      this.terminated = true;
-      raise WRENCHException(response["failure_cause"]);
-    }
+      this.spec = { "platform_xml": xml, "controller_hostname": controller_hostname }; //what is spec??
+      try {
+        //connect to WRENCH daemon
+      } catch (e) {
+        throw WRENCHException(`Cannot connect to WRENCH daemon (${this.daemon_host}:${this.daemon_port}). Perhaps it needs to be started?`)
+      }
+
+      const response = r.json()
+      if (!response["wrench_api_request_success"]) {
+        this.terminated = true;
+        throw WRENCHException(response["failure_cause"]);
+      }
       this.daemon_port = response["port_number"];
       this.daemon_url = `http://${this.daemon_host}:${this.daemon_port}/simulation`;
       this.started = true;
-  else
-    {
-      pass;
     }
   }
 
   __send_request_to_daemon(requests_method, route, json_data) {
     try {
-      const r = requests_method(route, json = json_data);
+      const r = requests_method(route, json_data);
       return r;
     } catch (e) {
-      raise WRENCHException("Connection to wrench-daemon severed: " + e.toString() + "\n");
+      throw WRENCHException("Connection to wrench-daemon severed: " + e.toString() + "\n");
     }
   }
 
@@ -92,7 +87,7 @@ class Simulation {
   }
 
   get_simulated_time() {
-    const r = this.__send_request_to_daemon(requests.get, `${this.daemon_url}/${this.simid}/getTime`, json_data = {});
+    const r = this.__send_request_to_daemon(requests.get, `${this.daemon_url}/${this.simid}/getTime`, {});
 
     const response = r.json();
     return response["time"];
