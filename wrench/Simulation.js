@@ -42,6 +42,15 @@ class Simulation {
     this.simid = 101;
   }
 
+  __send_request_to_daemon(requests_method, route, json_data) {
+    try {
+      const r = requests_method(route, json_data);
+      return r;
+    } catch (e) {
+      throw WRENCHException("Connection to wrench-daemon severed: " + e.toString() + "\n");
+    }
+  }
+
   start(platform_file_path, controller_hostname) {
     if(this.terminated) {
       throw WRENCHException("This simulation has been terminated.");
@@ -57,11 +66,12 @@ class Simulation {
       this.spec = { "platform_xml": xml, "controller_hostname": controller_hostname }; //what is spec??
       try {
         //connect to WRENCH daemon
+        const r = requests.post(`${this.daemon_url}/startSimulation`, this.spec) //what is requests?
       } catch (e) {
         throw WRENCHException(`Cannot connect to WRENCH daemon (${this.daemon_host}:${this.daemon_port}). Perhaps it needs to be started?`)
       }
 
-      const response = r.json()
+      const response = r.json() //what is json??
       if (!response["wrench_api_request_success"]) {
         this.terminated = true;
         throw WRENCHException(response["failure_cause"]);
@@ -72,18 +82,9 @@ class Simulation {
     }
   }
 
-  __send_request_to_daemon(requests_method, route, json_data) {
-    try {
-      const r = requests_method(route, json_data);
-      return r;
-    } catch (e) {
-      throw WRENCHException("Connection to wrench-daemon severed: " + e.toString() + "\n");
-    }
-  }
-
   sleep(seconds) {
     const data = { increment: seconds };
-    this.__send_request_to_daemon(requests.post, `${this.daemonUrl}/${this.simid}/advanceTime`, data);
+    this.__send_request_to_daemon(requests.post, `${this.daemon_url}/${this.simid}/advanceTime`, data);
   }
 
   get_simulated_time() {
