@@ -26,18 +26,9 @@ class Simulation {
     this.daemon_url = `http://${daemon_host}:${daemon_port}`;
     this.started = false;
 
-    atexit.register(this.terminate); //????
+    atexit.register(this.terminate); //not sure how to translate this to JavaScript
     this.terminated = false;
     this.spec = null;
-
-    this.tasks = {};
-    this.actions = {};
-    this.standard_jobs = {};
-    this.compound_jobs = {};
-    this.files = {};
-    this.compute_services = {};
-    this.storage_services = {};
-    this.file_registry_services = {};
 
     this.simid = 101;
   }
@@ -58,7 +49,7 @@ class Simulation {
 
     if (!this.started) {
       try {
-        //read in xml file
+        //read in xml file (I do not know how to do that)
       } catch (e) {
         throw WRENCHException(`Cannot read platform file '${platform_file_path.absolute().name}' (${e.toString()})`);
       }
