@@ -30,3 +30,15 @@ Actions:
 - Add to the docker compose.yml so that there is a running wrench-daemon process
 - Implement a hello world simulation in the simulation popup
 ---
+### Meeting 3
+
+Date: Tuesday, 9/24
+
+Business:
+- Reviewed progress since last week's meeting
+- Discussed problem areas
+- Reviewed REST APIs
+
+Actions:
+- Continue working on getting the hello world simulation to run
+---
