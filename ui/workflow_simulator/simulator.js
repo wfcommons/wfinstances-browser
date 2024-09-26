@@ -1,6 +1,4 @@
-import { Task } from "wrench.task"
-import { Simulation } from '/wrench/Simulation'
-import { ComputeService } from "wrench.compute_service"
+import { Simulation } from './Simulation'
 
 
 export function simulate() {

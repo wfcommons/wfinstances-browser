@@ -1,5 +1,5 @@
 import {Button, Group, Modal} from '@mantine/core';
-import {simulate} from '../../../wrench/workflow_simulator/simulator';
+import {simulate} from '../../workflow_simulator/simulator';
 
 export function SimulateModal({ 
     opened,
