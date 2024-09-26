@@ -1,4 +1,5 @@
 import {Button, Group, Modal} from '@mantine/core';
+import {simulate} from '../../../wrench/workflow_simulator/simulator';
 
 export function SimulateModal({ 
     opened,
@@ -10,7 +11,7 @@ export function SimulateModal({
     return (
         <Modal title="WfInstance Simulation" opened={opened} onClose={onClose} size='100%'>
             <Group justify="center" pt={15}>
-                <Button variant="default">Run Simulation</Button>
+                <Button variant="default" OnClick={simulate}>Run Simulation</Button>
             </Group>
         </Modal>
     );
