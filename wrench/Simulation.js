@@ -20,27 +20,26 @@ import { VirtualMachine } from "wrench.virtual_machine"
 import { Workflow } from "wrench.workflow"
 
 class Simulation {
-  constructor(daemon_host = "localhost", daemon_port = 2345 ) {
+  constructor(daemon_host = "wrench", daemon_port = 2345 ) {
     this.daemon_host = daemon_host;
     this.daemon_port = daemon_port;
     this.daemon_url = `http://${daemon_host}:${daemon_port}`;
     this.started = false;
 
-    atexit.register(this.terminate); //not sure how to translate this to JavaScript
     this.terminated = false;
     this.spec = null;
 
     this.simid = 101;
   }
 
-  __send_request_to_daemon(requests_method, route, json_data) {
-    try {
-      const r = requests_method(route, json_data);
-      return r;
-    } catch (e) {
-      throw WRENCHException("Connection to wrench-daemon severed: " + e.toString() + "\n");
-    }
-  }
+  // __send_request_to_daemon(requests_method, route, json_data) {
+  //   try {
+  //     const r = requests_method(route, json_data);
+  //     return r;
+  //   } catch (e) {
+  //     throw WRENCHException("Connection to wrench-daemon severed: " + e.toString() + "\n");
+  //   }
+  // }
 
   start(platform_file_path, controller_hostname) {
     if(this.terminated) {
@@ -73,15 +72,44 @@ class Simulation {
     }
   }
 
-  sleep(seconds) {
+  // async sleep(seconds) {
+  //   const data = { increment: seconds };
+  //   this.__send_request_to_daemon(requests.post, `${this.daemon_url}/${this.simid}/advanceTime`, data);
+  // }
+
+  async sleep(seconds) {
     const data = { increment: seconds };
-    this.__send_request_to_daemon(requests.post, `${this.daemon_url}/${this.simid}/advanceTime`, data);
+
+    await fetch(`${this.daemon_url}/${this.simid}/advanceTime`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
   }
 
-  get_simulated_time() {
-    const r = this.__send_request_to_daemon(requests.get, `${this.daemon_url}/${this.simid}/getTime`, {});
+  // get_simulated_time() {
+  //   const r = this.__send_request_to_daemon(requests.get, `${this.daemon_url}/${this.simid}/getTime`, {});
 
-    const response = r.json();
-    return response["time"];
+  //   const response = r.json();
+  //   return response["time"];
+  // }
+
+  async get_simulated_time() {
+    const response = await fetch(`${this.daemon_url}/${this.simid}/getTime`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // if (!response.ok) {
+    //   throw new Error("Error fetching simulated time.");
+    // }
+
+    const data = await response.json();
+    return data.time;
   }
+
 }
