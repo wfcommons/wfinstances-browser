@@ -11,7 +11,7 @@ export function SimulateModal({
     return (
         <Modal title="WfInstance Simulation" opened={opened} onClose={onClose} size='100%'>
             <Group justify="center" pt={15}>
-                <Button variant="default" OnClick={simulate}>Run Simulation</Button>
+                <Button variant="default" onClick={simulate()}>Run Simulation</Button>
             </Group>
         </Modal>
     );

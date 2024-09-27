@@ -28,13 +28,15 @@ export class Simulation {
         if (!this.started) {
 
             //read in xml file
-            fetch('path/to/local/file.xml')
+            fetch('one_host_and_several_clusters.xml')
                 .then(response => response.text())
+                .then(xmlString => {
+                    let xml = xmlString;
+                    this.spec = { "platform_xml": xml, "controller_hostname": controller_hostname };
+                })
                 .catch(error => console.error('Error fetching XML file:', error));
 
-
             //connect to WRENCH daemon
-            this.spec = { "platform_xml": xml, "controller_hostname": controller_hostname };
             const r = await fetch(`${this.daemon_url}/${this.simid}/getTime`, {
                 method: 'POST',
                 headers: {
@@ -88,9 +90,9 @@ export class Simulation {
             },
         });
 
-        // if (!response.ok) {
-        //   throw new Error("Error fetching simulated time.");
-        // }
+        if (!response.ok) {
+            console.error("Error fetching simulated time.");
+        }
 
         const data = await response.json();
         return data.time;
