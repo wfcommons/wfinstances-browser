@@ -1,10 +1,6 @@
 import {Button, Group, Modal} from '@mantine/core';
-//import {simulate} from '../../workflow_simulator/simulator';
-
-function placeholder() {
-    console.log("hello world");
-}
-export function SimulateModal({ 
+import {simulate} from '../../workflow_simulator/simulator';
+export function SimulateModal({
     opened,
     onClose
 }: { 
@@ -14,7 +10,7 @@ export function SimulateModal({
     return (
         <Modal title="WfInstance Simulation" opened={opened} onClose={onClose} size='100%'>
             <Group justify="center" pt={15}>
-                <Button variant="default" onClick={placeholder}>Run Simulation</Button>
+                <Button variant="default" onClick={simulate}>Run Simulation</Button>
             </Group>
         </Modal>
     );

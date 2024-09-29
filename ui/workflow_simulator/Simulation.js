@@ -1,3 +1,44 @@
+let xmlString = `<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+<platform version="4.1">
+  <zone id="world" routing="Full">
+
+    <zone id="outside" routing="None">
+      <host id="UserHost" speed="1Gf">
+        <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+          <prop id="size" value="5000GiB"/>
+          <prop id="mount" value="/"/>
+        </disk>
+      </host>
+    </zone>
+
+    <cluster id="datacenter1" prefix="c-" suffix=".me" radical="0-15" speed="1Gf" bw="125MBps" lat="50us"
+             router_id="router1" core="1"/>
+
+    <cluster id="datacenter2" prefix="d-" suffix=".me" radical="0-63" speed="2Gf" bw="125MBps" lat="50us"
+             router_id="router2" core="1"/>
+
+    <cluster id="datacenter3" prefix="e-" suffix=".me" radical="0-31" speed="3Gf" bw="125MBps" lat="50us"
+             router_id="router3" core="1"/>
+
+
+    <link id="link1" bandwidth="400kBps" latency="10ms"/>
+    <link id="link2" bandwidth="100kBps" latency="10ms"/>
+    <link id="link3" bandwidth="300kBps" latency="10ms"/>
+
+    <zoneRoute src="datacenter1" dst="outside" gw_src="router1" gw_dst="UserHost">
+      <link_ctn id="link1"/>
+    </zoneRoute>
+    <zoneRoute src="datacenter2" dst="outside" gw_src="router2" gw_dst="UserHost">
+      <link_ctn id="link2"/>
+    </zoneRoute>
+    <zoneRoute src="datacenter3" dst="outside" gw_src="router3" gw_dst="UserHost">
+      <link_ctn id="link3"/>
+    </zoneRoute>
+
+
+  </zone>
+</platform>`
 export class Simulation {
     constructor(daemon_host = "wrench", daemon_port = 2345 ) {
         this.daemon_host = daemon_host;
@@ -28,16 +69,25 @@ export class Simulation {
         if (!this.started) {
 
             //read in xml file
-            fetch('one_host_and_several_clusters.xml')
-                .then(response => response.text())
-                .then(xmlString => {
-                    let xml = xmlString;
-                    this.spec = { "platform_xml": xml, "controller_hostname": controller_hostname };
-                })
-                .catch(error => console.error('Error fetching XML file:', error));
+            // let reader = new FileReader();
+            // reader.readAsText('./one_host_and_several_clusters.xml')
+            // reader.onload = function(e) {
+            //     let xml = e.target.result; // Store the file content as a string
+            //     this.spec = { "platform_xml": xml, "controller_hostname": controller_hostname };
+            // };
+
+            // fetch('./one_host_and_several_clusters.xml')
+            //     .then(response => response.text())
+            //     .then(xmlString => {
+            //         let xml = xmlString;
+            //         this.spec = { "platform_xml": xml, "controller_hostname": controller_hostname };
+            //     })
+            //     .catch(error => console.error('Error fetching XML file:', error));
+
+            this.spec = { "platform_xml": xmlString, "controller_hostname": controller_hostname };
 
             //connect to WRENCH daemon
-            const r = await fetch(`${this.daemon_url}/${this.simid}/getTime`, {
+            const r = await fetch(`${this.daemon_url}/startSimulation`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
