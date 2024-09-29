@@ -203,7 +203,6 @@ export function MetricsTable({
                             <IconEye />
                         </ActionIcon>
                     </Tooltip>
-                    <SimulateModal opened={openedSimulateModal} onClose={closeSimulateModal} />
                     <Tooltip label='Simulate workflow instance' position="top">
                         <ActionIcon
                             onClick={() => {openSimulateModal();}}
