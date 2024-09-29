@@ -203,7 +203,6 @@ export function MetricsTable({
                             <IconEye />
                         </ActionIcon>
                     </Tooltip>
-                    <SimulateModal opened={openedSimulateModal} onClose={closeSimulateModal} />
                     <Tooltip label='Simulate workflow instance' position="top">
                         <ActionIcon
                             onClick={() => {openSimulateModal();}}
@@ -233,6 +232,7 @@ export function MetricsTable({
     return (
         <>
             <MantineReactTable table={table} />
+            <SimulateModal opened={openedSimulateModal} onClose={closeSimulateModal} />
             {selectedRow && <GraphModal id={selectedRow.original.id} opened={opened} onClose={close} />}
         </>
     );
