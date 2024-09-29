@@ -233,6 +233,7 @@ export function MetricsTable({
     return (
         <>
             <MantineReactTable table={table} />
+            <SimulateModal opened={openedSimulateModal} onClose={closeSimulateModal} />
             {selectedRow && <GraphModal id={selectedRow.original.id} opened={opened} onClose={close} />}
         </>
     );
