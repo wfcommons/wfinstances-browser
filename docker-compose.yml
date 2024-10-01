@@ -64,6 +64,7 @@ services:
     build: ./wrench
     ports:
       - 127.0.0.1:2345:2345
+      - 127.0.0.1:1237:1237
     networks:
       - nginx-network
 
