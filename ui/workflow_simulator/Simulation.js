@@ -40,7 +40,7 @@ let xmlString = `<?xml version='1.0'?>
   </zone>
 </platform>`
 export class Simulation {
-    constructor(daemon_host = "wrench", daemon_port = 2345 ) {
+    constructor(daemon_host = "localhost", daemon_port = 2345 ) {
         this.daemon_host = daemon_host;
         this.daemon_port = daemon_port;
         this.daemon_url = `http://${daemon_host}:${daemon_port}`;
