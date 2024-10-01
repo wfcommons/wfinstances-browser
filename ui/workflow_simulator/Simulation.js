@@ -87,16 +87,17 @@ export class Simulation {
             this.spec = { "platform_xml": xmlString, "controller_hostname": controller_hostname };
 
             //connect to WRENCH daemon
-            const r = await fetch(`${this.daemon_url}/startSimulation`, {
+            const r = await fetch(`${this.daemon_url}/api/startSimulation`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'text/plain',
                 },
                 body: JSON.stringify(this.spec),
             });
 
             //handle errors
-            const response = r.json()
+            const response = await r.json()
+	    console.log(response)
             if (!response.wrench_api_request_success) {
                 this.terminated = true;
                 console.error("Failed to start");
@@ -116,13 +117,14 @@ export class Simulation {
     async sleep(seconds) {
         const data = { increment: seconds };
 
-        await fetch(`${this.daemon_url}/${this.simid}/advanceTime`, {
+        const r = await fetch(`${this.daemon_url}/${this.simid}/advanceTime`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/plain',
             },
             body: JSON.stringify(data),
         });
+       const response = await r.json()
     }
 
     // get_simulated_time() {
@@ -136,7 +138,7 @@ export class Simulation {
         const response = await fetch(`${this.daemon_url}/${this.simid}/getTime`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/plain',
             },
         });
 
