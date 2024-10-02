@@ -32,15 +32,21 @@ async def get_wf_instance(request: Request, id: str) -> dict:
         'result': wf_instance
     }
 
-@router.get('/public/simulate/{id}', response_model=ApiResponse)
-async def get_wf_instance(request: Request, id: str) -> dict:
+@router.post('/public/simulate/{id}', response_model=ApiResponse)
+async def post_wf_instance(request: Request, id: str) -> dict:
     # Call the function to update the simulation collection
     update_simulation_collection(id, request.client.host)
 
-    wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
+    print("BACKEND RECEIVED A SIMULATION REQUEST")
+    print(f"THE ID RECEIVED IS: {id}")
+
+    request_body = await request.json()
+    print(f"THE REQUEST BODY HAS THE FOLLOWING FIELDS: {request_body.keys()}")
+    print("I NOW SHOULD RUN A SIMULATION USING THE WRENCH PYTHON API")
+    print("FOR NOW, JUST RETURNING SOME BOGUS DICT AS SIMULATION OUTPUT")
+
+    # wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
     return {
-        'detail': ('WfInstance retrieved.'
-                   if wf_instance else
-                   'WfInstance not found.'),
-        'result': wf_instance
+        'detail': 'Simulation results',
+        'result': {'STUFF': 'DATA'}
     }
