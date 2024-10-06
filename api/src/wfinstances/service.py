@@ -1,4 +1,6 @@
 import requests
+import wrench
+import pathlib
 from jsonschema import validate, ValidationError
 from src.exceptions import InvalidWfInstanceException, GithubResourceNotFoundException
 
@@ -52,3 +54,20 @@ def validate_wf_instance(wf_instance: dict) -> None:
         validate(wf_instance, schema=schema)
     except ValidationError as e:
         raise InvalidWfInstanceException(str(e))
+    
+def do_simulation(request_body):
+    print(f"Instantiating a simulation...")
+    simulation = wrench.Simulation()
+    print(f"Starting the simulation using the XML platform file...")
+    r = requests.post(f"http://{simulation.daemon_host}:{simulation.daemon_port}/api/startSimulation", json=request_body)
+    response = r.json()
+    simulation.daemon_port = response["port_number"]
+    simulation.daemon_url = f"http://{simulation.daemon_host}:{simulation.daemon_port}/simulation"
+    simulation.started = True
+    simulation_time = simulation.get_simulated_time()
+    print(f"Simulation time: {simulation_time}")
+    print(f"Sleeping for 10 seconds...")
+    simulation.sleep(10)
+    simulation_time = simulation.get_simulated_time()
+    print(f"Simulation time: {simulation_time}")
+    return simulation_time
