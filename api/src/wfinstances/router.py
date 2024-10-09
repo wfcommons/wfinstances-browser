@@ -43,9 +43,11 @@ async def post_wf_instance(request: Request, id: str) -> dict:
     request_body = await request.json()
     print(f"THE REQUEST BODY HAS THE FOLLOWING FIELDS: {request_body.keys()}")
     print("I NOW SHOULD RUN A SIMULATION USING THE WRENCH PYTHON API")
-    runtime = do_simulation(request_body)
 
     # wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
+
+    runtime = do_simulation(request_body["platform_xml"], request_body["controller_host"], wf_instance)
+
     return {
         'detail': 'Simulation results',
         'result': {'Runtime': runtime}

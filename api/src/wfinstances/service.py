@@ -58,12 +58,19 @@ def validate_wf_instance(wf_instance: dict) -> None:
 def do_simulation(request_body):
     print(f"Instantiating a simulation...")
     simulation = wrench.Simulation()
+
+    platform_file_path = "/tmp/platform.xml"
+    with open(platform_file_path, "w") as f:
+        f.write(request_body["platform_xml"])
+    controller_host = request_body["controller_host"]
+
     print(f"Starting the simulation using the XML platform file...")
-    r = requests.post(f"http://{simulation.daemon_host}:{simulation.daemon_port}/api/startSimulation", json=request_body)
-    response = r.json()
-    simulation.daemon_port = response["port_number"]
-    simulation.daemon_url = f"http://{simulation.daemon_host}:{simulation.daemon_port}/simulation"
-    simulation.started = True
+    # r = requests.post(f"http://{simulation.daemon_host}:{simulation.daemon_port}/api/startSimulation", json=request_body)
+    # response = r.json()
+    # simulation.daemon_port = response["port_number"]
+    # simulation.daemon_url = f"http://{simulation.daemon_host}:{simulation.daemon_port}/simulation"
+    # simulation.started = True
+    simulation.start(pathlib.Path(platform_file_path), controller_host)
     simulation_time = simulation.get_simulated_time()
     print(f"Simulation time: {simulation_time}")
     print(f"Sleeping for 10 seconds...")
