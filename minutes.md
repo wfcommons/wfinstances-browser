@@ -57,3 +57,19 @@ Business:
 Actions:
 - Create a simulation that simulates a "hello world" program using the Python API.
 ---
+### Meeting 5
+
+Date: Tuesday, 10/8
+
+Business:
+- Discussed possible improvements to make to code written in the last week
+- Discussed next steps to simulate a workflow
+- Considered possible output visualization
+
+Actions:
+- make do_simulation take three arguments instead of just the request_body
+- Figure out where to find the id and pass it to the back end
+- Turn the json string into a file so simulation.start has valid input
+- use read_workflow_as_json to simulate a workflow
+---
+
