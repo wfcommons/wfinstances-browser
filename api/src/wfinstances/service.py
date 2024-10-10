@@ -55,22 +55,12 @@ def validate_wf_instance(wf_instance: dict) -> None:
     except ValidationError as e:
         raise InvalidWfInstanceException(str(e))
     
-def do_simulation(request_body):
+def do_simulation(request_platform_file_path, request_controller_host, wf_instance):
     print(f"Instantiating a simulation...")
     simulation = wrench.Simulation()
-
-    platform_file_path = "/tmp/platform.xml"
-    with open(platform_file_path, "w") as f:
-        f.write(request_body["platform_xml"])
-    controller_host = request_body["controller_host"]
-
+    controller_host = request_controller_host
     print(f"Starting the simulation using the XML platform file...")
-    # r = requests.post(f"http://{simulation.daemon_host}:{simulation.daemon_port}/api/startSimulation", json=request_body)
-    # response = r.json()
-    # simulation.daemon_port = response["port_number"]
-    # simulation.daemon_url = f"http://{simulation.daemon_host}:{simulation.daemon_port}/simulation"
-    # simulation.started = True
-    simulation.start(pathlib.Path(platform_file_path), controller_host)
+    simulation.start(pathlib.Path(request_platform_file_path), controller_host)
     simulation_time = simulation.get_simulated_time()
     print(f"Simulation time: {simulation_time}")
     print(f"Sleeping for 10 seconds...")

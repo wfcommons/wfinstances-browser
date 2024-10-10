@@ -44,9 +44,14 @@ async def post_wf_instance(request: Request, id: str) -> dict:
     print(f"THE REQUEST BODY HAS THE FOLLOWING FIELDS: {request_body.keys()}")
     print("I NOW SHOULD RUN A SIMULATION USING THE WRENCH PYTHON API")
 
-    # wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
+    wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
 
-    runtime = do_simulation(request_body["platform_xml"], request_body["controller_host"], wf_instance)
+    # make a path to the xml file
+    platform_file_path = "/tmp/platform.xml"
+    with open(platform_file_path, "w") as f:
+        f.write(request_body["platform_xml"])
+
+    runtime = do_simulation(platform_file_path, request_body["controller_hostname"], wf_instance)
 
     return {
         'detail': 'Simulation results',

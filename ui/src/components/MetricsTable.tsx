@@ -40,6 +40,11 @@ export function MetricsTable({
         open();
     }
 
+    const handleRowMenuActionSimulate = (row: MRT_Row<Metrics>) => {
+        setSelectedRow(row);
+        openSimulateModal();
+    }
+
     // Columns to be used in the table.
     const columns = useMemo<MRT_ColumnDef<Metrics>[]>(
         () => [
@@ -205,7 +210,7 @@ export function MetricsTable({
                     </Tooltip>
                     <Tooltip label='Simulate workflow instance' position="top">
                         <ActionIcon
-                            onClick={() => {openSimulateModal();}}
+                            onClick={() => handleRowMenuActionSimulate(row)}
                         >
                             <IconHourglass />
                         </ActionIcon>
@@ -232,7 +237,7 @@ export function MetricsTable({
     return (
         <>
             <MantineReactTable table={table} />
-            <SimulateModal opened={openedSimulateModal} onClose={closeSimulateModal} />
+            {selectedRow && <SimulateModal id={selectedRow.original.id} opened={openedSimulateModal} onClose={closeSimulateModal} />}
             {selectedRow && <GraphModal id={selectedRow.original.id} opened={opened} onClose={close} />}
         </>
     );
