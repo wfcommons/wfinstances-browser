@@ -43,13 +43,13 @@ let xmlString = `<?xml version='1.0'?>
   </zone>
 </platform>`
 
-export async function simulate() {
+export async function simulate(id) {
 
     // Send simulation request to the api backend
     const spec = { "platform_xml": xmlString, "controller_hostname": "UserHost" };
 
     console.log("SENDING REQUEST TO BACKEND");
-    const r = await fetch(`/wf-instances/public/simulate/FOO`, {
+    const r = await fetch(`/wf-instances/public/simulate/${id}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'text/plain',
