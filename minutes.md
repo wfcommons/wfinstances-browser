@@ -72,4 +72,28 @@ Actions:
 - Turn the json string into a file so simulation.start has valid input
 - use read_workflow_as_json to simulate a workflow
 ---
+### Meeting 6
+
+Date: Tuesday, 10/15
+
+Business:
+- Investigated issue of Alyssa's computer being unable to run the simulation
+- Discussed options for displaying the input and output of the simulation
+
+Actions:
+- Implement a way for the user to customize the hardware specifications of the simulation
+- Display the results of the simulation
+---
+### Meeting 7
+
+Business:
+- Discussed different options for the UI of the hardware customization and came to a conclusion to create a table with numerical inputs and sliders
+- Discussed the upcoming presentation and possibilities for visuals
+
+Actions:
+- Move the xml string parsing from the frontend to the backend for better encapsulation
+- Modify the UI to include a table with sliders and numerical inputs
+- Get output from the simulation including the job completed, its start time, and its end time
+- If prev. item completed, begin working on a way to visualize the output data
+---
 

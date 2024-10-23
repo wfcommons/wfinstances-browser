@@ -1,4 +1,4 @@
-import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Flex, Text} from '@mantine/core';
+import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Text} from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import {useState} from "react";
@@ -13,14 +13,16 @@ export function SimulateModal({
     onClose: () => void
 }) {
     const [elements, setElements] = useState([
-        { cluster: 1, bw: 0, latency: 0, computeNode: 0, core: 0, speed: 0},
-      ])
+        { cluster: 1, bw: 400, latency: 10, computeNode: 1, core: 16, speed: 1},
+        { cluster: 2, bw: 100, latency: 10, computeNode: 1, core: 64, speed: 2},
+        { cluster: 3, bw: 300, latency: 10, computeNode: 1, core: 32, speed: 3},
+    ])
     const [readBandwidth, setReadBandwidth] = useState(0);
     const [writeBandwidth, setWriteBandwidth] = useState(0);
 
     const addRow = () => {
         const newCluster = elements.length + 1; // Increment cluster number
-        const newElement = { cluster: newCluster, bw: 0, latency: 0, computeNode: 0, core: 0, speed: 0 };
+        const newElement = { cluster: newCluster, bw: 100, latency: 10, computeNode: 1, core: 32, speed: 1 };
         setElements([...elements, newElement]); // Add new element to state
     };
     const deleteRow = (index) => {
@@ -31,7 +33,7 @@ export function SimulateModal({
     // Function to handle input change in the table
     const updateElement = (index, field, value) => {
         const updatedElements = elements.map((element, i) =>
-          i === index ? { ...element, [field]: value } : element
+            (i === index ? { ...element, [field]: value } : element)
         );
         setElements(updatedElements);
     };
@@ -71,26 +73,26 @@ export function SimulateModal({
                   </host>
                 </zone>`;
 
-                // Loop through the clusters and add them to the XML string
-                Object.entries(clusterData.clusters).forEach(([id, values]) => {
-                    xmlString += `
+        // Loop through the clusters and add them to the XML string
+        Object.entries(clusterData.clusters).forEach(([id, values]) => {
+            xmlString += `
                 <cluster id="datacenter${id}" prefix="c-" suffix=".me" radical="${values.computeNodes}" speed="${values.speed}Gf" bw="125MBps" lat="50us" router_id="router${id}" core="${values.cores}"/>`;
-                });
+        });
 
-                // Loop through the clusters and add them to the XML string
-                Object.entries(clusterData.clusters).forEach(([id, values]) => {
-                    xmlString += `
+        // Loop through the clusters and add them to the XML string
+        Object.entries(clusterData.clusters).forEach(([id, values]) => {
+            xmlString += `
                 <link id="link${id}" bandwidth="${values.bw}kBps" latency="${values.latency}ms"/>`;
-                });
+        });
 
-                Object.entries(clusterData.clusters).forEach(([id, values]) => {
-                    xmlString += `
+        Object.entries(clusterData.clusters).forEach(([id, values]) => {
+            xmlString += `
                 <zoneRoute src="datacenter${id}" dst="outside" gw_src="router${id}" gw_dst="UserHost">
                   <link_ctn id="link${id}"/>
                 </zoneRoute>`
-                });
+        });
 
-                xmlString += `
+        xmlString += `
               </zone>
             </platform>`;
         return xmlString; // Return the generated XML string
@@ -109,21 +111,21 @@ export function SimulateModal({
             <td style={{ width: 'auto', padding: '2px', textAlign: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <ActionIcon color="red" onClick={() => deleteRow(index)}>
-                    <IconTrash size={16} />
+                        <IconTrash size={16} />
                     </ActionIcon>
                 </div>
             </td>
-           {['bw', 'latency', 'computeNode', 'core', 'speed'].map((field) => (
-            <td key={field}>
-              <NumberInput
-                value={element[field]}
-                onChange={(value) => updateElement(index, field, value)}
-                placeholder={field}
-                size="xs"
-                min={0}
-              />
-            </td>
-           ))}
+            {['bw', 'latency', 'computeNode', 'core', 'speed'].map((field) => (
+                <td key={field}>
+                    <NumberInput
+                        value={element[field]}
+                        onChange={(value) => updateElement(index, field, value)}
+                        placeholder={field}
+                        size="xs"
+                        min={0}
+                    />
+                </td>
+            ))}
         </tr>
     ));
 
