@@ -1,4 +1,4 @@
-import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Text} from '@mantine/core';
+import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text} from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import {useState} from "react";
@@ -13,16 +13,18 @@ export function SimulateModal({
     onClose: () => void
 }) {
     const [elements, setElements] = useState([
-        { cluster: 1, bw: 400, latency: 10, computeNode: 1, core: 16, speed: 1},
+        { cluster: 1, bw: 400, latency: 10, computeNode: 2, core: 16, speed: 1},
         { cluster: 2, bw: 100, latency: 10, computeNode: 1, core: 64, speed: 2},
         { cluster: 3, bw: 300, latency: 10, computeNode: 1, core: 32, speed: 3},
     ])
-    const [readBandwidth, setReadBandwidth] = useState(0);
-    const [writeBandwidth, setWriteBandwidth] = useState(0);
+    const [readBandwidth, setReadBandwidth] = useState(100);
+    const [writeBandwidth, setWriteBandwidth] = useState(100);
+
+    const [newCluster, increaseCluster] = useState(elements.length+1)
 
     const addRow = () => {
-        const newCluster = elements.length + 1; // Increment cluster number
-        const newElement = { cluster: newCluster, bw: 100, latency: 10, computeNode: 1, core: 32, speed: 1 };
+        increaseCluster(newCluster + 1);// Increment cluster number
+        const newElement = { cluster: newCluster, bw: 100, latency: 10, computeNode: 1, core: 32, speed: 2 };
         setElements([...elements, newElement]); // Add new element to state
     };
     const deleteRow = (index) => {
@@ -115,17 +117,96 @@ export function SimulateModal({
                     </ActionIcon>
                 </div>
             </td>
-            {['bw', 'latency', 'computeNode', 'core', 'speed'].map((field) => (
-                <td key={field}>
-                    <NumberInput
-                        value={element[field]}
-                        onChange={(value) => updateElement(index, field, value)}
-                        placeholder={field}
-                        size="xs"
-                        min={0}
-                    />
-                </td>
-            ))}
+            <td key={element.bw}>
+                <NumberInput
+                    value={element[element.bw]}
+                    onChange={(value) => updateElement(index, element.bw, value)}
+                    defaultValue={element.bw}
+                    size="xs"
+                    suffix="kBps"
+                    min={50}
+                    max={1000}
+                />
+                <Slider 
+                    value={element[element.bw]}
+                    onChange={(value) => updateElement(index, element.bw, value)}
+                    defaultValue={element.bw} 
+                    min={50} 
+                    max={1000} 
+                    step={50} 
+                    label={(value) => `${value} kBps`} />
+            </td>
+            <td key={element.latency}>
+                <NumberInput
+                    value={element[element.latency]}
+                    onChange={(value) => updateElement(index, element.latency, value)}
+                    defaultValue={element.latency}
+                    size="xs"
+                    suffix="ms"
+                    min={1}
+                    max={100}
+                />
+                <Slider value={element[element.latency]}
+                    onChange={(value) => updateElement(index, element.latency, value)}
+                    defaultValue={element.latency} 
+                    min={1} 
+                    max={100} 
+                    step={1} 
+                    label={(value) => `${value} ms`} />
+            </td>
+            <td key={element.computeNode}>
+                <NumberInput
+                    value={element[element.computeNode]}
+                    onChange={(value) => updateElement(index, element.computeNode, value)}
+                    defaultValue={element.computeNode}
+                    size="xs"
+                    min={1}
+                    max={10}
+                />
+                <Slider 
+                    value={element[element.computeNode]}
+                    onChange={(value) => updateElement(index, element.computeNode, value)}
+                    defaultValue={element.computeNode} 
+                    min={1} 
+                    max={10} 
+                    step={1} />
+            </td>
+            <td key={element.core}>
+                <NumberInput
+                    value={element[element.core]}
+                    onChange={(value) => updateElement(index, element.core, value)}
+                    defaultValue={element.core}
+                    size="xs"
+                    min={16}
+                    max={256}
+                />
+                <Slider 
+                    value={element[element.core]}
+                    onChange={(value) => updateElement(index, element.core, value)}
+                    defaultValue={element.core} 
+                    min={16} 
+                    max={256} 
+                    step={1} />
+            </td>
+            <td key={element.speed}>
+                <NumberInput
+                    value={element[element.speed]}
+                    onChange={(value) => updateElement(index, element.speed, value)}
+                    defaultValue={element.speed}
+                    size="xs"
+                    suffix="Gflop/sec"
+                    min={1}
+                    max={10}
+                />
+                <Slider
+                    value={element[element.speed]}
+                    onChange={(value) => updateElement(index, element.speed, value)}
+                    defaultValue={element.speed} 
+                    min={1} 
+                    max={10} 
+                    step={1} 
+                    label={(value) => `${value} Gflop/sec`} />
+            </td>
         </tr>
     ));
 
@@ -150,15 +231,63 @@ export function SimulateModal({
                 <Button variant="default" onClick={addRow}>Add Cluster</Button>
             </Group>
             <Group justify="flex-start" pt={15}>
-                <Text>Read Bandwdith of the Disk on the Controller Host:</Text>
-                <NumberInput min={0} size="sm" value={readBandwidth} onChange={setReadBandwidth} />
-            </Group>
-            <Group justify="flex-start" pt={15}>
-                <Text>Write Bandwdith of the Disk on the Controller Host:</Text>
-                <NumberInput min={0} size="sm" value={writeBandwidth} onChange={setWriteBandwidth}/>
+                <div>
+                    <Table justify="left">
+                        <Table.Tbody>
+                            <tr>
+                                <td width="auto" valign="top">
+                                    <Text px={10}>Read Bandwidth of the Disk on the Controller Host:  </Text>
+                                </td>
+                                <td width="auto">
+                                    <NumberInput
+                                        defaultValue={100}
+                                        min={50}
+                                        max={1000}
+                                        size="xs"
+                                        suffix="MBps"
+                                        value={readBandwidth}
+                                        onChange={setReadBandwidth}  />
+                                    <Slider
+                                        value={readBandwidth}
+                                        onChange={setReadBandwidth}
+                                        defaultValue={100}
+                                        min={50}
+                                        max={1000}
+                                        step={50}
+                                        label={(value) => `${value} MBps`} />
+                                </td>
+                            </tr>
+                            <tr></tr>
+                            <tr>
+                                <td width="auto" valign="top">
+                                    <Text px={10}>Write Bandwidth of the Disk on the Controller Host:  </Text>
+                                </td>
+                                <td width="auto">
+                                    <NumberInput
+                                        defaultValue={100}
+                                        min={50}
+                                        max={1000}
+                                        size="xs"
+                                        suffix="MBps"
+                                        value={writeBandwidth}
+                                        onChange={setWriteBandwidth}  />
+                                    <Slider
+                                        value={writeBandwidth}
+                                        onChange={setWriteBandwidth}
+                                        defaultValue={100}
+                                        min={50}
+                                        max={1000}
+                                        step={50}
+                                        label={(value) => `${value} MBps`} />
+                                </td>
+                                <td></td>
+                            </tr>
+                        </Table.Tbody>
+                    </Table>
+                </div>
             </Group>
             <Group justify="center" pt={15}>
-                <Button variant="default" onClick={handleRunSimulation}>Run Simulation</Button>
+                <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
             </Group>
         </Modal>
     );
