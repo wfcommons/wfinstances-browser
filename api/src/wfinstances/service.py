@@ -143,7 +143,8 @@ def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
         compute_resources[target_cs]["num_idle_cores"] -= 1
 
     return
-    
+
+
 def do_simulation(request_platform_file_path, request_controller_host, wf_instance):
     print(f"Instantiating a simulation...")
     simulation = wrench.Simulation()
@@ -230,3 +231,42 @@ def do_simulation(request_platform_file_path, request_controller_host, wf_instan
     # simulation_time = simulation.get_simulated_time()
     # print(f"Simulation time: {simulation_time}")
     return simulation_time
+
+
+def generate_xml(clusterData):
+    xml_string = f"""<?xml version='1.0'?>
+ <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+ <platform version="4.1">
+   <zone id="world" routing="Full">
+
+     <zone id="outside" routing="None">
+       <host id="UserHost" speed="1Gf">
+         <disk id="hard_drive" read_bw="{clusterData.readBandwidth}MBps" write_bw="{clusterData.writeBandwidth}MBps">
+           <prop id="size" value="5000GiB"/>
+           <prop id="mount" value="/"/>
+         </disk>
+       </host>
+     </zone>"""
+
+    for id, values in clusterData["clusters"].items():
+        prefix = chr(99 + int(id) - 1)
+        xml_string += f"""
+            <cluster id="datacenter{id}" prefix="-{prefix}" suffix=".me" radical="0-{values['computeNodes'] - 1}" 
+            speed="{values['speed']}Gf" bw="125MBps" lat="50us" router_id="router{id}" core="{values['cores']}"/>"""
+
+    for id, values in clusterData["clusters"].items():
+        xml_string += f"""
+            <link id="link{id}" bandwidth="{values['bw']}kBps" latency="{values['latency']}ms"/>"""
+
+    for id, values in clusterData["clusters"].items():
+        xml_string += f"""
+            <zoneRoute src="datacenter{id}" dst="outside" gw_src="router{id}" gw_dst="UserHost">
+                  <link_ctn id="link{id}"/>
+                </zoneRoute>"""
+
+    xml_string += """
+    </zone>
+</platform>`"""
+
+    print(xml_string)
+    return xml_string
