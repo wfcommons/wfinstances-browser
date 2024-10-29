@@ -205,6 +205,7 @@ def do_simulation(request_platform_file_path, request_controller_host, wf_instan
     for f in files:
         ss.create_file_copy(f)
 
+    events = []
     # We are now ready to schedule the workflow
     print(f"Starting my main loop!")
     while not workflow.is_done():
@@ -216,21 +217,21 @@ def do_simulation(request_platform_file_path, request_controller_host, wf_instan
         if event["event_type"] != "standard_job_completion":
             print(f"  - Event: {event}")  # Should make sure it's a job completion
         else:
+            events.append({
+                "task_name": event["standard_job"].get_tasks()[0].get_name(),
+                "scheduled_time": event["submit_date"],
+                "completion_time": event["end_date"]
+            })
             completed_job = event["standard_job"]
             completed_task_name = completed_job.get_tasks()[0].get_name()
             print(f"Task {completed_task_name} has completed!")
             compute_resources[event["compute_service"]]["num_idle_cores"] += 1
 
     print(f"Workflow execution completed at time {simulation.get_simulated_time()}!")
-    simulation_time = simulation.get_simulated_time()
+    print(f"Workflow execution events {events}!")
+    simulation_events = events
 
-    # simulation_time = simulation.get_simulated_time()
-    # print(f"Simulation time: {simulation_time}")
-    # print(f"Sleeping for 10 seconds...")
-    # simulation.sleep(10)
-    # simulation_time = simulation.get_simulated_time()
-    # print(f"Simulation time: {simulation_time}")
-    return simulation_time
+    return simulation_events
 
 
 def generate_xml(clusterData):
