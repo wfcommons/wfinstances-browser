@@ -60,47 +60,6 @@ export function SimulateModal({
         return clusterData;
     };
 
-    // Function to generate the XML string based on the cluster data
-    // const generateXML = (clusterData) => {
-    //     let xmlString = `<?xml version='1.0'?>
-    //         <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
-    //         <platform version="4.1">
-    //           <zone id="world" routing="Full">
-    //
-    //             <zone id="outside" routing="None">
-    //               <host id="UserHost" speed="1Gf">
-    //                 <disk id="hard_drive" read_bw="${clusterData.readBandwidth}MBps" write_bw="${clusterData.writeBandwidth}MBps">
-    //                   <prop id="size" value="5000GiB"/>
-    //                   <prop id="mount" value="/"/>
-    //                 </disk>
-    //               </host>
-    //             </zone>`;
-    //
-    //     // Loop through the clusters and add them to the XML string
-    //     Object.entries(clusterData.clusters).forEach(([id, values]) => {
-    //         xmlString += `
-    //             <cluster id="datacenter${id}" prefix="c-" suffix=".me" radical="0-${values.computeNodes-1}" speed="${values.speed}Gf" bw="125MBps" lat="50us" router_id="router${id}" core="${values.cores}"/>`;
-    //     });
-    //
-    //     // Loop through the clusters and add them to the XML string
-    //     Object.entries(clusterData.clusters).forEach(([id, values]) => {
-    //         xmlString += `
-    //             <link id="link${id}" bandwidth="${values.bw}kBps" latency="${values.latency}ms"/>`;
-    //     });
-    //
-    //     Object.entries(clusterData.clusters).forEach(([id, values]) => {
-    //         xmlString += `
-    //             <zoneRoute src="datacenter${id}" dst="outside" gw_src="router${id}" gw_dst="UserHost">
-    //               <link_ctn id="link${id}"/>
-    //             </zoneRoute>`
-    //     });
-    //
-    //     xmlString += `
-    //           </zone>
-    //         </platform>`;
-    //     return xmlString; // Return the generated XML string
-    // };
-
     // Combined function to run simulation and get data
     const handleRunSimulation = () => {
         const data = getData(); // Call getData to get the current state
@@ -161,16 +120,16 @@ export function SimulateModal({
                     onChange={(value) => updateElement(index, 'computeNode', value)}
                     defaultValue='computeNode'
                     size="xs"
-                    min={1}
-                    max={10}
+                    min={4}
+                    max={256}
                 />
                 <Slider
                     value={element['computeNode']}
                     onChange={(value) => updateElement(index, 'computeNode', value)}
                     defaultValue='computeNode'
-                    min={1}
-                    max={10}
-                    step={1} />
+                    min={4}
+                    max={256}
+                    step={2} />
             </td>
             <td key='core'>
                 <NumberInput
@@ -178,15 +137,15 @@ export function SimulateModal({
                     onChange={(value) => updateElement(index, 'core', value)}
                     defaultValue='core'
                     size="xs"
-                    min={16}
-                    max={256}
+                    min={1}
+                    max={10}
                 />
                 <Slider
                     value={element['core']}
                     onChange={(value) => updateElement(index, 'core', value)}
                     defaultValue='core'
-                    min={16}
-                    max={256}
+                    min={1}
+                    max={10}
                     step={1} />
             </td>
             <td key='speed'>
@@ -224,7 +183,7 @@ export function SimulateModal({
                             <Table.Th>Link Latency</Table.Th>
                             <Table.Th>Compute Nodes</Table.Th>
                             <Table.Th>Cores per Compute Nodes</Table.Th>
-                            <Table.Th>Core Speed (GFlop/sec)</Table.Th>
+                            <Table.Th>Core Speed</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>{rows}</Table.Tbody>
