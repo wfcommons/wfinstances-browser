@@ -241,7 +241,7 @@ def generate_xml(clusterData):
 
      <zone id="outside" routing="None">
        <host id="UserHost" speed="1Gf">
-         <disk id="hard_drive" read_bw="{clusterData.readBandwidth}MBps" write_bw="{clusterData.writeBandwidth}MBps">
+         <disk id="hard_drive" read_bw="{clusterData["readBandwidth"]}MBps" write_bw="{clusterData["writeBandwidth"]}MBps">
            <prop id="size" value="5000GiB"/>
            <prop id="mount" value="/"/>
          </disk>
@@ -266,7 +266,7 @@ def generate_xml(clusterData):
 
     xml_string += """
     </zone>
-</platform>`"""
+</platform>"""
 
     print(xml_string)
     return xml_string

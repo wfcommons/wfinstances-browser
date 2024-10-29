@@ -13,9 +13,9 @@ export function SimulateModal({
     onClose: () => void
 }) {
     const [elements, setElements] = useState([
-        { cluster: 1, bw: 400, latency: 10, computeNode: 1, core: 16, speed: 1},
-        { cluster: 2, bw: 100, latency: 10, computeNode: 1, core: 64, speed: 2},
-        { cluster: 3, bw: 300, latency: 10, computeNode: 1, core: 32, speed: 3},
+        { cluster: 1, bw: 400, latency: 10, computeNode: 16, core: 1, speed: 1},
+        { cluster: 2, bw: 100, latency: 10, computeNode: 64, core: 1, speed: 2},
+        { cluster: 3, bw: 300, latency: 10, computeNode: 32, core: 1, speed: 3},
     ])
     const [readBandwidth, setReadBandwidth] = useState(100);
     const [writeBandwidth, setWriteBandwidth] = useState(100);
@@ -24,7 +24,7 @@ export function SimulateModal({
 
     const addRow = () => {
         increaseCluster(newCluster + 1);// Increment cluster number
-        const newElement = { cluster: newCluster, bw: 100, latency: 10, computeNode: 4, core: 32, speed: 1 };
+        const newElement = { cluster: newCluster, bw: 100, latency: 10, computeNode: 32, core: 1, speed: 1 };
         setElements([...elements, newElement]); // Add new element to state
     };
     const deleteRow = (index) => {
