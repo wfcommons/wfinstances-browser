@@ -86,6 +86,8 @@ Actions:
 ---
 ### Meeting 7
 
+Date: Tuesday, 10/22
+
 Business:
 - Discussed different options for the UI of the hardware customization and came to a conclusion to create a table with numerical inputs and sliders
 - Discussed the upcoming presentation and possibilities for visuals
@@ -96,4 +98,17 @@ Actions:
 - Get output from the simulation including the job completed, its start time, and its end time
 - If prev. item completed, begin working on a way to visualize the output data
 ---
+### Meeting 8
 
+Date: Tuesday, 10/29
+
+Business:
+- Reviewed progress made in the last week
+- Discussed options for visualization and more clearly defined how the Gantt chart may be set up
+- Discussed options for unit testing
+
+Actions:
+- Change id from 1 base to 0 base
+- Change prefix to be the id
+- Create a map between the bare metal compute service and the host in order to define which cluster a task is run on
+---
