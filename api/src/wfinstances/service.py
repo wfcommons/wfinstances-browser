@@ -4,6 +4,7 @@ import pathlib
 # import json
 from jsonschema import validate, ValidationError
 from src.exceptions import InvalidWfInstanceException, GithubResourceNotFoundException
+from src.wfinstances.simulation import schedule_tasks
 from typing import List, Dict
 from wrench.simulation import Simulation  # For type checking
 from wrench.task import Task  # For type checking
@@ -59,91 +60,6 @@ def validate_wf_instance(wf_instance: dict) -> None:
         validate(wf_instance, schema=schema)
     except ValidationError as e:
         raise InvalidWfInstanceException(str(e))
-
-
-def pick_task_to_schedule(tasks: List[Task]):
-    """
-    A method to select a particular task to schedule. Right now, just selects
-    the task with the largest flop
-    """
-    # pick the task with the largest flop amount
-    max_flop = 0
-    target_task = None
-    for task in tasks:
-        if task.get_flops() > max_flop:
-            max_flop = task.get_flops()
-            target_task = task
-    return target_task
-
-
-def pick_target_cs(compute_resources: Dict[ComputeService, Dict[str, float]], desired_num_cores: int) -> ComputeService:
-    """
-    A method to select a compute service on which to schedule a task. Right now,
-    just selects the compute service with the largest flop rate
-    """
-    # pick the one with the largest core speed
-    max_core_speed = 0
-    target_cs = None
-    for cs in compute_resources:
-        # If there are no idle cores, don't consider this resource
-        if compute_resources[cs]["num_idle_cores"] < desired_num_cores:
-            continue
-        if compute_resources[cs]["core_speed"] > max_core_speed:
-            max_core_speed = compute_resources[cs]["core_speed"]
-            target_cs = cs
-    return target_cs
-
-
-def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
-                   compute_resources: Dict[ComputeService, Dict[str, float]], storage_service):
-    """
-    A method that schedules tasks, using list scheduling, if possible
-    """
-
-    while True:
-        # If no tasks left to schedule, we're done
-        if len(tasks_to_schedule) == 0:
-            break
-
-        # Pick one of the tasks for scheduling
-        task_to_schedule = pick_task_to_schedule(tasks_to_schedule)
-        if task_to_schedule is None:
-            break
-
-        # Pick one of the compute services on which to schedule the task,
-        # using the minimum number of cores for the task
-        target_cs = pick_target_cs(compute_resources, task_to_schedule.get_min_num_cores())
-
-        # If we didn't find a compute service, we're done
-        if target_cs is None:
-            break
-
-        # Remove the task from future consideration
-        tasks_to_schedule.remove(task_to_schedule)
-
-        print(f"Scheduling task {task_to_schedule.get_name()} on compute service {target_cs.get_name()}...")
-
-        # Create the dictionary of file locations, which in this case
-        # is always the one storage service
-        input_files = task_to_schedule.get_input_files()
-        output_files = task_to_schedule.get_output_files()
-        locations = {}
-        for f in input_files:
-            locations[f] = storage_service
-        for f in output_files:
-            locations[f] = storage_service
-
-        # Create a standard job for the task
-        job = simulation.create_standard_job([task_to_schedule], locations)
-
-        # Submit the standard job for execution
-        target_cs.submit_standard_job(job)
-
-        # Update the number of idle cores of the target compute service
-        compute_resources[target_cs]["num_idle_cores"] -= 1
-
-    return
-
 
 def do_simulation(request_platform_xml, request_controller_host, wf_instance):
     print(f"Instantiating a simulation...")
@@ -239,6 +155,7 @@ def do_simulation(request_platform_xml, request_controller_host, wf_instance):
 
 
 def generate_xml(clusterData):
+    print(f"clusterData before parsing: {clusterData}")
     xml_string = f"""<?xml version='1.0'?>
  <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
  <platform version="4.1">
@@ -256,7 +173,7 @@ def generate_xml(clusterData):
     for id, values in clusterData["clusters"].items():
         prefix = str(int(id) - 1)
         xml_string += f"""
-            <cluster id="datacenter{id}" prefix="-{prefix}" suffix=".me" radical="0-{values['computeNodes'] - 1}" 
+            <cluster id="datacenter{id}" prefix="{prefix}-" suffix=".me" radical="0-{values['computeNodes'] - 1}" 
             speed="{values['speed']}Gf" bw="125MBps" lat="50us" router_id="router{id}" core="{values['cores']}"/>"""
 
     for id, values in clusterData["clusters"].items():
