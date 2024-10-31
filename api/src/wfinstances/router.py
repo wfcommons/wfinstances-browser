@@ -47,12 +47,12 @@ async def post_wf_instance(request: Request, id: str) -> dict:
     wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
 
     # make a path to the xml file
-    request_body["platform_xml"] = generate_xml(request_body["platform_xml"])
-    platform_file_path = "/tmp/platform.xml"
-    with open(platform_file_path, "w") as f:
-        f.write(request_body["platform_xml"])
+    #request_body["platform_xml"] = generate_xml(request_body["platform_xml"])
+    #platform_file_path = "/tmp/platform.xml"
+    #with open(platform_file_path, "w") as f:
+    #    f.write(request_body["platform_xml"])
 
-    runtime = do_simulation(platform_file_path, request_body["controller_hostname"], wf_instance)
+    runtime = do_simulation(request_body["platform_xml"], request_body["controller_hostname"], wf_instance)
 
     return {
         'detail': 'Simulation results',

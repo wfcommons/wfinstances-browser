@@ -145,12 +145,12 @@ def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
     return
 
 
-def do_simulation(request_platform_file_path, request_controller_host, wf_instance):
+def do_simulation(request_platform_xml, request_controller_host, wf_instance):
     print(f"Instantiating a simulation...")
     simulation = wrench.Simulation()
     user_host = request_controller_host
     print(f"Starting the simulation using the XML platform file...")
-    simulation.start(pathlib.Path(request_platform_file_path), user_host)
+    simulation.start(request_platform_xml, user_host)
 
     # Get the list of all hostnames in the platform
     print(f"Getting the list of all hostnames...")
