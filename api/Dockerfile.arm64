@@ -10,6 +10,8 @@ RUN apt-get install -y cmake
 
 RUN wget --no-check-certificate https://framagit.org/simgrid/simgrid/-/archive/v3.36/simgrid-v3.36.tar.gz && tar -xf simgrid-v3.36.tar.gz && cd simgrid-v3.36 && cmake . && make && make install && cd .. && rm -rf simgrid-v3.36*
 
+RUN wget https://github.com/simgrid/file-system-module/archive/refs/tags/v0.2.tar.gz && tar -xf v0.2.tar.gz && cd file-system-module-0.2 && mkdir build && cd build && cmake .. && make  && sudo make install && cd ../.. && rm -rf v0.2.tar.gz file-system-module-v*
+
 RUN apt-get -y install nlohmann-json3-dev
 
 RUN apt-get -y install libasio-dev
@@ -19,7 +21,7 @@ RUN pip install jsonref --break-system-packages
 RUN apt-get install -y libboost-program-options-dev
 
 
-RUN wget https://github.com/wrench-project/wrench/archive/refs/heads/master.zip && unzip master.zip && cd wrench-master && mkdir build && cd build && cmake .. && make -j12 wrench-daemon examples && make install && cd ../.. && /bin/rm -rf wrench-master
+RUN wget https://github.com/wrench-project/wrench/archive/refs/tags/v2.4.tar.gz && tar -xzf v2.4.tar.gz && cd wrench-2.4 && mkdir build && cd build && cmake .. && make -j12 wrench-daemon examples && make install && cd ../.. && /bin/rm -rf wrench-2.4
 
 COPY requirements.txt .
 
@@ -41,10 +43,10 @@ RUN chmod 0644 /etc/cron.d/run-curl-job
 
 RUN crontab /etc/cron.d/run-curl-job
 
-# Install WRENCH API
+# Install WRENCH API 0.3
 RUN apt-get -y install zip
-RUN python3 -m pip install build --break-system-packages
-RUN wget https://github.com/wrench-project/wrench-python-api/archive/refs/heads/main.zip; unzip main.zip; cd wrench-python-api-main; python3 -m build; python3 -m pip install ./dist/wrench-*.whl --break-system-packages
+RUN python3 -m pip install build
+RUN wget https://github.com/wrench-project/wrench-python-api/archive/refs/tags/v0.3.tar.gz; unzip v0.3.tar.gz; cd wrench-python-api-0.3; python3 -m build; python3 -m pip install ./dist/wrench-*.whl
 
 
 COPY . .
