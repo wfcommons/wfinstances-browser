@@ -168,9 +168,11 @@ def do_simulation(request_platform_file_path, request_controller_host, wf_instan
     # Creating a bare-metal compute service on ALL other hosts
     print(f"Creating {len(list_of_hostnames)} compute services...")
     running_bmcss = []
+    bmcs_to_cluster_map={}
     for host in list_of_hostnames:
         bmcs = simulation.create_bare_metal_compute_service(host, {host: (-1, -1)}, "", {}, {})
         running_bmcss.append(bmcs)
+        bmcs_to_cluster_map[bmcs.get_name()] = int(host.split("-")[0])
 
     # Create a data structure that keeps track of the compute resources, which
     # will be used for scheduling
@@ -214,11 +216,13 @@ def do_simulation(request_platform_file_path, request_controller_host, wf_instan
 
         # Wait for next event
         event = simulation.wait_for_next_event()
+        print(event)
         if event["event_type"] != "standard_job_completion":
             print(f"  - Event: {event}")  # Should make sure it's a job completion
         else:
             events.append({
                 "task_name": event["standard_job"].get_tasks()[0].get_name(),
+                "cluster_index": bmcs_to_cluster_map[event["compute_service"].get_name()],
                 "scheduled_time": event["submit_date"],
                 "completion_time": event["end_date"]
             })
@@ -250,7 +254,7 @@ def generate_xml(clusterData):
      </zone>"""
 
     for id, values in clusterData["clusters"].items():
-        prefix = chr(99 + int(id) - 1)
+        prefix = str(int(id) - 1)
         xml_string += f"""
             <cluster id="datacenter{id}" prefix="-{prefix}" suffix=".me" radical="0-{values['computeNodes'] - 1}" 
             speed="{values['speed']}Gf" bw="125MBps" lat="50us" router_id="router{id}" core="{values['cores']}"/>"""
