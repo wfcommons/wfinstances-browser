@@ -52,7 +52,7 @@ async def post_wf_instance(request: Request, id: str) -> dict:
     #with open(platform_file_path, "w") as f:
     #    f.write(request_body["platform_xml"])
 
-    runtime = do_simulation(generate_xml(request_body["platform_xml"]), request_body["controller_hostname"], wf_instance)
+    runtime = do_simulation(generate_xml(request_body["platform_spec"]), request_body["controller_hostname"], wf_instance)
 
     return {
         'detail': 'Simulation results',

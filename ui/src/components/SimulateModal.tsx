@@ -1,5 +1,5 @@
-import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip} from '@mantine/core';
-import { IconTrash } from '@tabler/icons-react';
+import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Tabs, UnstyledButton, rem} from '@mantine/core';
+import {IconPlus, IconTrash, IconX} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import {useState} from "react";
 
@@ -7,29 +7,138 @@ export function SimulateModal({
     id,
     opened,
     onClose
-}: { 
-    id: string,
-    opened: boolean,
-    onClose: () => void
+}: {
+  id: string,
+  opened: boolean,
+  onClose: () => void
 }) {
-    const [elements, setElements] = useState([
+    const initialElements = [
         { cluster: 1, bw: 400, latency: 10, computeNode: 16, core: 1, speed: 1},
         { cluster: 2, bw: 100, latency: 10, computeNode: 64, core: 1, speed: 2},
         { cluster: 3, bw: 300, latency: 10, computeNode: 32, core: 1, speed: 3},
-    ])
-    const [readBandwidth, setReadBandwidth] = useState(100);
-    const [writeBandwidth, setWriteBandwidth] = useState(100);
+    ];
+    const initialReadBandwidth = 100;
+    const initialWriteBandwidth = 100;
+  
+    const [tabs, setTabs] = useState([
+        { id: '1',
+            data: JSON.parse(JSON.stringify(initialElements)),
+            read: JSON.parse(JSON.stringify(initialReadBandwidth)),
+            write: JSON.parse(JSON.stringify(initialWriteBandwidth))
+        },
+    ]);
+    const [tabTracker, increaseTracker] = useState(tabs.length+1);
 
+    // Track the currently active tab
+    const [activeTab, setActiveTab] = useState('1');
+
+    //Add a new tab
+    const addTab = () => {
+        increaseTracker(tabTracker + 1);
+        const newId = (tabTracker).toString();
+        const newTab = {
+            id: newId,
+            data: JSON.parse(JSON.stringify(initialElements)),
+            read: JSON.parse(JSON.stringify(initialReadBandwidth)),
+            write: JSON.parse(JSON.stringify(initialWriteBandwidth))};
+        setTabs([...tabs, newTab]);
+        setActiveTab(newId); // Set focus on the new tab
+    };
+
+    //Remove a tab
+    const removeTab = (id) => {
+        setTabs(tabs.filter((tab) => tab.id !== id));
+        setActiveTab(tabs.length > 1 ? tabs[0].id : '');
+    };
+
+    const updateTabData = (id, newData) => {
+        setTabs(tabs.map(tab =>
+            (tab.id === id ? { ...tab, data: newData } : tab)
+        ));
+    };
+    
+    const updateReadBandwidthTabData = (id, newData) => {
+        setTabs(tabs.map(tab =>
+            (tab.id === id ? { ...tab, read: newData } : tab)
+        ));
+    }
+
+    const updateWriteBandwidthTabData = (id, newData) => {
+        setTabs(tabs.map(tab =>
+            (tab.id === id ? { ...tab, write: newData } : tab)
+        ));
+    }
+
+    const iconStyle = { width: rem(12), height: rem(12) };
+    return (
+        <Modal title="WfInstance Simulation" opened={opened} onClose={onClose} size='100%'>
+            <i>{id}</i>
+            <Tabs defaultValue="1">
+                <Tabs.List>
+                    {tabs.map((tab) => (
+                        <Tabs.Tab key={tab.id} value={tab.id} rightSection={<UnstyledButton
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                removeTab(tab.id);
+                            }}>
+                            <IconX style={iconStyle} />
+                        </UnstyledButton>}>
+                         New Experiment
+                        </Tabs.Tab>
+                    ))}
+                    <Tooltip label={"Add Cluster"}>
+                        <UnstyledButton onClick={addTab}><IconPlus style={iconStyle} /></UnstyledButton>
+                    </Tooltip>
+                </Tabs.List>
+                {tabs.map((tab) => (
+                    <Tabs.Panel key={tab.id} value={tab.id}>
+                        <NewTab 
+                            tabData={initialElements} 
+                            tabReadBandwidth={initialReadBandwidth} 
+                            tabWriteBandwidth={initialWriteBandwidth} 
+                            onElementChange={(newData) => updateTabData(tab.id, newData)}
+                            onReadBandwidthChange={(newData) => updateReadBandwidthTabData(tab.id, newData)}
+                            onWriteBandwidthChange={(newData) => updateWriteBandwidthTabData(tab.id, newData)}
+                            id={id}
+                        />
+                    </Tabs.Panel>
+                ))}
+            </Tabs>
+        </Modal>
+
+
+    );
+}
+
+function NewTab ({
+    tabData, 
+    tabReadBandwidth, 
+    tabWriteBandwidth, 
+    onElementChange, 
+    onReadBandwidthChange, 
+    onWriteBandwidthChange,
+    id
+}) {
+
+    const [elements, setElements] = useState(tabData)
+
+    const [readBandwidth, setReadBandwidth] = useState(tabReadBandwidth);
+    const [writeBandwidth, setWriteBandwidth] = useState(tabWriteBandwidth);
+  
     const [newCluster, increaseCluster] = useState(elements.length+1)
 
     const addRow = () => {
         increaseCluster(newCluster + 1);// Increment cluster number
         const newElement = { cluster: newCluster, bw: 100, latency: 10, computeNode: 32, core: 1, speed: 1 };
-        setElements([...elements, newElement]); // Add new element to state
+        const updatedElements = [...elements, newElement];
+        setElements(updatedElements); // Add new element to state
+        onElementChange(updatedElements); //update parent function
+
     };
     const deleteRow = (index) => {
         const updatedElements = elements.filter((_, i) => i !== index); // Remove the row at the given index
         setElements(updatedElements);
+        onElementChange(updatedElements);
     };
 
     // Function to handle input change in the table
@@ -38,8 +147,19 @@ export function SimulateModal({
             (i === index ? { ...element, [field]: value } : element)
         );
         setElements(updatedElements);
+        onElementChange(updatedElements);
     };
-    // New getData function
+    
+    const updateReadBandwidth = (value) => {
+        setReadBandwidth(value);
+        onReadBandwidthChange(value);
+    }
+    
+    const updateWriteBandwidth = (value) => {
+        setWriteBandwidth(value);
+        onWriteBandwidthChange(value);
+    }
+
     const getData = () => {
         const clusterData = {
             readBandwidth,
@@ -63,10 +183,9 @@ export function SimulateModal({
     // Combined function to run simulation and get data
     const handleRunSimulation = () => {
         const data = getData(); // Call getData to get the current state
-        //const xmlString = generateXML(data); // Generate the XML string
-        //console.log(xmlString); // Log the XML string or use it as needed
         simulate(id, data); // Call the simulate function with the id
     };
+
     // Generate table rows with input fields
     const rows = elements.map((element, index) => (
         <tr key={element.cluster}>
@@ -120,16 +239,16 @@ export function SimulateModal({
                     onChange={(value) => updateElement(index, 'computeNode', value)}
                     defaultValue='computeNode'
                     size="xs"
-                    min={4}
+                    min={1}
                     max={256}
                 />
                 <Slider
                     value={element['computeNode']}
                     onChange={(value) => updateElement(index, 'computeNode', value)}
                     defaultValue='computeNode'
-                    min={4}
+                    min={1}
                     max={256}
-                    step={2} />
+                    step={1} />
             </td>
             <td key='core'>
                 <NumberInput
@@ -171,8 +290,7 @@ export function SimulateModal({
     ));
 
     return (
-        <Modal title="WfInstance Simulation" opened={opened} onClose={onClose} size='100%'>
-            <i>{id}</i>
+        <Group>
             <Group justify="center">
                 <Title order={4}>Input Compute Platform XML Specifications</Title>
                 <Table striped highlightOnHover withTableBorder withColumnBorders>
@@ -206,10 +324,10 @@ export function SimulateModal({
                                         size="xs"
                                         suffix="MBps"
                                         value={readBandwidth}
-                                        onChange={setReadBandwidth}  />
+                                        onChange={updateReadBandwidth} />
                                     <Slider
                                         value={readBandwidth}
-                                        onChange={setReadBandwidth}
+                                        onChange={updateReadBandwidth}
                                         defaultValue={100}
                                         min={50}
                                         max={1000}
@@ -230,10 +348,10 @@ export function SimulateModal({
                                         size="xs"
                                         suffix="MBps"
                                         value={writeBandwidth}
-                                        onChange={setWriteBandwidth}  />
+                                        onChange={updateWriteBandwidth} />
                                     <Slider
                                         value={writeBandwidth}
-                                        onChange={setWriteBandwidth}
+                                        onChange={updateWriteBandwidth}
                                         defaultValue={100}
                                         min={50}
                                         max={1000}
@@ -249,6 +367,8 @@ export function SimulateModal({
             <Group justify="center" pt={15}>
                 <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
             </Group>
-        </Modal>
+        </Group>
+
+
     );
 }

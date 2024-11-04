@@ -46,7 +46,7 @@
 export async function simulate(id, xmlData) {
 
     // Send simulation request to the api backend
-    const spec = { "platform_xml": xmlData, "controller_hostname": "UserHost" };
+    const spec = { "platform_spec": xmlData, "controller_hostname": "UserHost" };
 
     console.log("SENDING REQUEST TO BACKEND");
     const r = await fetch(`/wf-instances/public/simulate/${id}`, {
