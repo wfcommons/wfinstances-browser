@@ -1,4 +1,4 @@
-import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Tabs, UnstyledButton, rem} from '@mantine/core';
+import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Tabs, UnstyledButton, rem, Stack} from '@mantine/core';
 import {IconPlus, IconTrash, IconX} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import {useState} from "react";
@@ -73,8 +73,8 @@ export function SimulateModal({
     return (
         <Modal title="WfInstance Simulation" opened={opened} onClose={onClose} size='100%'>
             <i>{id}</i>
-            <Tabs defaultValue="1">
-                <Tabs.List>
+            <Tabs defaultValue="1" variant="outline">
+                <Tabs.List pt={15}>
                     {tabs.map((tab) => (
                         <Tabs.Tab key={tab.id} value={tab.id} rightSection={<UnstyledButton
                             onClick={(e) => {
@@ -87,7 +87,7 @@ export function SimulateModal({
                         </Tabs.Tab>
                     ))}
                     <Tooltip label={"Add Cluster"}>
-                        <UnstyledButton onClick={addTab}><IconPlus style={iconStyle} /></UnstyledButton>
+                        <UnstyledButton ml={5} onClick={addTab}><IconPlus style={iconStyle} /></UnstyledButton>
                     </Tooltip>
                 </Tabs.List>
                 {tabs.map((tab) => (
@@ -290,7 +290,7 @@ function NewTab ({
     ));
 
     return (
-        <Group>
+        <Group pt={15}>
             <Group justify="center">
                 <Title order={4}>Input Compute Platform XML Specifications</Title>
                 <Table striped highlightOnHover withTableBorder withColumnBorders>
@@ -308,8 +308,8 @@ function NewTab ({
                 </Table>
                 <Button variant="default" onClick={addRow}>Add Cluster</Button>
             </Group>
-            <Group justify="flex-start" pt={15}>
-                <div>
+            <Stack align="stretch">
+                <Group pt={15} justify="flex-start">
                     <Table justify="left">
                         <Table.Tbody>
                             <tr>
@@ -362,11 +362,11 @@ function NewTab ({
                             </tr>
                         </Table.Tbody>
                     </Table>
-                </div>
-            </Group>
-            <Group justify="center" pt={15}>
-                <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
-            </Group>
+                </Group>
+                <Group justify="center" pt={15}>
+                    <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
+                </Group>
+            </Stack>
         </Group>
 
 
