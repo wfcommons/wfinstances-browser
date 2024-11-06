@@ -111,4 +111,16 @@ Actions:
 - Change id from 1 base to 0 base
 - Change prefix to be the id
 - Create a map between the bare metal compute service and the host in order to define which cluster a task is run on
+- Find a software that will provide options for visualizing the data and create a graph
+---
+### Meeting 9
+
+Date: Tuesday, 11/5
+
+Business:
+- Attempted unsuccesfully to integrate plotly into the ui docker container and create a graph
+
+Actions:
+- Find an alternative to plotly to create the data visualization
+- Integrate the visualization software and create a "hello world" graph
 ---
