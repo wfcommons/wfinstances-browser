@@ -20,6 +20,7 @@
     "@tabler/icons": "^2.46.0",
     "@tabler/icons-react": "^2.46.0",
     "@tanstack/react-query": "^5.24.1",
+    "chart.js": "^4.4.6",
     "cytoscape": "^3.23.0",
     "cytoscape-cose-bilkent": "^4.1.0",
     "cytoscape-dagre": "^2.5.0",
@@ -28,6 +29,7 @@
     "jszip": "^3.10.1",
     "mantine-react-table": "^2.0.0-alpha.14",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^18.2.0"
   },
