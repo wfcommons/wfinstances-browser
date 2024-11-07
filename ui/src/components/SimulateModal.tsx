@@ -259,7 +259,7 @@ export function SimulateModal({
                 <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
             </Group>
             <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
-                {showGraph && graphData && <SimulationGraph runtimeData={graphData} />}
+                {showGraph && graphData && <SimulationGraph runtimeData={graphData} id = {id}/>}
             </Group>
         </Modal>
     );

@@ -5,7 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 // Register chart components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-export const SimulationGraph = ({ runtimeData }) => {
+export const SimulationGraph = ({ runtimeData, id }) => {
     // Sort the data by completion time
     runtimeData.sort((a, b) => a.completion_time - b.completion_time);
     
@@ -103,7 +103,7 @@ export const SimulationGraph = ({ runtimeData }) => {
 
   return (
     <div style={{ alignItems: 'center', justifyContent: 'center', width: '80%', height: '100%' }}>
-      <h3 style={{ textAlign: 'center' }}>Cluster Task Runtime</h3>
+      <h3 style={{ textAlign: 'center' }}>Task Runtime of {id}</h3>
       <div>
         <Scatter data={data} options={options} />
       </div>
