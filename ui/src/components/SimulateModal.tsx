@@ -1,6 +1,7 @@
 import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip} from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
+import { SimulationGraph } from '~/components/SimulationGraph';
 import {useState} from "react";
 
 export function SimulateModal({
@@ -17,10 +18,17 @@ export function SimulateModal({
         { cluster: 2, bw: 100, latency: 10, computeNode: 64, core: 1, speed: 2},
         { cluster: 3, bw: 300, latency: 10, computeNode: 32, core: 1, speed: 3},
     ])
+    interface TaskData {
+        task_name: string;
+        cluster_index: number;
+        scheduled_time: number;
+        completion_time: number;
+      }
     const [readBandwidth, setReadBandwidth] = useState(100);
     const [writeBandwidth, setWriteBandwidth] = useState(100);
-
-    const [newCluster, increaseCluster] = useState(elements.length+1)
+    const [newCluster, increaseCluster] = useState(elements.length+1);
+    const [showGraph, setShowGraph] = useState(false); // New state to control graph visibility
+    const [graphData, setGraphData] = useState<TaskData[] | null>(null);
 
     const addRow = () => {
         increaseCluster(newCluster + 1);// Increment cluster number
@@ -61,11 +69,12 @@ export function SimulateModal({
     };
 
     // Combined function to run simulation and get data
-    const handleRunSimulation = () => {
-        const data = getData(); // Call getData to get the current state
-        //const xmlString = generateXML(data); // Generate the XML string
-        //console.log(xmlString); // Log the XML string or use it as needed
-        simulate(id, data); // Call the simulate function with the id
+    const handleRunSimulation = async () => {
+        const data = getData();
+        // Pass the simulation data to the simulate function and wait for results
+        const results = await simulate(id, data);
+        setGraphData(results.result.Runtime);  // Set the data returned from simulation
+        setShowGraph(true);  // Display the graph after simulation
     };
     // Generate table rows with input fields
     const rows = elements.map((element, index) => (
@@ -248,6 +257,9 @@ export function SimulateModal({
             </Group>
             <Group justify="center" pt={15}>
                 <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
+            </Group>
+            <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
+                {showGraph && graphData && <SimulationGraph runtimeData={graphData} id = {id}/>}
             </Group>
         </Modal>
     );
