@@ -1,4 +1,4 @@
-import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Tabs, UnstyledButton, rem, Stack} from '@mantine/core';
+import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Tabs, UnstyledButton, rem, Input} from '@mantine/core';
 import {IconPlus, IconTrash, IconX} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import {useState} from "react";
@@ -19,12 +19,15 @@ export function SimulateModal({
     ];
     const initialReadBandwidth = 100;
     const initialWriteBandwidth = 100;
+
+    const defaultTitle = "New Experiment";
   
     const [tabs, setTabs] = useState([
         { id: '1',
             data: JSON.parse(JSON.stringify(initialElements)),
             read: JSON.parse(JSON.stringify(initialReadBandwidth)),
-            write: JSON.parse(JSON.stringify(initialWriteBandwidth))
+            write: JSON.parse(JSON.stringify(initialWriteBandwidth)),
+            title: JSON.parse(JSON.stringify(defaultTitle))
         },
     ]);
     const [tabTracker, increaseTracker] = useState(tabs.length+1);
@@ -40,7 +43,9 @@ export function SimulateModal({
             id: newId,
             data: JSON.parse(JSON.stringify(initialElements)),
             read: JSON.parse(JSON.stringify(initialReadBandwidth)),
-            write: JSON.parse(JSON.stringify(initialWriteBandwidth))};
+            write: JSON.parse(JSON.stringify(initialWriteBandwidth)),
+            title: JSON.parse(JSON.stringify(defaultTitle))
+        };
         setTabs([...tabs, newTab]);
         setActiveTab(newId); // Set focus on the new tab
     };
@@ -68,6 +73,12 @@ export function SimulateModal({
             (tab.id === id ? { ...tab, write: newData } : tab)
         ));
     }
+    
+    const updateTitleTabData = (id, newData) => {
+        setTabs(tabs.map(tab =>
+            (tab.id === id ? { ...tab, title: newData } : tab)
+        ));
+    }
 
     const iconStyle = { width: rem(12), height: rem(12) };
     return (
@@ -83,7 +94,15 @@ export function SimulateModal({
                             }}>
                             <IconX style={iconStyle} />
                         </UnstyledButton>}>
-                         New Experiment
+                            <Text mx={0} size="sm"
+                                style={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    maxWidth: '14ch', // Limits text display to approximately 14 characters
+                                }}>
+                                {tab.title}
+                            </Text>
                         </Tabs.Tab>
                     ))}
                     <Tooltip label={"Add Cluster"}>
@@ -99,6 +118,7 @@ export function SimulateModal({
                             onElementChange={(newData) => updateTabData(tab.id, newData)}
                             onReadBandwidthChange={(newData) => updateReadBandwidthTabData(tab.id, newData)}
                             onWriteBandwidthChange={(newData) => updateWriteBandwidthTabData(tab.id, newData)}
+                            onTitleChange={(newData) => updateTitleTabData(tab.id, newData)}
                             id={id}
                         />
                     </Tabs.Panel>
@@ -113,10 +133,12 @@ export function SimulateModal({
 function NewTab ({
     tabData, 
     tabReadBandwidth, 
-    tabWriteBandwidth, 
+    tabWriteBandwidth,
+    tabTitle,
     onElementChange, 
     onReadBandwidthChange, 
     onWriteBandwidthChange,
+    onTitleChange,
     id
 }) {
 
@@ -132,6 +154,8 @@ function NewTab ({
 
     const [readBandwidth, setReadBandwidth] = useState(tabReadBandwidth);
     const [writeBandwidth, setWriteBandwidth] = useState(tabWriteBandwidth);
+
+    const [title, setTitle] = useState(tabTitle);
   
     const [newCluster, increaseCluster] = useState(elements.length+1)
 
@@ -166,6 +190,11 @@ function NewTab ({
     const updateWriteBandwidth = (value) => {
         setWriteBandwidth(value);
         onWriteBandwidthChange(value);
+    }
+    
+    const updateTitle = (value) => {
+        setTitle(value);
+        onTitleChange(value);
     }
 
     const getData = () => {
@@ -299,6 +328,11 @@ function NewTab ({
 
     return (
         <Group pt={15}>
+            <Group justify="flex-start" style={{width: "25%"}}>
+                <Tooltip label="Rename">
+                    <Input defaultValue="New Experiment" value={title} onChange={(event) => updateTitle(event.currentTarget.value)} style={{width: "100%"}}/>
+                </Tooltip>
+            </Group>
             <Group justify="center">
                 <Title order={4}>Input Compute Platform XML Specifications</Title>
                 <Table striped highlightOnHover withTableBorder withColumnBorders>
@@ -370,7 +404,7 @@ function NewTab ({
                     </Table.Tbody>
                 </Table>
             </Group>
-            <Group justify="center" pt={15}>
+            <Group justify="center" pt={15} style={{width: '100%'}}>
                 <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
             </Group>
         </Group>
