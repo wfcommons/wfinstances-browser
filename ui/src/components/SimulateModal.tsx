@@ -120,6 +120,14 @@ function NewTab ({
     id
 }) {
 
+    const bwMin = 50, bwMax = 1000, bwStep = 50;
+    const latencyMin = 1, latencyMax = 100, latencyStep = 1;
+    const computeNodeMin = 1, computeNodeMax = 256, computeNodeStep = 1;
+    const coreMin = 1, coreMax = 10, coreStep = 1;
+    const speedMin = 1, speedMax = 10, speedStep = 1;
+    const readBandwidthMin = 50, readBandwidthMax = 1000, readBandwidthStep = 50;
+    const writeBandwidthMin = 50, writeBandwidthMax = 1000, writeBandwidthStep = 50;
+
     const [elements, setElements] = useState(tabData)
 
     const [readBandwidth, setReadBandwidth] = useState(tabReadBandwidth);
@@ -203,16 +211,16 @@ function NewTab ({
                     defaultValue='bw'
                     size="xs"
                     suffix="kBps"
-                    min={50}
-                    max={1000}
+                    min={bwMin}
+                    max={bwMax}
                 />
                 <Slider
                     value={element['bw']}
                     onChange={(value) => updateElement(index, 'bw', value)}
                     defaultValue='bw'
-                    min={50}
-                    max={1000}
-                    step={50}
+                    min={bwMin}
+                    max={bwMax}
+                    step={bwStep}
                     label={(value) => `${value} kBps`} />
             </td>
             <td key='latency'>
@@ -222,15 +230,15 @@ function NewTab ({
                     defaultValue='latency'
                     size="xs"
                     suffix="ms"
-                    min={1}
-                    max={100}
+                    min={latencyMin}
+                    max={latencyMax}
                 />
                 <Slider value={element['latency']}
                     onChange={(value) => updateElement(index, 'latency', value)}
                     defaultValue='latency'
-                    min={1}
-                    max={100}
-                    step={1}
+                    min={latencyMin}
+                    max={latencyMax}
+                    step={latencyStep}
                     label={(value) => `${value} ms`} />
             </td>
             <td key='computeNode'>
@@ -239,16 +247,16 @@ function NewTab ({
                     onChange={(value) => updateElement(index, 'computeNode', value)}
                     defaultValue='computeNode'
                     size="xs"
-                    min={1}
-                    max={256}
+                    min={computeNodeMin}
+                    max={computeNodeMax}
                 />
                 <Slider
                     value={element['computeNode']}
                     onChange={(value) => updateElement(index, 'computeNode', value)}
                     defaultValue='computeNode'
-                    min={1}
-                    max={256}
-                    step={1} />
+                    min={computeNodeMin}
+                    max={computeNodeMax}
+                    step={computeNodeStep} />
             </td>
             <td key='core'>
                 <NumberInput
@@ -256,16 +264,16 @@ function NewTab ({
                     onChange={(value) => updateElement(index, 'core', value)}
                     defaultValue='core'
                     size="xs"
-                    min={1}
-                    max={10}
+                    min={coreMin}
+                    max={coreMax}
                 />
                 <Slider
                     value={element['core']}
                     onChange={(value) => updateElement(index, 'core', value)}
                     defaultValue='core'
-                    min={1}
-                    max={10}
-                    step={1} />
+                    min={coreMin}
+                    max={coreMax}
+                    step={coreStep} />
             </td>
             <td key='speed'>
                 <NumberInput
@@ -274,16 +282,16 @@ function NewTab ({
                     defaultValue='speed'
                     size="xs"
                     suffix="Gflop/sec"
-                    min={1}
-                    max={10}
+                    min={speedMin}
+                    max={speedMax}
                 />
                 <Slider
                     value={element['speed']}
                     onChange={(value) => updateElement(index, 'speed', value)}
                     defaultValue='speed'
-                    min={1}
-                    max={10}
-                    step={1}
+                    min={speedMin}
+                    max={speedMax}
+                    step={speedStep}
                     label={(value) => `${value} Gflop/sec`} />
             </td>
         </tr>
@@ -308,65 +316,63 @@ function NewTab ({
                 </Table>
                 <Button variant="default" onClick={addRow}>Add Cluster</Button>
             </Group>
-            <Stack align="stretch">
-                <Group pt={15} justify="flex-start">
-                    <Table justify="left">
-                        <Table.Tbody>
-                            <tr>
-                                <td width="auto" valign="top">
-                                    <Text px={10}>Read Bandwidth of the Disk on the Controller Host:  </Text>
-                                </td>
-                                <td width="auto">
-                                    <NumberInput
-                                        defaultValue={100}
-                                        min={50}
-                                        max={1000}
-                                        size="xs"
-                                        suffix="MBps"
-                                        value={readBandwidth}
-                                        onChange={updateReadBandwidth} />
-                                    <Slider
-                                        value={readBandwidth}
-                                        onChange={updateReadBandwidth}
-                                        defaultValue={100}
-                                        min={50}
-                                        max={1000}
-                                        step={50}
-                                        label={(value) => `${value} MBps`} />
-                                </td>
-                            </tr>
-                            <tr></tr>
-                            <tr>
-                                <td width="auto" valign="top">
-                                    <Text px={10}>Write Bandwidth of the Disk on the Controller Host:  </Text>
-                                </td>
-                                <td width="auto">
-                                    <NumberInput
-                                        defaultValue={100}
-                                        min={50}
-                                        max={1000}
-                                        size="xs"
-                                        suffix="MBps"
-                                        value={writeBandwidth}
-                                        onChange={updateWriteBandwidth} />
-                                    <Slider
-                                        value={writeBandwidth}
-                                        onChange={updateWriteBandwidth}
-                                        defaultValue={100}
-                                        min={50}
-                                        max={1000}
-                                        step={50}
-                                        label={(value) => `${value} MBps`} />
-                                </td>
-                                <td></td>
-                            </tr>
-                        </Table.Tbody>
-                    </Table>
-                </Group>
-                <Group justify="center" pt={15}>
-                    <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
-                </Group>
-            </Stack>
+            <Group pt={15} align="flex-start" width="auto">
+                <Table align="flex-start" width="auto">
+                    <Table.Tbody>
+                        <tr>
+                            <td width="auto" valign="top">
+                                <Text px={10}>Read Bandwidth of the Disk on the Controller Host:  </Text>
+                            </td>
+                            <td width="auto">
+                                <NumberInput
+                                    defaultValue={readBandwidth}
+                                    min={readBandwidthMin}
+                                    max={readBandwidthMax}
+                                    size="xs"
+                                    suffix="MBps"
+                                    value={readBandwidth}
+                                    onChange={updateReadBandwidth} />
+                                <Slider
+                                    defaultValue={readBandwidth}
+                                    min={readBandwidthMin}
+                                    max={readBandwidthMax}
+                                    step={readBandwidthStep}
+                                    label={(value) => `${value} MBps`}
+                                    value={readBandwidth}
+                                    onChange={updateReadBandwidth}/>
+                            </td>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                            <td width="auto" valign="top">
+                                <Text px={10}>Write Bandwidth of the Disk on the Controller Host:  </Text>
+                            </td>
+                            <td width="auto">
+                                <NumberInput
+                                    defaultValue={writeBandwidth}
+                                    min={writeBandwidthMin}
+                                    max={writeBandwidthMax}
+                                    size="xs"
+                                    suffix="MBps"
+                                    value={writeBandwidth}
+                                    onChange={updateWriteBandwidth} />
+                                <Slider
+                                    defaultValue={writeBandwidth}
+                                    min={writeBandwidthMin}
+                                    max={writeBandwidthMax}
+                                    step={writeBandwidthStep}
+                                    label={(value) => `${value} MBps`}
+                                    value={writeBandwidth}
+                                    onChange={updateWriteBandwidth}/>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </Table.Tbody>
+                </Table>
+            </Group>
+            <Group justify="center" pt={15}>
+                <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
+            </Group>
         </Group>
 
 
