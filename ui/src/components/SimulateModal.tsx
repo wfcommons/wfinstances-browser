@@ -1,4 +1,4 @@
-import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip} from '@mantine/core';
+import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Loader} from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import { SimulationGraph } from '~/components/SimulationGraph';
@@ -29,6 +29,7 @@ export function SimulateModal({
     const [newCluster, increaseCluster] = useState(elements.length+1);
     const [showGraph, setShowGraph] = useState(false); // New state to control graph visibility
     const [graphData, setGraphData] = useState<TaskData[] | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const addRow = () => {
         increaseCluster(newCluster + 1);// Increment cluster number
@@ -70,11 +71,13 @@ export function SimulateModal({
 
     // Combined function to run simulation and get data
     const handleRunSimulation = async () => {
+        setLoading(true); // Show loader
         const data = getData();
         // Pass the simulation data to the simulate function and wait for results
         const results = await simulate(id, data);
         setGraphData(results.result.Runtime);  // Set the data returned from simulation
         setShowGraph(true);  // Display the graph after simulation
+        setLoading(false);
     };
     // Generate table rows with input fields
     const rows = elements.map((element, index) => (
@@ -259,7 +262,11 @@ export function SimulateModal({
                 <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
             </Group>
             <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
-                {showGraph && graphData && <SimulationGraph runtimeData={graphData} id = {id}/>}
+                {loading ? (
+                    <Loader color="gray" /> // Show loader while loading
+                ) : (
+                    showGraph && graphData && <SimulationGraph runtimeData={graphData} id={id} />
+                )}
             </Group>
         </Modal>
     );
