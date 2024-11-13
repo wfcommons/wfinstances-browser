@@ -168,7 +168,7 @@ function NewTab ({
 
     const [title, setTitle] = useState(tabTitle);
 
-    const [newCluster, increaseCluster] = useState(elements.length+1)
+    const [newCluster, increaseCluster] = useState(elements.length+1);
 
     const addRow = () => {
         increaseCluster(newCluster + 1);// Increment cluster number
@@ -431,7 +431,5 @@ function NewTab ({
                 )}
             </Group>
         </Group>
-
-
     );
 }

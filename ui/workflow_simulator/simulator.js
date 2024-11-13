@@ -58,10 +58,6 @@ export async function simulate(id, xmlData) {
     });
 
     //handle errors
-    console.log("WAITING FOR RESPONSE FROM BACKEND");
     const response = await r.json()
-    console.log("GOT THIS RESPONSE:");
-    console.log(response)
-    console.log("I SHOULD NOW DISPLAY THE OUTPUT IN SOME SHAPE OR FORM")
-
+    return response
 }
