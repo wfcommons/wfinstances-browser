@@ -124,3 +124,17 @@ Actions:
 - Find an alternative to plotly to create the data visualization
 - Integrate the visualization software and create a "hello world" graph
 ---
+### Meeting 10
+
+Date: Tuesday, 11/12
+
+Business:
+- Discussed options for a Gantt chart
+- Decided on apex chart
+- Reviewed existing line chart
+
+Actions:
+- Merge branches and resolve all conflicts
+- Create a poster draft
+- Display a Gantt chart
+---
