@@ -1,6 +1,7 @@
-import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Tabs, UnstyledButton, rem, Input} from '@mantine/core';
+import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Tabs, UnstyledButton, rem, Input, Loader} from '@mantine/core';
 import {IconPlus, IconTrash, IconX} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
+import { SimulationGraph } from '~/components/SimulationGraph';
 import {useState} from "react";
 
 export function SimulateModal({
@@ -56,7 +57,7 @@ export function SimulateModal({
         setActiveTab(tabs.length > 1 ? tabs[0].id : '');
     };
 
-    const updateTabData = (id, newData) => {
+    const updateElementsTabData = (id, newData) => {
         setTabs(tabs.map(tab =>
             (tab.id === id ? { ...tab, data: newData } : tab)
         ));
@@ -115,7 +116,7 @@ export function SimulateModal({
                             tabData={initialElements} 
                             tabReadBandwidth={initialReadBandwidth} 
                             tabWriteBandwidth={initialWriteBandwidth} 
-                            onElementChange={(newData) => updateTabData(tab.id, newData)}
+                            onElementChange={(newData) => updateElementsTabData(tab.id, newData)}
                             onReadBandwidthChange={(newData) => updateReadBandwidthTabData(tab.id, newData)}
                             onWriteBandwidthChange={(newData) => updateWriteBandwidthTabData(tab.id, newData)}
                             onTitleChange={(newData) => updateTitleTabData(tab.id, newData)}
@@ -150,13 +151,23 @@ function NewTab ({
     const readBandwidthMin = 50, readBandwidthMax = 1000, readBandwidthStep = 50;
     const writeBandwidthMin = 50, writeBandwidthMax = 1000, writeBandwidthStep = 50;
 
+    interface TaskData {
+       task_name: string;
+       cluster_index: number;
+       scheduled_time: number;
+       completion_time: number;
+    }
+    const [showGraph, setShowGraph] = useState(false); // New state to control graph visibility
+    const [graphData, setGraphData] = useState<TaskData[] | null>(null);
+    const [loading, setLoading] = useState(false);
+
     const [elements, setElements] = useState(tabData)
 
     const [readBandwidth, setReadBandwidth] = useState(tabReadBandwidth);
     const [writeBandwidth, setWriteBandwidth] = useState(tabWriteBandwidth);
 
     const [title, setTitle] = useState(tabTitle);
-  
+
     const [newCluster, increaseCluster] = useState(elements.length+1)
 
     const addRow = () => {
@@ -181,17 +192,17 @@ function NewTab ({
         setElements(updatedElements);
         onElementChange(updatedElements);
     };
-    
+
     const updateReadBandwidth = (value) => {
         setReadBandwidth(value);
         onReadBandwidthChange(value);
     }
-    
+
     const updateWriteBandwidth = (value) => {
         setWriteBandwidth(value);
         onWriteBandwidthChange(value);
     }
-    
+
     const updateTitle = (value) => {
         setTitle(value);
         onTitleChange(value);
@@ -218,9 +229,14 @@ function NewTab ({
     };
 
     // Combined function to run simulation and get data
-    const handleRunSimulation = () => {
-        const data = getData(); // Call getData to get the current state
-        simulate(id, data); // Call the simulate function with the id
+    const handleRunSimulation = async () => {
+        setLoading(true); // Show loader
+        const data = getData();
+        // Pass the simulation data to the simulate function and wait for results
+        const results = await simulate(id, data);
+        setGraphData(results.result.Runtime);  // Set the data returned from simulation
+        setShowGraph(true);  // Display the graph after simulation
+        setLoading(false);
     };
 
     // Generate table rows with input fields
@@ -406,6 +422,13 @@ function NewTab ({
             </Group>
             <Group justify="center" pt={15} style={{width: '100%'}}>
                 <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
+            </Group>
+            <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
+                {loading ? (
+                    <Loader color="gray" /> // Show loader while loading
+                ) : (
+                    showGraph && graphData && <SimulationGraph runtimeData={graphData} id={id} />
+                )}
             </Group>
         </Group>
 
