@@ -3,6 +3,7 @@ import {IconPlus, IconTrash, IconX} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import { SimulationGraph } from '~/components/SimulationGraph';
 import {useState} from "react";
+import { SimulateChart } from '~/components/SimulateChart';
 
 export function SimulateModal({
     id,
@@ -13,6 +14,7 @@ export function SimulateModal({
   opened: boolean,
   onClose: () => void
 }) {
+
     const initialElements = [
         { cluster: 1, bw: 400, latency: 10, computeNode: 16, core: 1, speed: 1},
         { cluster: 2, bw: 100, latency: 10, computeNode: 64, core: 1, speed: 2},
@@ -429,6 +431,9 @@ function NewTab ({
                 ) : (
                     showGraph && graphData && <SimulationGraph runtimeData={graphData} id={id} />
                 )}
+            </Group>
+            <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
+                <SimulateChart />
             </Group>
         </Group>
     );
