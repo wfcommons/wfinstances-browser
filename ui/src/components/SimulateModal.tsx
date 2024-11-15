@@ -4,7 +4,6 @@ import {simulate} from '../../workflow_simulator/simulator';
 import { SimulationGraph } from '~/components/SimulationGraph';
 import {useState} from "react";
 import { SimulateChart } from '~/components/SimulateChart';
-
 export function SimulateModal({
     id,
     opened,
