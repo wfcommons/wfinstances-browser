@@ -63,11 +63,11 @@ export const SimulationGraph = ({ runtimeData, id }) => {
                     text: 'Time (in seconds)'
                 },
                 min: 0,
-                max: xAxisMax,  // Dynamically set the max value
+                max: xAxisMax,  
                 ticks: {
                     stepSize: 50,
-                    callback: function(value) {
-                        return value;
+                    callback: function(value: number) {
+                        return value.toFixed(2);
                     }
                 }
             },

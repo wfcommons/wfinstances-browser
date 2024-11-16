@@ -163,8 +163,10 @@ function NewTab ({
        scheduled_time: number;
        completion_time: number;
     }
+
     const [showGraph, setShowGraph] = useState(false); // New state to control graph visibility
     const [graphData, setGraphData] = useState<TaskData[] | null>(null);
+    const [seriesData, setSeriesData] =useState<{ data: { x: string; y: [number, number], completion: number, name: string }[] }[] | null>(null);
     const [loading, setLoading] = useState(false);
 
     const [elements, setElements] = useState(tabData)
@@ -177,20 +179,88 @@ function NewTab ({
     const [newCluster, increaseCluster] = useState(elements.length+1);
 
     const options = {
-        chart: {
-            id: 'basic-bar',
+        chart: { 
+            type: "rangeBar",
+         },
+        plotOptions: {
+            bar: {
+                horizontal: true,
+                barHeight: "50%",
+                dataLabels: { enabled: false },
+                borderRadius: 4,
+            },
         },
-        xaxis: {
-            categories: [1991, 1992, 1993, 1994, 1995],
+        title: {
+            text: "Runtime of Tasks In Each Cluster", // Use the title prop here
+            align: 'center',
         },
+        xaxis: { 
+            type: "numeric", 
+            title: { text: "Time (s)" },
+            labels: {
+                show: true, // Show labels on the x-axis
+                formatter: function (value) {
+                    return value.toFixed(2); // Display time with 2 decimal places
+                }
+            },
+        },
+        tooltip: {
+            custom: function({ seriesIndex, dataPointIndex, w }) {
+                const pointData = w.config.series[seriesIndex].data[dataPointIndex];
+                const taskName = pointData.name;
+                const completionTime = pointData.y[1];
+                return `
+                    <div style="padding: 5px; border: 1px solid #ccc; background: #fff;">
+                        <strong>Task Name:</strong> ${taskName}<br />
+                        <strong>Completion Time:</strong> ${completionTime}
+                    </div>
+                `;
+            }
+        }
     };
 
-    const series = [
-        {
-            name: 'Series 1',
-            data: [30, 40, 45, 50, 49],
-        },
-    ];
+    function assignTasksToNodes(runtimeData: TaskData[], clusters: ClusterData['clusters']): ScheduledTask[] {
+        const scheduledTasks: ScheduledTask[] = [];
+      
+        runtimeData.forEach(task => {
+          const { cluster_index, scheduled_time, completion_time } = task;
+          const computeNodes = clusters[cluster_index].computeNodes;
+      
+          let assignedNode = -1;
+          for (let node = 0; node < computeNodes; node++) {
+            const isOverlap = scheduledTasks.some(t =>
+              t.cluster_index === cluster_index &&
+              t.compute_node === node &&
+              (t.scheduled_time < completion_time && t.completion_time > scheduled_time)
+            );
+            if (!isOverlap) {
+              assignedNode = node;
+              break;
+            }
+          }
+      
+          if (assignedNode !== -1) {
+            scheduledTasks.push({ ...task, compute_node: assignedNode });
+          }
+        });
+      
+        return scheduledTasks;
+      }
+      
+    interface ScheduledTask extends TaskData {
+        compute_node: number;
+    }
+
+    function transformToSeries(scheduledTasks: ScheduledTask[]): { data: { x: string; y: [number, number], completion: number, name: string }[] }[] {
+        const data = scheduledTasks.map(task => ({
+            x: `Cluster ${task.cluster_index}: Node ${task.compute_node}`,
+            y: [task.scheduled_time, task.completion_time] as [number, number],
+            completion: task.completion_time,
+            name: task.task_name, // Include the task name for tooltip
+        }));
+    
+        return [{ data }];
+    }
 
 
     const addRow = () => {
@@ -245,9 +315,9 @@ function NewTab ({
                 "cores": element.core,
                 "speed": element.speed
             };
-            clusterData.clusters[(index + 1).toString()] = values; // Index is 0-based, so +1
+            clusterData.clusters[(index).toString()] = values;
         });
-        console.log(clusterData);
+        // console.log(clusterData);
         return clusterData;
     };
 
@@ -255,9 +325,14 @@ function NewTab ({
     const handleRunSimulation = async () => {
         setLoading(true); // Show loader
         const data = getData();
+        // setClusterData(data);
         // Pass the simulation data to the simulate function and wait for results
         const results = await simulate(id, data);
         setGraphData(results.result.Runtime);  // Set the data returned from simulation
+        const scheduledTasks = assignTasksToNodes(results.result.Runtime, data.clusters);
+        const series = transformToSeries(scheduledTasks);
+        console.log(series);
+        setSeriesData(series);
         setShowGraph(true);  // Display the graph after simulation
         setLoading(false);
     };
@@ -455,7 +530,11 @@ function NewTab ({
             </Group>
             <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
                 <div>
-                    <Chart options={options} series={series} type="bar" height="350" />
+                    {loading ? (
+                        <Loader color="gray" /> // Show loader while loading
+                    ) : (
+                        showGraph  && <Chart options={options} series={seriesData} type="rangeBar" height="750" width ="800"/>
+                    )}
                 </div>
             </Group>
         </Group>

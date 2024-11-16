@@ -171,7 +171,7 @@ def generate_xml(clusterData):
      </zone>"""
 
     for id, values in clusterData["clusters"].items():
-        prefix = str(int(id) - 1)
+        prefix = str(int(id))
         xml_string += f"""
             <cluster id="datacenter{id}" prefix="{prefix}-" suffix=".me" radical="0-{values['computeNodes'] - 1}" 
             speed="{values['speed']}Gf" bw="125MBps" lat="50us" router_id="router{id}" core="{values['cores']}"/>"""
