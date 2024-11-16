@@ -2,8 +2,13 @@ import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Tex
 import {IconPlus, IconTrash, IconX} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import { SimulationGraph } from '~/components/SimulationGraph';
-import {useState} from "react";
-import { SimulateChart } from '~/components/SimulateChart';
+import React, {useState} from "react";
+import loadable from '@loadable/component';
+
+const Chart = loadable(() => import('react-apexcharts'), {
+    ssr: false,
+    resolveComponent: (components: any) => components.default['default'] as any,
+});
 export function SimulateModal({
     id,
     opened,
@@ -170,6 +175,23 @@ function NewTab ({
     const [title, setTitle] = useState(tabTitle);
 
     const [newCluster, increaseCluster] = useState(elements.length+1);
+
+    const options = {
+        chart: {
+            id: 'basic-bar',
+        },
+        xaxis: {
+            categories: [1991, 1992, 1993, 1994, 1995],
+        },
+    };
+
+    const series = [
+        {
+            name: 'Series 1',
+            data: [30, 40, 45, 50, 49],
+        },
+    ];
+
 
     const addRow = () => {
         increaseCluster(newCluster + 1);// Increment cluster number
@@ -432,7 +454,9 @@ function NewTab ({
                 )}
             </Group>
             <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
-                <SimulateChart />
+                <div>
+                    <Chart options={options} series={series} type="bar" height="350" />
+                </div>
             </Group>
         </Group>
     );
