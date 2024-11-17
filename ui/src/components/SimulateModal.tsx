@@ -168,6 +168,7 @@ function NewTab ({
     const [graphData, setGraphData] = useState<TaskData[] | null>(null);
     const [seriesData, setSeriesData] =useState<{ data: { x: string; y: [number, number], completion: number, name: string }[] }[] | null>(null);
     const [loading, setLoading] = useState(false);
+    const [colorMap, setColorMap] = useState<{ [key: string]: string }>(null);
 
     const [elements, setElements] = useState(tabData)
 
@@ -178,10 +179,33 @@ function NewTab ({
 
     const [newCluster, increaseCluster] = useState(elements.length+1);
 
+    const generateRandomColor = () => {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    };
+    
+    const getColorMap = (tasks: TaskData[]) => {
+        const colorMap: { [key: string]: string } = {};
+        tasks.forEach(task => {
+            if (!colorMap[task.task_name]) {
+                colorMap[task.task_name] = generateRandomColor();
+            }
+        });
+        return colorMap;
+    };
+
     const options = {
         chart: { 
             type: "rangeBar",
          },
+         colors: [function ({ seriesIndex, dataPointIndex, w }: any) {
+            const taskName = w.config.series[seriesIndex].data[dataPointIndex].name;
+            return colorMap[taskName] || '#000000'; // Default to black if no color is found
+        }],
         plotOptions: {
             bar: {
                 horizontal: true,
@@ -331,6 +355,7 @@ function NewTab ({
         setGraphData(results.result.Runtime);  // Set the data returned from simulation
         const scheduledTasks = assignTasksToNodes(results.result.Runtime, data.clusters);
         const series = transformToSeries(scheduledTasks);
+        setColorMap(getColorMap(results.result.Runtime))
         console.log(series);
         setSeriesData(series);
         setShowGraph(true);  // Display the graph after simulation
