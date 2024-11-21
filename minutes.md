@@ -138,3 +138,17 @@ Actions:
 - Create a poster draft
 - Display a Gantt chart
 ---
+### Meeting 11
+
+Date: Tuesday, 11/19
+
+Business:
+- Reviewed first draft of poster and made edits
+- Drew a rough sketch of the software architecture graph
+
+Actions:
+- Draw final sortware architecture graph
+- Fix font to be a sans-serif font
+- Remove first example of the Gantt chart and the line charts
+- Add a screenshot of the simulate button
+---
