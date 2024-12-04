@@ -2,7 +2,7 @@ import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Tex
 import {IconPlus, IconTrash, IconX} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import { SimulationGraph } from '~/components/SimulationGraph';
-import React, {useState} from "react";
+import React, { useState, useEffect } from 'react';
 import loadable from '@loadable/component';
 
 const Chart = loadable(() => import('react-apexcharts'), {
@@ -179,7 +179,14 @@ function NewTab ({
 
     const [newCluster, increaseCluster] = useState(elements.length+1);
 
-    const generateRandomColor = () => {
+    useEffect(() => {
+        if (graphData) {
+            const newColorMap = getColorMap(graphData);
+            setColorMap(newColorMap);
+        }
+    }, [graphData]);
+
+    const generateRandomColor = (): string => {
         const letters = '0123456789ABCDEF';
         let color = '#';
         for (let i = 0; i < 6; i++) {
@@ -188,23 +195,43 @@ function NewTab ({
         return color;
     };
     
-    const getColorMap = (tasks: TaskData[]) => {
+    const getColorMap = (tasks: TaskData[]): { [key: string]: string } => {
         const colorMap: { [key: string]: string } = {};
+        const usedColors: Set<string> = new Set();
+    
         tasks.forEach(task => {
-            if (!colorMap[task.task_name]) {
-                colorMap[task.task_name] = generateRandomColor();
+            const lastUnderscoreIndex = task.task_name.lastIndexOf('_');
+            const baseName = lastUnderscoreIndex >= 0 
+                ? task.task_name.substring(0, lastUnderscoreIndex)
+                : task.task_name;
+    
+            if (!colorMap[baseName]) {
+                let newColor = generateRandomColor();
+                while (usedColors.has(newColor)) {
+                    newColor = generateRandomColor();
+                }
+                colorMap[baseName] = newColor;
+                usedColors.add(newColor);
             }
         });
+    
         return colorMap;
     };
-
+    
     const options = {
         chart: { 
             type: "rangeBar",
          },
          colors: [function ({ seriesIndex, dataPointIndex, w }: any) {
             const taskName = w.config.series[seriesIndex].data[dataPointIndex].name;
-            return colorMap[taskName] || '#000000'; // Default to black if no color is found
+            const lastUnderscoreIndex = taskName.lastIndexOf('_');
+            const baseName = lastUnderscoreIndex >= 0 
+                ? taskName.substring(0, lastUnderscoreIndex)
+                : taskName; // Fallback if no underscore
+
+            const color = colorMap?.[baseName] || '#000000'; // Map to baseName
+            // console.log(`Task: ${taskName}, BaseName: ${baseName}, Color: ${color}`);
+            return color;
         }],
         plotOptions: {
             bar: {
