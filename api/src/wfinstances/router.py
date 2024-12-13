@@ -3,8 +3,10 @@ from src.wfinstances.service import retrieve_wf_instance, retrieve_wf_instances,
 from src.metrics.serializer import serialize_metrics, serialize_metric
 from src.models import ApiResponse
 from src.database import metrics_collection, add_item_to_downloads_collection, add_item_to_visualizations_collection, update_simulation_collection
+from simulation import do_simulation
 
 router = APIRouter()
+
 
 @router.post('/public/', response_model=ApiResponse)
 async def post_query_wf_instances(request: Request, ids: list[str]) -> dict:
@@ -19,6 +21,7 @@ async def post_query_wf_instances(request: Request, ids: list[str]) -> dict:
         'result': wf_instances
     }
 
+
 @router.get('/public/viz/{id}', response_model=ApiResponse)
 async def get_wf_instance(request: Request, id: str) -> dict:
     # Call the function to update the visualizations collection
@@ -32,25 +35,15 @@ async def get_wf_instance(request: Request, id: str) -> dict:
         'result': wf_instance
     }
 
+
 @router.post('/public/simulate/{id}', response_model=ApiResponse)
 async def post_wf_instance(request: Request, id: str) -> dict:
     # Call the function to update the simulation collection
     update_simulation_collection(id, request.client.host)
 
-    print("BACKEND RECEIVED A SIMULATION REQUEST")
-    print(f"THE ID RECEIVED IS: {id}")
-
     request_body = await request.json()
-    print(f"THE REQUEST BODY HAS THE FOLLOWING FIELDS: {request_body.keys()}")
-    print("I NOW SHOULD RUN A SIMULATION USING THE WRENCH PYTHON API")
 
     wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
-
-    # make a path to the xml file
-    #request_body["platform_xml"] = generate_xml(request_body["platform_xml"])
-    #platform_file_path = "/tmp/platform.xml"
-    #with open(platform_file_path, "w") as f:
-    #    f.write(request_body["platform_xml"])
 
     runtime = do_simulation(generate_xml(request_body["platform_spec"]), request_body["controller_hostname"], wf_instance)
 

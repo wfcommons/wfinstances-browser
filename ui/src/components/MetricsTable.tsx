@@ -16,7 +16,7 @@ import { DownloadButton } from './DownloadButton';
 import { GraphModal } from '~/components/GraphModal';
 import { SimulateModal } from '~/components/SimulateModal';
 import { Metrics } from '~/types/Metrics';
-import classes from "~/components/style/Navbar.module.css";
+// import classes from "~/components/style/Navbar.module.css";
 
 function formatBytes(bytes: number) {
     return `${(bytes /  (1024 ** 2)).toFixed(2)} MB`;
