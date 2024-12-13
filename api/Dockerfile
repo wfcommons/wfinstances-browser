@@ -29,4 +29,5 @@ RUN wget https://github.com/wrench-project/wrench-python-api/archive/refs/tags/v
 
 COPY . .
 
-CMD cron && uvicorn src.main:app --host 0.0.0.0 --port 8081
+#CMD cron && uvicorn src.main:app --host 0.0.0.0 --port 8081
+CMD cron && bash ./run_uvicorn_and_wrench_daemon.bash
