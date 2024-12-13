@@ -11,7 +11,7 @@ import {
 import 'mantine-react-table/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import {ActionIcon, Tooltip, Box, Flex} from '@mantine/core';
-import {IconEye, IconHourglass} from '@tabler/icons-react';
+import {IconEye, IconChartHistogram} from '@tabler/icons-react';
 import { DownloadButton } from './DownloadButton';
 import { GraphModal } from '~/components/GraphModal';
 import { SimulateModal } from '~/components/SimulateModal';
@@ -27,8 +27,8 @@ function formatRuntime(work: number) {
 }
 
 export function MetricsTable({
-                                 data
-                             } : {
+    data
+} : {
     data: Metrics[]
 }) {
     const [opened, { open, close }] = useDisclosure(false);
@@ -212,7 +212,7 @@ export function MetricsTable({
                         <ActionIcon
                             onClick={() => handleRowMenuActionSimulate(row)}
                         >
-                            <IconHourglass />
+                            <IconChartHistogram />
                         </ActionIcon>
                     </Tooltip>
                 </Box>

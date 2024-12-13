@@ -1,5 +1,4 @@
-import wrench
-from wrench.simulation import Simulation  
+from wrench.simulation import Simulation
 from wrench.task import Task 
 from wrench.compute_service import ComputeService 
 from typing import List, Dict
