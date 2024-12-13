@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Request
-from src.wfinstances.service import retrieve_wf_instance, retrieve_wf_instances, do_simulation, generate_xml
+from src.wfinstances.service import retrieve_wf_instance, retrieve_wf_instances, generate_xml
 from src.metrics.serializer import serialize_metrics, serialize_metric
 from src.models import ApiResponse
 from src.database import metrics_collection, add_item_to_downloads_collection, add_item_to_visualizations_collection, update_simulation_collection
-from simulation import do_simulation
+from src.wfinstances.simulation import do_simulation
 
 router = APIRouter()
 

@@ -4,6 +4,9 @@ from wrench.compute_service import ComputeService
 from typing import List, Dict
 
 
+task_flops = {}
+
+
 def pick_task_to_schedule(tasks: List[Task]):
     """
     A method to select a particular task to schedule. Right now, just selects
@@ -11,10 +14,10 @@ def pick_task_to_schedule(tasks: List[Task]):
     """
     # pick the task with the largest flop amount
     target_task = tasks[0]
-    max_flop = target_task.get_flops()
+    max_flop = task_flops[target_task.get_name()]
     for task in tasks[1:]:
-        if task.get_flops() > max_flop:
-            max_flop = task.get_flops()
+        if task_flops[task.get_name()] > max_flop:
+            max_flop = task_flops[task.get_name()]
             target_task = task
     return target_task
 
@@ -89,9 +92,11 @@ def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
 
 
 def do_simulation(request_platform_xml, request_controller_host, wf_instance):
+
     print(f"Instantiating a simulation...")
-    simulation = wrench.Simulation()
+    simulation = Simulation()
     user_host = request_controller_host
+
     print(f"Starting the simulation using the XML platform file...")
     simulation.start(request_platform_xml, user_host)
 
@@ -99,7 +104,7 @@ def do_simulation(request_platform_xml, request_controller_host, wf_instance):
     print(f"Getting the list of all hostnames...")
     list_of_hostnames = simulation.get_all_hostnames()
 
-    if not "UserHost" in list_of_hostnames:
+    if "UserHost" not in list_of_hostnames:
         raise Exception("This simulator assumes that the XML platform files has a host with hostname UserHost that"
                         " has a disk mounted at '/'")
     list_of_hostnames.remove("UserHost")
@@ -144,6 +149,11 @@ def do_simulation(request_platform_xml, request_controller_host, wf_instance):
                                                     ignore_avg_cpu=True,
                                                     show_warnings=True)
 
+    # Get all task flops now so that we avoid calling get_flop over and over and over
+    for task_name, task_object in workflow.get_tasks().items():
+        task_flops[task_name] = task_object.get_flops()
+    num_tasks = len(workflow.get_tasks())
+
     # Create all needed files on the storage service
     print(f"Create all file copies on the storage service...")
     files = workflow.get_input_files()
@@ -153,7 +163,9 @@ def do_simulation(request_platform_xml, request_controller_host, wf_instance):
     events = []
     # We are now ready to schedule the workflow
     print(f"Starting my main loop!")
-    while not workflow.is_done():
+    num_completed_tasks = 0
+
+    while num_completed_tasks < num_tasks:
         # Perform some scheduling, perhaps
         schedule_tasks(simulation, workflow.get_ready_tasks(), compute_resources, ss)
 
@@ -173,9 +185,10 @@ def do_simulation(request_platform_xml, request_controller_host, wf_instance):
             completed_task_name = completed_job.get_tasks()[0].get_name()
             print(f"Task {completed_task_name} has completed!")
             compute_resources[event["compute_service"]]["num_idle_cores"] += 1
+            num_completed_tasks += 1
 
     print(f"Workflow execution completed at time {simulation.get_simulated_time()}!")
-    print(f"Workflow execution events {events}!")
+    # print(f"Workflow execution events {events}!")
     simulation_events = events
 
     return simulation_events
