@@ -1,6 +1,6 @@
 import {Center, Container, Image, Modal, List, ListItem, ThemeIcon} from '@mantine/core';
 import classes from './style/HelpModal.module.css';
-import {IconFilter, IconEye, IconColumns, IconDownload} from '@tabler/icons-react';
+import {IconFilter, IconEye, IconColumns, IconDownload, IconHourglass} from '@tabler/icons-react';
 import wfcommonslogo from "../../public/images/wfcommons-horizontal.png";
 
 
@@ -73,6 +73,16 @@ export function HelpModal({
                             }>
                             <strong>Visualizing workflow instances</strong> &#8212; Click on <IconEye size="1rem" style={{marginBottom: '-2px'}}/> to visualize the structure of
                             workflow instances with fewer than 250 tasks.
+                        </ListItem>
+                        <ListItem
+                            style={{ marginBottom: '20px' }}
+                            icon={
+                                <ThemeIcon size={30} radius="xl">
+                                    <IconHourglass size="1rem" />
+                                </ThemeIcon>
+                            }>
+                            <strong>Simulating workflow instances</strong> &#8212; Click on <IconHourglass size="1rem" style={{marginBottom: '-2px'}}/> to simulate the runtime of
+                            workflow instances.
                         </ListItem>
                     </List>
                 </Container>

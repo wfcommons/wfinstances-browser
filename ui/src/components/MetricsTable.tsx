@@ -11,9 +11,10 @@ import {
 import 'mantine-react-table/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import {ActionIcon, Tooltip, Box, Flex} from '@mantine/core';
-import {IconEye} from '@tabler/icons-react';
+import {IconEye, IconHourglass} from '@tabler/icons-react';
 import { DownloadButton } from './DownloadButton';
 import { GraphModal } from '~/components/GraphModal';
+import { SimulateModal } from '~/components/SimulateModal';
 import { Metrics } from '~/types/Metrics';
 import classes from "~/components/style/Navbar.module.css";
 
@@ -31,11 +32,17 @@ export function MetricsTable({
     data: Metrics[]
 }) {
     const [opened, { open, close }] = useDisclosure(false);
+    const [openedSimulateModal, { open:openSimulateModal, close:closeSimulateModal}] = useDisclosure(false);
     const [selectedRow, setSelectedRow] = useState<MRT_Row<Metrics> | null>(null);
 
     const handleRowMenuAction = (row: MRT_Row<Metrics>) => {
         setSelectedRow(row);
         open();
+    }
+
+    const handleRowMenuActionSimulate = (row: MRT_Row<Metrics>) => {
+        setSelectedRow(row);
+        openSimulateModal();
     }
 
     // Columns to be used in the table.
@@ -201,6 +208,13 @@ export function MetricsTable({
                             <IconEye />
                         </ActionIcon>
                     </Tooltip>
+                    <Tooltip label='Simulate workflow instance' position="top">
+                        <ActionIcon
+                            onClick={() => handleRowMenuActionSimulate(row)}
+                        >
+                            <IconHourglass />
+                        </ActionIcon>
+                    </Tooltip>
                 </Box>
             );
         },
@@ -223,6 +237,7 @@ export function MetricsTable({
     return (
         <>
             <MantineReactTable table={table} />
+            {selectedRow && <SimulateModal id={selectedRow.original.id} opened={openedSimulateModal} onClose={closeSimulateModal} />}
             {selectedRow && <GraphModal id={selectedRow.original.id} opened={opened} onClose={close} />}
         </>
     );

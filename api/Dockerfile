@@ -1,4 +1,5 @@
-FROM python:3.12-bookworm
+FROM wrenchproject/wrench:2.4
+USER root
 
 COPY requirements.txt .
 
@@ -14,11 +15,17 @@ RUN chmod +x /usr/local/bin/workflowInjection.sh
 
 ARG WFINSTANCES_CRAWL_PERIOD_IN_DAYS
 
-RUN echo "0 0 */${WFINSTANCES_CRAWL_PERIOD_IN_DAYS} * *  /usr/local/bin/workflowInjection.sh" > /etc/cron.d/run-curl-job
+RUN  echo "0 0 */${WFINSTANCES_CRAWL_PERIOD_IN_DAYS} * *  /usr/local/bin/workflowInjection.sh" > /etc/cron.d/run-curl-job
 
 RUN chmod 0644 /etc/cron.d/run-curl-job
 
 RUN crontab /etc/cron.d/run-curl-job
+
+# Install WRENCH API 0.3
+RUN apt-get -y install zip
+RUN python3 -m pip install build
+RUN wget https://github.com/wrench-project/wrench-python-api/archive/refs/tags/v0.3.zip; unzip v0.3.zip; cd wrench-python-api-0.3; python3 -m build; python3 -m pip install ./dist/wrench-*.whl
+
 
 COPY . .
 
