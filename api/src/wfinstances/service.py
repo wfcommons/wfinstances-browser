@@ -1,6 +1,14 @@
 import requests
+import wrench
+import pathlib
+# import json
 from jsonschema import validate, ValidationError
 from src.exceptions import InvalidWfInstanceException, GithubResourceNotFoundException
+from src.wfinstances.simulation import schedule_tasks
+from typing import List, Dict
+from wrench.simulation import Simulation  # For type checking
+from wrench.task import Task  # For type checking
+from wrench.compute_service import ComputeService  # For type checking
 
 
 def retrieve_wf_instances(metrics: list[dict]) -> list[dict]:
@@ -52,3 +60,43 @@ def validate_wf_instance(wf_instance: dict) -> None:
         validate(wf_instance, schema=schema)
     except ValidationError as e:
         raise InvalidWfInstanceException(str(e))
+
+
+def generate_xml(cluster_data):
+    print(f"cluster_data before parsing: {cluster_data}")
+    xml_string = f"""<?xml version='1.0'?>
+ <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+ <platform version="4.1">
+   <zone id="world" routing="Full">
+
+     <zone id="outside" routing="None">
+       <host id="UserHost" speed="1Gf">
+         <disk id="hard_drive" read_bw="{cluster_data["readBandwidth"]}MBps" write_bw="{cluster_data["writeBandwidth"]}MBps">
+           <prop id="size" value="5000GiB"/>
+           <prop id="mount" value="/"/>
+         </disk>
+       </host>
+     </zone>"""
+
+    for id, values in cluster_data["clusters"].items():
+        prefix = str(int(id))
+        xml_string += f"""
+            <cluster id="datacenter{id}" prefix="{prefix}-" suffix=".me" radical="0-{values['computeNodes'] - 1}" 
+            speed="{values['speed']}Gf" bw="125MBps" lat="50us" router_id="router{id}" core="{values['cores']}"/>"""
+
+    for id, values in cluster_data["clusters"].items():
+        xml_string += f"""
+            <link id="link{id}" bandwidth="{values['bw']}kBps" latency="{values['latency']}ms"/>"""
+
+    for id, values in cluster_data["clusters"].items():
+        xml_string += f"""
+            <zoneRoute src="datacenter{id}" dst="outside" gw_src="router{id}" gw_dst="UserHost">
+                  <link_ctn id="link{id}"/>
+                </zoneRoute>"""
+
+    xml_string += """
+    </zone>
+</platform>"""
+
+    print(xml_string)
+    return xml_string

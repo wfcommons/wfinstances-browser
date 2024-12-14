@@ -11,11 +11,12 @@ import {
 import 'mantine-react-table/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import {ActionIcon, Tooltip, Box, Flex} from '@mantine/core';
-import {IconEye} from '@tabler/icons-react';
+import {IconEye, IconChartHistogram} from '@tabler/icons-react';
 import { DownloadButton } from './DownloadButton';
 import { GraphModal } from '~/components/GraphModal';
+import { SimulateModal } from '~/components/SimulateModal';
 import { Metrics } from '~/types/Metrics';
-import classes from "~/components/style/Navbar.module.css";
+// import classes from "~/components/style/Navbar.module.css";
 
 function formatBytes(bytes: number) {
     return `${(bytes /  (1024 ** 2)).toFixed(2)} MB`;
@@ -26,16 +27,22 @@ function formatRuntime(work: number) {
 }
 
 export function MetricsTable({
-                                 data
-                             } : {
+    data
+} : {
     data: Metrics[]
 }) {
     const [opened, { open, close }] = useDisclosure(false);
+    const [openedSimulateModal, { open:openSimulateModal, close:closeSimulateModal}] = useDisclosure(false);
     const [selectedRow, setSelectedRow] = useState<MRT_Row<Metrics> | null>(null);
 
     const handleRowMenuAction = (row: MRT_Row<Metrics>) => {
         setSelectedRow(row);
         open();
+    }
+
+    const handleRowMenuActionSimulate = (row: MRT_Row<Metrics>) => {
+        setSelectedRow(row);
+        openSimulateModal();
     }
 
     // Columns to be used in the table.
@@ -183,22 +190,40 @@ export function MetricsTable({
             // Access the metrics object from the row
             const metrics = row.original;
 
-            // Determine whether the ActionIcon should be disabled
-            const isDisabled = (metrics.numTasks > 250);
+            // Determine whether the viz ActionIcon should be disabled
+            const vizMaxTasks = 250
+            const vizIsDisabled = (metrics.numTasks > vizMaxTasks);
 
             // Tooltip message
-            const tooltipMessage = isDisabled
-                ? 'Viz disabled for workflow instances with >= 250 tasks' // Message when disabled
+            const vizTooltipMessage = vizIsDisabled
+                ? 'Viz disabled for workflow instances with >= ' + vizMaxTasks + ' tasks' // Message when disabled
                 : 'Visualize workflow instance'; // Message when enabled
+
+            // Determine whether the simulate ActionIcon should be disabled
+            const simMaxTasks = 1000
+            const simIsDisabled = (metrics.numTasks > simMaxTasks);
+
+            // Tooltip message
+            const simTooltipMessage = simIsDisabled
+                ? 'Simulation disabled for workflow instances with >= ' + simMaxTasks + ' tasks' // Message when disabled
+                : 'Simulate workflow instance'; // Message when enabled
 
             return (
                 <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
-                    <Tooltip label={tooltipMessage} position="top">
+                    <Tooltip label={vizTooltipMessage} position="top">
                         <ActionIcon
                             onClick={() => handleRowMenuAction(row)}
-                            disabled={isDisabled} // Apply the condition here
+                            disabled={vizIsDisabled}
                         >
                             <IconEye />
+                        </ActionIcon>
+                    </Tooltip>
+                    <Tooltip label={simTooltipMessage} position="top">
+                        <ActionIcon
+                            onClick={() => handleRowMenuActionSimulate(row)}
+                            disabled={simIsDisabled}
+                        >
+                            <IconChartHistogram />
                         </ActionIcon>
                     </Tooltip>
                 </Box>
@@ -223,6 +248,7 @@ export function MetricsTable({
     return (
         <>
             <MantineReactTable table={table} />
+            {selectedRow && <SimulateModal id={selectedRow.original.id} opened={openedSimulateModal} onClose={closeSimulateModal} />}
             {selectedRow && <GraphModal id={selectedRow.original.id} opened={opened} onClose={close} />}
         </>
     );
