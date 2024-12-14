@@ -324,7 +324,6 @@ function NewTab ({
         setElements(updatedElements); // Add new element to state
         onElementChange(updatedElements); //update parent function
         setSimulationButtonDisabled(false)
-        console.log("SETTING simulationButtonDisabled to FALSE")
 
 
     };
@@ -332,10 +331,8 @@ function NewTab ({
         const updatedElements = elements.filter((_, i) => i !== index); // Remove the row at the given index
         setElements(updatedElements);
         onElementChange(updatedElements);
-        console.log("TESTING");
         console.log(updatedElements.length)
         if (updatedElements.length == 0) {
-            console.log("SETTING simulationButtonDisabled to TRUE")
             setSimulationButtonDisabled(true)
         }
     };
