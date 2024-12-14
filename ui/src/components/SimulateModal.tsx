@@ -1,5 +1,6 @@
-import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, Text, Tooltip, Tabs, UnstyledButton, rem, Input, Loader} from '@mantine/core';
-import {IconPlus, IconTrash, IconX} from '@tabler/icons-react';
+import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, List, ListItem,
+    Text, Tooltip, Tabs, UnstyledButton, rem, Input, Loader, Accordion} from '@mantine/core';
+import {IconPlus, IconTrash, IconX, IconHelp} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import { SimulationGraph } from '~/components/SimulationGraph';
 import React, { useState, useEffect } from 'react';
@@ -10,13 +11,13 @@ const Chart = loadable(() => import('react-apexcharts'), {
     resolveComponent: (components: any) => components.default['default'] as any,
 });
 export function SimulateModal({
-    id,
-    opened,
-    onClose
-}: {
-  id: string,
-  opened: boolean,
-  onClose: () => void
+                                  id,
+                                  opened,
+                                  onClose
+                              }: {
+    id: string,
+    opened: boolean,
+    onClose: () => void
 }) {
 
     const initialElements = [
@@ -28,7 +29,7 @@ export function SimulateModal({
     const initialWriteBandwidth = 100;
 
     const defaultTitle = "New Experiment";
-  
+
     const [tabs, setTabs] = useState([
         { id: '1',
             data: JSON.parse(JSON.stringify(initialElements)),
@@ -68,7 +69,7 @@ export function SimulateModal({
             (tab.id === id ? { ...tab, data: newData } : tab)
         ));
     };
-    
+
     const updateReadBandwidthTabData = (id, newData) => {
         setTabs(tabs.map(tab =>
             (tab.id === id ? { ...tab, read: newData } : tab)
@@ -80,7 +81,7 @@ export function SimulateModal({
             (tab.id === id ? { ...tab, write: newData } : tab)
         ));
     }
-    
+
     const updateTitleTabData = (id, newData) => {
         setTabs(tabs.map(tab =>
             (tab.id === id ? { ...tab, title: newData } : tab)
@@ -102,12 +103,12 @@ export function SimulateModal({
                             <IconX style={iconStyle} />
                         </UnstyledButton>}>
                             <Text mx={0} size="sm"
-                                style={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    maxWidth: '14ch', // Limits text display to approximately 14 characters
-                                }}>
+                                  style={{
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      whiteSpace: 'nowrap',
+                                      maxWidth: '14ch', // Limits text display to approximately 14 characters
+                                  }}>
                                 {tab.title}
                             </Text>
                         </Tabs.Tab>
@@ -118,10 +119,10 @@ export function SimulateModal({
                 </Tabs.List>
                 {tabs.map((tab) => (
                     <Tabs.Panel key={tab.id} value={tab.id}>
-                        <NewTab 
-                            tabData={initialElements} 
-                            tabReadBandwidth={initialReadBandwidth} 
-                            tabWriteBandwidth={initialWriteBandwidth} 
+                        <NewTab
+                            tabData={initialElements}
+                            tabReadBandwidth={initialReadBandwidth}
+                            tabWriteBandwidth={initialWriteBandwidth}
                             onElementChange={(newData) => updateElementsTabData(tab.id, newData)}
                             onReadBandwidthChange={(newData) => updateReadBandwidthTabData(tab.id, newData)}
                             onWriteBandwidthChange={(newData) => updateWriteBandwidthTabData(tab.id, newData)}
@@ -138,16 +139,16 @@ export function SimulateModal({
 }
 
 function NewTab ({
-    tabData, 
-    tabReadBandwidth, 
-    tabWriteBandwidth,
-    tabTitle,
-    onElementChange, 
-    onReadBandwidthChange, 
-    onWriteBandwidthChange,
-    onTitleChange,
-    id
-}) {
+                     tabData,
+                     tabReadBandwidth,
+                     tabWriteBandwidth,
+                     tabTitle,
+                     onElementChange,
+                     onReadBandwidthChange,
+                     onWriteBandwidthChange,
+                     onTitleChange,
+                     id
+                 }) {
 
     const bwMin = 50, bwMax = 1000, bwStep = 50;
     const latencyMin = 1, latencyMax = 100, latencyStep = 1;
@@ -157,11 +158,13 @@ function NewTab ({
     const readBandwidthMin = 50, readBandwidthMax = 1000, readBandwidthStep = 50;
     const writeBandwidthMin = 50, writeBandwidthMax = 1000, writeBandwidthStep = 50;
 
+    const [simulationButtonDisabled, setSimulationButtonDisabled] = useState(false);
+
     interface TaskData {
-       task_name: string;
-       cluster_index: number;
-       scheduled_time: number;
-       completion_time: number;
+        task_name: string;
+        cluster_index: number;
+        scheduled_time: number;
+        completion_time: number;
     }
 
     const [showGraph, setShowGraph] = useState(false); // New state to control graph visibility
@@ -194,17 +197,17 @@ function NewTab ({
         }
         return color;
     };
-    
+
     const getColorMap = (tasks: TaskData[]): { [key: string]: string } => {
         const colorMap: { [key: string]: string } = {};
         const usedColors: Set<string> = new Set();
-    
+
         tasks.forEach(task => {
             const lastUnderscoreIndex = task.task_name.lastIndexOf('_');
-            const baseName = lastUnderscoreIndex >= 0 
+            const baseName = lastUnderscoreIndex >= 0
                 ? task.task_name.substring(0, lastUnderscoreIndex)
                 : task.task_name;
-    
+
             if (!colorMap[baseName]) {
                 let newColor = generateRandomColor();
                 while (usedColors.has(newColor)) {
@@ -214,18 +217,18 @@ function NewTab ({
                 usedColors.add(newColor);
             }
         });
-    
+
         return colorMap;
     };
-    
+
     const options = {
-        chart: { 
+        chart: {
             type: "rangeBar",
-         },
-         colors: [function ({ seriesIndex, dataPointIndex, w }: any) {
+        },
+        colors: [function ({ seriesIndex, dataPointIndex, w }: any) {
             const taskName = w.config.series[seriesIndex].data[dataPointIndex].name;
             const lastUnderscoreIndex = taskName.lastIndexOf('_');
-            const baseName = lastUnderscoreIndex >= 0 
+            const baseName = lastUnderscoreIndex >= 0
                 ? taskName.substring(0, lastUnderscoreIndex)
                 : taskName; // Fallback if no underscore
 
@@ -245,8 +248,8 @@ function NewTab ({
             text: "Runtime of Tasks In Each Cluster", // Use the title prop here
             align: 'center',
         },
-        xaxis: { 
-            type: "numeric", 
+        xaxis: {
+            type: "numeric",
             title: { text: "Time (s)" },
             labels: {
                 show: true, // Show labels on the x-axis
@@ -272,32 +275,32 @@ function NewTab ({
 
     function assignTasksToNodes(runtimeData: TaskData[], clusters: ClusterData['clusters']): ScheduledTask[] {
         const scheduledTasks: ScheduledTask[] = [];
-      
+
         runtimeData.forEach(task => {
-          const { cluster_index, scheduled_time, completion_time } = task;
-          const computeNodes = clusters[cluster_index].computeNodes;
-      
-          let assignedNode = -1;
-          for (let node = 0; node < computeNodes; node++) {
-            const isOverlap = scheduledTasks.some(t =>
-              t.cluster_index === cluster_index &&
-              t.compute_node === node &&
-              (t.scheduled_time < completion_time && t.completion_time > scheduled_time)
-            );
-            if (!isOverlap) {
-              assignedNode = node;
-              break;
+            const { cluster_index, scheduled_time, completion_time } = task;
+            const computeNodes = clusters[cluster_index].computeNodes;
+
+            let assignedNode = -1;
+            for (let node = 0; node < computeNodes; node++) {
+                const isOverlap = scheduledTasks.some(t =>
+                    t.cluster_index === cluster_index &&
+                    t.compute_node === node &&
+                    (t.scheduled_time < completion_time && t.completion_time > scheduled_time)
+                );
+                if (!isOverlap) {
+                    assignedNode = node;
+                    break;
+                }
             }
-          }
-      
-          if (assignedNode !== -1) {
-            scheduledTasks.push({ ...task, compute_node: assignedNode });
-          }
+
+            if (assignedNode !== -1) {
+                scheduledTasks.push({ ...task, compute_node: assignedNode });
+            }
         });
-      
+
         return scheduledTasks;
-      }
-      
+    }
+
     interface ScheduledTask extends TaskData {
         compute_node: number;
     }
@@ -309,7 +312,7 @@ function NewTab ({
             completion: task.completion_time,
             name: task.task_name, // Include the task name for tooltip
         }));
-    
+
         return [{ data }];
     }
 
@@ -320,12 +323,21 @@ function NewTab ({
         const updatedElements = [...elements, newElement];
         setElements(updatedElements); // Add new element to state
         onElementChange(updatedElements); //update parent function
+        setSimulationButtonDisabled(false)
+        console.log("SETTING simulationButtonDisabled to FALSE")
+
 
     };
     const deleteRow = (index) => {
         const updatedElements = elements.filter((_, i) => i !== index); // Remove the row at the given index
         setElements(updatedElements);
         onElementChange(updatedElements);
+        console.log("TESTING");
+        console.log(updatedElements.length)
+        if (updatedElements.length == 0) {
+            console.log("SETTING simulationButtonDisabled to TRUE")
+            setSimulationButtonDisabled(true)
+        }
     };
 
     // Function to handle input change in the table
@@ -374,8 +386,8 @@ function NewTab ({
 
     // Combined function to run simulation and get data
     const handleRunSimulation = async () => {
-        setLoading(true); // Show loader
         const data = getData();
+        setLoading(true); // Show loader
         // setClusterData(data);
         // Pass the simulation data to the simulate function and wait for results
         const results = await simulate(id, data);
@@ -429,12 +441,12 @@ function NewTab ({
                     max={latencyMax}
                 />
                 <Slider value={element['latency']}
-                    onChange={(value) => updateElement(index, 'latency', value)}
-                    defaultValue='latency'
-                    min={latencyMin}
-                    max={latencyMax}
-                    step={latencyStep}
-                    label={(value) => `${value} ms`} />
+                        onChange={(value) => updateElement(index, 'latency', value)}
+                        defaultValue='latency'
+                        min={latencyMin}
+                        max={latencyMax}
+                        step={latencyStep}
+                        label={(value) => `${value} ms`} />
             </td>
             <td key='computeNode'>
                 <NumberInput
@@ -500,7 +512,40 @@ function NewTab ({
                 </Tooltip>
             </Group>
             <Group justify="center">
-                <Title order={4}>Input Compute Platform XML Specifications</Title>
+                <Accordion style={{width: "100%"}}>
+                    <Accordion.Item value="item-1">
+                        <Accordion.Control icon={<IconHelp />}><Title order={4}>Compute Platform Specifications</Title></Accordion.Control>
+                        <Accordion.Panel style={{ width: '100%' }}>
+
+                            <p>
+                            The simulated platform consists of a user host, on which all the workflow's
+                            input / output files are and will be stored, and of at least one compute
+                            cluster. You can add/remove and specify clusters as you wish with the widget below.
+                            Each cluster is described by:
+
+                            <List style={{ paddingLeft: '30px' }}>
+                                <ListItem>
+                                    A bandwidth and latency for the link that connects the cluster to the user host
+                                </ListItem>
+                                <ListItem>
+                                    A number of compute nodes, a number of core per compute node, and a core speed
+                                </ListItem>
+                            </List>
+                            </p>
+
+
+                            <p>
+                            The user host is described by:
+                            <List style={{ paddingLeft: '30px' }}>
+                                <ListItem>
+                                    The read and write bandwidth of the disk that is used to store all workflow files
+                                </ListItem>
+                            </List>
+                            </p>
+
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                </Accordion>
                 <Table striped highlightOnHover withTableBorder withColumnBorders>
                     <Table.Thead>
                         <Table.Tr>
@@ -571,7 +616,7 @@ function NewTab ({
                 </Table>
             </Group>
             <Group justify="center" pt={15} style={{width: '100%'}}>
-                <Button variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
+                <Button disabled={simulationButtonDisabled} variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
             </Group>
             <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
                 {loading ? (
