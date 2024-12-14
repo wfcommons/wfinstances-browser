@@ -40,7 +40,7 @@ export const SimulationGraph = ({ runtimeData, id }) => {
                 showLine: false
             },
             {
-                label: 'Stepped Line',
+                label: 'Task completions',
                 data: cumulativeData.map(item => ({
                     x: item.completion_time,
                     y: item.cumulative_tasks
@@ -103,7 +103,7 @@ export const SimulationGraph = ({ runtimeData, id }) => {
 
   return (
     <div style={{ alignItems: 'center', justifyContent: 'center', width: '80%', height: '100%' }}>
-      <h3 style={{ textAlign: 'center' }}>Task Runtime of {id}</h3>
+      <h3 style={{ textAlign: 'center' }}>Task completion times</h3>
       <div>
         <Scatter data={data} options={options} />
       </div>

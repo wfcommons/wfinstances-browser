@@ -89,9 +89,11 @@ export function SimulateModal({
     }
 
     const iconStyle = { width: rem(12), height: rem(12) };
+    const modal_title = "Simulation of workflow instance: " + id
+
     return (
-        <Modal title="WfInstance Simulation" opened={opened} onClose={onClose} size='100%'>
-            <i>{id}</i>
+        <Modal title={<Title order={4}>{modal_title}</Title>}  opened={opened} onClose={onClose} size='100%'>
+
             <Tabs defaultValue="1" variant="outline">
                 <Tabs.List pt={15}>
                     {tabs.map((tab) => (
@@ -245,7 +247,7 @@ function NewTab ({
             },
         },
         title: {
-            text: "Runtime of Tasks In Each Cluster", // Use the title prop here
+            text: "Execution Gantt chart", // Use the title prop here
             align: 'center',
         },
         xaxis: {
@@ -547,24 +549,30 @@ function NewTab ({
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th>Cluster</Table.Th>
-                            <Table.Th>Link Bandwidth</Table.Th>
-                            <Table.Th>Link Latency</Table.Th>
-                            <Table.Th>Compute Nodes</Table.Th>
-                            <Table.Th>Cores per Compute Nodes</Table.Th>
-                            <Table.Th>Core Speed</Table.Th>
+                            <Table.Th>Link bandwidth</Table.Th>
+                            <Table.Th>Link latency</Table.Th>
+                            <Table.Th>#Compute nodes</Table.Th>
+                            <Table.Th>#Cores per node</Table.Th>
+                            <Table.Th>Core speed</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>{rows}</Table.Tbody>
                 </Table>
                 <Button variant="default" onClick={addRow}>Add Cluster</Button>
             </Group>
-            <Group pt={15} align="flex-start" width="auto">
+            <Group pt={15} align="flex-start" style={{width: '100%'}}>
                 <Table align="flex-start" width="auto">
                     <Table.Tbody>
                         <tr>
                             <td width="auto" valign="top">
-                                <Text px={10}>Read Bandwidth of the Disk on the Controller Host:  </Text>
+                                <Text px={10}>Read bandwidth of the user host's disk:  </Text>
                             </td>
+                            <td></td>
+                            <td width="auto" valign="top">
+                                <Text px={10}>Write bandwidth of the user host's disk:  </Text>
+                            </td>
+                        </tr>
+                        <tr>
                             <td width="auto">
                                 <NumberInput
                                     defaultValue={readBandwidth}
@@ -583,12 +591,7 @@ function NewTab ({
                                     value={readBandwidth}
                                     onChange={updateReadBandwidth}/>
                             </td>
-                        </tr>
-                        <tr></tr>
-                        <tr>
-                            <td width="auto" valign="top">
-                                <Text px={10}>Write Bandwidth of the Disk on the Controller Host:  </Text>
-                            </td>
+                            <td width="30px"></td>
                             <td width="auto">
                                 <NumberInput
                                     defaultValue={writeBandwidth}
@@ -607,7 +610,6 @@ function NewTab ({
                                     value={writeBandwidth}
                                     onChange={updateWriteBandwidth}/>
                             </td>
-                            <td></td>
                         </tr>
                     </Table.Tbody>
                 </Table>
