@@ -58,7 +58,10 @@ def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
 
         # Pick one of the compute services on which to schedule the task,
         # using the minimum number of cores for the task
-        target_cs = pick_target_cs(compute_resources, task_to_schedule.get_min_num_cores())
+
+        # task_min_num_cores = task_to_schedule.get_min_num_cores()
+        task_min_num_cores = 1
+        target_cs = pick_target_cs(compute_resources, task_min_num_cores)
 
         # If we didn't find a compute service, we're done
         if target_cs is None:
@@ -171,7 +174,6 @@ def do_simulation(request_platform_xml, request_controller_host, wf_instance):
 
         # Wait for next event
         event = simulation.wait_for_next_event()
-        print(event)
         if event["event_type"] != "standard_job_completion":
             print(f"  - Event: {event}")  # Should make sure it's a job completion
         else:

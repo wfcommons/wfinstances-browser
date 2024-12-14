@@ -190,27 +190,38 @@ export function MetricsTable({
             // Access the metrics object from the row
             const metrics = row.original;
 
-            // Determine whether the ActionIcon should be disabled
-            const isDisabled = (metrics.numTasks > 250);
+            // Determine whether the viz ActionIcon should be disabled
+            const vizMaxTasks = 250
+            const vizIsDisabled = (metrics.numTasks > vizMaxTasks);
 
             // Tooltip message
-            const tooltipMessage = isDisabled
-                ? 'Viz disabled for workflow instances with >= 250 tasks' // Message when disabled
+            const vizTooltipMessage = vizIsDisabled
+                ? 'Viz disabled for workflow instances with >= ' + vizMaxTasks + ' tasks' // Message when disabled
                 : 'Visualize workflow instance'; // Message when enabled
+
+            // Determine whether the simulate ActionIcon should be disabled
+            const simMaxTasks = 1000
+            const simIsDisabled = (metrics.numTasks > simMaxTasks);
+
+            // Tooltip message
+            const simTooltipMessage = simIsDisabled
+                ? 'Simulation disabled for workflow instances with >= ' + simMaxTasks + ' tasks' // Message when disabled
+                : 'Simulate workflow instance'; // Message when enabled
 
             return (
                 <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
-                    <Tooltip label={tooltipMessage} position="top">
+                    <Tooltip label={vizTooltipMessage} position="top">
                         <ActionIcon
                             onClick={() => handleRowMenuAction(row)}
-                            disabled={isDisabled} // Apply the condition here
+                            disabled={vizIsDisabled}
                         >
                             <IconEye />
                         </ActionIcon>
                     </Tooltip>
-                    <Tooltip label='Simulate workflow instance' position="top">
+                    <Tooltip label={simTooltipMessage} position="top">
                         <ActionIcon
                             onClick={() => handleRowMenuActionSimulate(row)}
+                            disabled={simIsDisabled}
                         >
                             <IconChartHistogram />
                         </ActionIcon>
