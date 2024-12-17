@@ -81,8 +81,7 @@ export function HelpModal({
                                     <IconChartHistogram size="1rem" />
                                 </ThemeIcon>
                             }>
-                            <strong>Simulating workflow instances</strong> &#8212; Click on <IconChartHistogram size="1rem" style={{marginBottom: '-2px'}}/> to simulate the runtime of
-                            workflow instances.
+                            <strong>Simulating workflow instances</strong> &#8212; Click on <IconChartHistogram size="1rem" style={{marginBottom: '-2px'}}/> to simulate the execution of workflow instances.
                         </ListItem>
                     </List>
                 </Container>
