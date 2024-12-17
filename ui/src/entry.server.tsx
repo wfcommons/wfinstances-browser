@@ -100,6 +100,7 @@ function handleBrowserRequest(
         const { pipe, abort } = renderToPipeableStream(
             <RemixServer
                 context={remixContext}
+                // context={customContext}
                 url={request.url}
                 abortDelay={ABORT_DELAY}
             />,

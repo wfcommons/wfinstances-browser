@@ -5,13 +5,22 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Metrics } from "~/types/Metrics";
 
+export let clientIp: string | null;
+
 export const meta: MetaFunction = () => {
     return [
         { title: "WfInstances browser" },
     ];
 };
 
-export const loader = async () => {
+export const loader = async ({ request }: { request: Request }) => {
+
+    // Obtain the client's IP address
+    clientIp = request.headers.get('X-Forwarded-For');
+    if (!clientIp) {
+        clientIp = request.headers.get('X-Real-IP') || 'unknown';
+    }
+
     const response = await fetch(`${process.env.API_BASE_URL}/metrics/private`);
     const jsonResponse = await response.json();
     const metrics: Metrics[] = await jsonResponse.result;

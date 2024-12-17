@@ -7,6 +7,7 @@ import { Task, File, WfInstance } from '~/types/WfInstance';
 import DAGRE from 'cytoscape-dagre';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { useDisclosure } from '@mantine/hooks';
+import {clientIp} from "~/routes/_index";
 
 Cytoscape.use(DAGRE);
 
