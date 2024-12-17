@@ -1,6 +1,6 @@
 import {Button, Group, Modal, Table, Title, NumberInput, ActionIcon, Slider, List, ListItem,
-    Text, Tooltip, Tabs, UnstyledButton, rem, Input, Loader, Accordion} from '@mantine/core';
-import {IconPlus, IconTrash, IconX, IconHelp} from '@tabler/icons-react';
+    Text, Tooltip, Tabs, UnstyledButton, rem, Input, Loader, Accordion, Menu, Divider} from '@mantine/core';
+import {IconPlus, IconTrash, IconX, IconHelp, IconChevronDown} from '@tabler/icons-react';
 import {simulate} from '../../workflow_simulator/simulator';
 import { SimulationGraph } from '~/components/SimulationGraph';
 import React, { useState, useEffect } from 'react';
@@ -23,7 +23,7 @@ export function SimulateModal({
     const initialElements = [
         { cluster: 1, bw: 400, latency: 10, computeNode: 16, core: 1, speed: 1},
         { cluster: 2, bw: 100, latency: 10, computeNode: 64, core: 1, speed: 2},
-        { cluster: 3, bw: 300, latency: 10, computeNode: 32, core: 1, speed: 3},
+        // { cluster: 3, bw: 300, latency: 10, computeNode: 32, core: 1, speed: 3},
     ];
     const initialReadBandwidth = 100;
     const initialWriteBandwidth = 100;
@@ -104,13 +104,12 @@ export function SimulateModal({
                             }}>
                             <IconX style={iconStyle} />
                         </UnstyledButton>}>
-                            <Text mx={0} size="sm"
-                                  style={{
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                      whiteSpace: 'nowrap',
-                                      maxWidth: '14ch', // Limits text display to approximately 14 characters
-                                  }}>
+                            <Text mx={0} size="sm" style={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: '14ch', // Limits text display to approximately 14 characters
+                            }}>
                                 {tab.title}
                             </Text>
                         </Tabs.Tab>
@@ -160,7 +159,12 @@ function NewTab ({
     const readBandwidthMin = 50, readBandwidthMax = 1000, readBandwidthStep = 50;
     const writeBandwidthMin = 50, writeBandwidthMax = 1000, writeBandwidthStep = 50;
 
-    const [simulationButtonDisabled, setSimulationButtonDisabled] = useState(false);
+    const [deleteClusterButtonDisabled, setDeleteClusterButtonDisabled] = useState(false);
+    const [addClusterButtonDisabled, setAddClusterButtonDisabled] = useState(false);
+
+    const [selectedTaskSelectionAlgorithm, setSelectedTaskSelectionAlgorithm] = useState('MostFlops');
+    const [selectedClusterSelectionAlgorithm, setSelectedClusterSelectionAlgorithm] = useState('FastestCores');
+
 
     interface TaskData {
         task_name: string;
@@ -325,7 +329,8 @@ function NewTab ({
         const updatedElements = [...elements, newElement];
         setElements(updatedElements); // Add new element to state
         onElementChange(updatedElements); //update parent function
-        setSimulationButtonDisabled(false)
+        setDeleteClusterButtonDisabled(false)
+        setAddClusterButtonDisabled(newCluster < 8);
 
 
     };
@@ -334,9 +339,9 @@ function NewTab ({
         setElements(updatedElements);
         onElementChange(updatedElements);
         console.log(updatedElements.length)
-        if (updatedElements.length == 0) {
-            setSimulationButtonDisabled(true)
-        }
+        setDeleteClusterButtonDisabled(updatedElements.length == 1)
+        setAddClusterButtonDisabled(false);
+
     };
 
     // Function to handle input change in the table
@@ -364,23 +369,31 @@ function NewTab ({
     }
 
     const getData = () => {
-        const clusterData = {
+        const platformSpec = {
             readBandwidth,
             writeBandwidth,
             clusters: {},
         };
+
         elements.forEach((element, index) => {
             const values = {
                 "bw": element.bw,
                 "latency": element.latency,
                 "computeNodes": element.computeNode,
                 "cores": element.core,
-                "speed": element.speed
+                "speed": element.speed,
             };
-            clusterData.clusters[(index).toString()] = values;
+            platformSpec.clusters[(index).toString()] = values;
         });
-        // console.log(clusterData);
-        return clusterData;
+
+        const simulationInput = {
+            platformSpec: platformSpec,
+            taskSelectionScheme: selectedTaskSelectionAlgorithm,
+            clusterSelectionScheme: selectedClusterSelectionAlgorithm,
+        }
+
+        // console.log(simulationInput);
+        return simulationInput;
     };
 
     // Combined function to run simulation and get data
@@ -391,7 +404,7 @@ function NewTab ({
         // Pass the simulation data to the simulate function and wait for results
         const results = await simulate(id, data);
         setGraphData(results.result.Runtime);  // Set the data returned from simulation
-        const scheduledTasks = assignTasksToNodes(results.result.Runtime, data.clusters);
+        const scheduledTasks = assignTasksToNodes(results.result.Runtime, data.platformSpec.clusters);
         const series = transformToSeries(scheduledTasks);
         setColorMap(getColorMap(results.result.Runtime))
         console.log(series);
@@ -405,7 +418,7 @@ function NewTab ({
         <tr key={element.cluster}>
             <td style={{ width: 'auto', padding: '2px', textAlign: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ActionIcon color="red" onClick={() => deleteRow(index)}>
+                    <ActionIcon color="red" disabled={deleteClusterButtonDisabled} onClick={() => deleteRow(index)}>
                         <Tooltip label="Delete Cluster"><IconTrash size={16} /></Tooltip>
                     </ActionIcon>
                 </div>
@@ -510,36 +523,37 @@ function NewTab ({
                     <Input defaultValue="New Experiment" value={title} onChange={(event) => updateTitle(event.currentTarget.value)} style={{width: "100%"}}/>
                 </Tooltip>
             </Group>
+
             <Group justify="center">
                 <Accordion style={{width: "100%"}}>
                     <Accordion.Item value="item-1">
-                        <Accordion.Control icon={<IconHelp />}><Title order={4}>Compute Platform Specifications</Title></Accordion.Control>
+                        <Accordion.Control icon={<IconHelp />}><Title order={4}>Compute Platform Specification</Title></Accordion.Control>
                         <Accordion.Panel style={{ width: '100%' }}>
 
                             <p>
-                            The simulated platform consists of a user host, on which all the workflow's
-                            input / output files are and will be stored, and of at least one compute
-                            cluster. You can add/remove and specify clusters as you wish with the widget below.
-                            Each cluster is described by:
+                                The simulated platform consists of a user host, on which all the workflow's
+                                input / output files are and will be stored, and of at least one compute
+                                cluster. You can add/remove and specify clusters as you wish with the widget below.
+                                Each cluster is described by:
 
-                            <List style={{ paddingLeft: '30px' }}>
-                                <ListItem>
-                                    A bandwidth and latency for the link that connects the cluster to the user host
-                                </ListItem>
-                                <ListItem>
-                                    A number of compute nodes, a number of core per compute node, and a core speed
-                                </ListItem>
-                            </List>
+                                <List style={{ paddingLeft: '30px' }}>
+                                    <ListItem>
+                                        A bandwidth and latency for the link that connects the cluster to the user host
+                                    </ListItem>
+                                    <ListItem>
+                                        A number of compute nodes, a number of core per compute node, and a core speed
+                                    </ListItem>
+                                </List>
                             </p>
 
 
                             <p>
-                            The user host is described by:
-                            <List style={{ paddingLeft: '30px' }}>
-                                <ListItem>
-                                    The read and write bandwidth of the disk that is used to store all workflow files
-                                </ListItem>
-                            </List>
+                                The user host is described by:
+                                <List style={{ paddingLeft: '30px' }}>
+                                    <ListItem>
+                                        The read and write bandwidth of the disk that is used to store all workflow files
+                                    </ListItem>
+                                </List>
                             </p>
 
                         </Accordion.Panel>
@@ -558,7 +572,7 @@ function NewTab ({
                     </Table.Thead>
                     <Table.Tbody>{rows}</Table.Tbody>
                 </Table>
-                <Button variant="default" onClick={addRow}>Add Cluster</Button>
+                <Button variant="default" disabled={addClusterButtonDisabled} onClick={addRow}>Add Cluster</Button>
             </Group>
             <Group pt={15} align="flex-start" style={{width: '100%'}}>
                 <Table align="flex-start" width="auto">
@@ -567,7 +581,7 @@ function NewTab ({
                             <td width="auto" valign="top">
                                 <Text px={10}>Read bandwidth of the user host's disk:  </Text>
                             </td>
-                            <td></td>
+                            <td width="40px"></td>
                             <td width="auto" valign="top">
                                 <Text px={10}>Write bandwidth of the user host's disk:  </Text>
                             </td>
@@ -591,7 +605,7 @@ function NewTab ({
                                     value={readBandwidth}
                                     onChange={updateReadBandwidth}/>
                             </td>
-                            <td width="30px"></td>
+                            <td width="40px"></td>
                             <td width="auto">
                                 <NumberInput
                                     defaultValue={writeBandwidth}
@@ -614,22 +628,95 @@ function NewTab ({
                     </Table.Tbody>
                 </Table>
             </Group>
-            <Group justify="center" pt={15} style={{width: '100%'}}>
-                <Button disabled={simulationButtonDisabled} variant="success" onClick={handleRunSimulation}>Run Simulation</Button>
+
+            <Group pt={15} align="flex-start" style={{width: '100%'}}>
+                <Accordion style={{width: "100%"}}>
+                    <Accordion.Item value="item-1">
+                        <Accordion.Control icon={<IconHelp />}><Title order={4}>Scheduling Algorithm</Title></Accordion.Control>
+                        <Accordion.Panel style={{ width: '100%' }}>
+
+                            <p>
+                                Workflow scheduling is done using a standard "list scheduling" approach: Whenever
+                                at least one task is ready and one core is idle, select one of the ready tasks and select one of the clusters
+                                with least one idle core an schedule that task on that cluster.  You can opt for different
+                                task and cluster scheduling schemes below using the two pulldown menus.
+                            </p>
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                </Accordion>
+                <Table align="flex-start" width="auto">
+                    <Table.Tbody>
+                        <tr>
+                            <td width="auto">
+                                <Text px={10}>Task selection scheme:</Text>
+                            </td>
+                            <td width="auto">
+                                <Menu>
+                                    <Menu.Target>
+                                        <Button variant="default">
+                                            {selectedTaskSelectionAlgorithm}<IconChevronDown style={{ marginLeft: '8px' }}/>
+                                        </Button>
+                                    </Menu.Target>
+
+                                    <Menu.Dropdown style={{zIndex: 1000}}>
+                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostFlops')}>Most
+                                            flops</Menu.Item>
+                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostData')}>Most
+                                            data</Menu.Item>
+                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostChildren')}>Most
+                                            children</Menu.Item>
+                                    </Menu.Dropdown>
+                                </Menu>
+                            </td>
+                            <td width="15%"></td>
+                            <td width="auto">
+                                <Text px={10}>Cluster selection scheme:</Text>
+                            </td>
+                            <td width="auto">
+                                <Menu>
+                                    <Menu.Target>
+                                        <Button variant="default">
+                                            {selectedClusterSelectionAlgorithm} <IconChevronDown style={{ marginLeft: '8px' }}/>
+                                        </Button>
+                                    </Menu.Target>
+
+                                    <Menu.Dropdown style={{zIndex: 1000}}>
+                                        <Menu.Item onClick={() => setSelectedClusterSelectionAlgorithm('FastestCores')}>FastestCores</Menu.Item>
+                                        <Menu.Item onClick={() => setSelectedClusterSelectionAlgorithm('FastestNetwork')}>FastestNetwork</Menu.Item>
+                                        <Menu.Item onClick={() => setSelectedClusterSelectionAlgorithm('MostIdleCores')}>MostIdleCores</Menu.Item>
+                                    </Menu.Dropdown>
+                                </Menu>
+                            </td>
+                        </tr>
+                    </Table.Tbody>
+                </Table>
             </Group>
-            <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
+
+            <Group pt={15} align="flex-start" style={{width: '100%'}}>
+                <Accordion style={{width: "100%"}}>
+                    <Accordion.Item value="item-1">
+                    </Accordion.Item>
+                </Accordion>
+            </Group>
+
+            <Group justify="center" pt={15} style={{width: '100%'}}>
+                <Button variant="success" onClick={handleRunSimulation}>Run
+                    Simulation</Button>
+            </Group>
+            <Group justify="center" align="center" style={{width: '100%', marginTop: '20px'}}>
                 {loading ? (
-                    <Loader color="gray" /> // Show loader while loading
+                    <Loader color="gray"/> // Show loader while loading
                 ) : (
-                    showGraph && graphData && <SimulationGraph runtimeData={graphData} id={id} />
+                    showGraph && graphData && <SimulationGraph runtimeData={graphData} id={id}/>
                 )}
             </Group>
-            <Group justify="center" align="center" style={{ width: '100%', marginTop: '20px' }}>
+            <Group justify="center" align="center" style={{width: '100%', marginTop: '20px'}}>
                 <div>
                     {loading ? (
-                        <Loader color="gray" /> // Show loader while loading
+                        <Loader color="gray"/> // Show loader while loading
                     ) : (
-                        showGraph  && <Chart options={options} series={seriesData} type="rangeBar" height="750" width ="800"/>
+                        showGraph &&
+                        <Chart options={options} series={seriesData} type="rangeBar" height="750" width="800"/>
                     )}
                 </div>
             </Group>

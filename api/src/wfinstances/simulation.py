@@ -1,47 +1,101 @@
 from wrench.simulation import Simulation
-from wrench.task import Task 
-from wrench.compute_service import ComputeService 
+from wrench.task import Task
+from wrench.compute_service import ComputeService
 from typing import List, Dict
 
+task_data = {}
+task_children = {}
 
-task_flops = {}
+
+def compute_task_data(task: Task):
+    if task.get_name() not in task_data:
+        data = 0
+        for f in task.get_input_files():
+            data += f.get_size()
+        for f in task.get_output_files():
+            data += f.get_size()
+        task_data[task.get_name()] = data
+    return task_data[task.get_name()]
 
 
-def pick_task_to_schedule(tasks: List[Task]):
-    """
-    A method to select a particular task to schedule. Right now, just selects
-    the task with the largest flop
-    """
-    # pick the task with the largest flop amount
+def compute_task_children(task: Task):
+    if task.get_name() not in task_children:
+        task_children[task.get_name()] = task.get_number_of_children()
+    return task_children[task.get_name()]
+
+
+def pick_task_to_schedule_most_flops(tasks: List[Task]) -> Task:
     target_task = tasks[0]
-    max_flop = task_flops[target_task.get_name()]
+    max_flop = target_task.get_flops()
     for task in tasks[1:]:
-        if task_flops[task.get_name()] > max_flop:
-            max_flop = task_flops[task.get_name()]
+        if task.get_flops() > max_flop:
+            max_flop = task.get_flops()
             target_task = task
     return target_task
 
 
-def pick_target_cs(compute_resources: Dict[ComputeService, Dict[str, float]], desired_num_cores: int) -> ComputeService:
+def pick_task_to_schedule_most_data(tasks: List[Task]) -> Task:
+    target_task = tasks[0]
+    max_data = compute_task_data(target_task)
+    for task in tasks[1:]:
+        data = compute_task_data(task)
+        if data > max_data:
+            max_data = data
+            target_task = task
+    return target_task
+
+
+def pick_task_to_schedule_most_children(tasks: List[Task]) -> Task:
+    target_task = tasks[0]
+    max_data = compute_task_children(target_task)
+    for task in tasks[1:]:
+        data = compute_task_children(task)
+        if data > max_data:
+            max_data = data
+            target_task = task
+    return target_task
+
+
+def pick_task_to_schedule(tasks: List[Task], task_selection_scheme: str) -> Task:
+    """
+    A method to select a particular task to schedule.
+    """
+    if task_selection_scheme == "MostFlops":
+        return pick_task_to_schedule_most_flops(tasks)
+    elif task_selection_scheme == "MostData":
+        return pick_task_to_schedule_most_data(tasks)
+    elif task_selection_scheme == "MostChildren":
+        return pick_task_to_schedule_most_children(tasks)
+    else:
+        raise Exception(f"Unknown task selection scheme: {task_selection_scheme}")
+
+
+def pick_target_cs(compute_resources: Dict[ComputeService, Dict[str, float]], desired_num_cores: int,
+                   cluster_selection_scheme: str) -> ComputeService | None:
     """
     A method to select a compute service on which to schedule a task. Right now,
     just selects the compute service with the largest flop rate
     """
-    # pick the one with the largest core speed
-    max_core_speed = 0
-    target_cs = None
-    for cs in compute_resources:
-        # If there are no idle cores, don't consider this resource
-        if compute_resources[cs]["num_idle_cores"] < desired_num_cores:
-            continue
-        if compute_resources[cs]["core_speed"] > max_core_speed:
-            max_core_speed = compute_resources[cs]["core_speed"]
-            target_cs = cs
-    return target_cs
+
+    # Filter out the clusters that have sufficient idle cores
+    candidate_clusters = [cs for cs in compute_resources.keys()
+                          if compute_resources[cs]["num_idle_cores"] >= desired_num_cores]
+    if len(candidate_clusters) == 0:
+        return None
+
+    if cluster_selection_scheme == "FastestCores":
+        return sorted(candidate_clusters, key=lambda x: compute_resources[x]["core_speed"])[-1]
+    elif cluster_selection_scheme == "FastestNetwork":
+        return sorted(candidate_clusters, key=lambda x: compute_resources[x]["link_bandwidth"])[-1]
+    elif cluster_selection_scheme == "MostIdleCores":
+        return sorted(candidate_clusters, key=lambda x: compute_resources[x]["num_idle_cores"])[-1]
+    else:
+        raise Exception(f"Unknown cluster selection scheme: {cluster_selection_scheme}")
 
 
 def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
-                   compute_resources: Dict[ComputeService, Dict[str, float]], storage_service):
+                   compute_resources: Dict[ComputeService, Dict[str, float]], storage_service,
+                   task_selection_scheme: str, cluster_selection_scheme: str):
     """
     A method that schedules tasks, using list scheduling, if possible
     """
@@ -52,7 +106,7 @@ def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
             break
 
         # Pick one of the tasks for scheduling
-        task_to_schedule = pick_task_to_schedule(tasks_to_schedule)
+        task_to_schedule = pick_task_to_schedule(tasks_to_schedule, task_selection_scheme)
         if task_to_schedule is None:
             break
 
@@ -61,7 +115,7 @@ def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
 
         # task_min_num_cores = task_to_schedule.get_min_num_cores()
         task_min_num_cores = 1
-        target_cs = pick_target_cs(compute_resources, task_min_num_cores)
+        target_cs = pick_target_cs(compute_resources, task_min_num_cores, cluster_selection_scheme)
 
         # If we didn't find a compute service, we're done
         if target_cs is None:
@@ -91,53 +145,46 @@ def schedule_tasks(simulation: Simulation, tasks_to_schedule: List[Task],
         # Update the number of idle cores of the target compute service
         compute_resources[target_cs]["num_idle_cores"] -= 1
 
-    return
 
+def do_simulation(request_platform_xml,
+                  cluster_specs,
+                  user_host,
+                  task_selection_scheme, cluster_selection_scheme, wf_instance):
 
-def do_simulation(request_platform_xml, request_controller_host, wf_instance):
+    print(cluster_specs)
 
     print(f"Instantiating a simulation...")
     simulation = Simulation()
-    user_host = request_controller_host
 
     print(f"Starting the simulation using the XML platform file...")
     simulation.start(request_platform_xml, user_host)
-
-    # Get the list of all hostnames in the platform
-    print(f"Getting the list of all hostnames...")
-    list_of_hostnames = simulation.get_all_hostnames()
-
-    if "UserHost" not in list_of_hostnames:
-        raise Exception("This simulator assumes that the XML platform files has a host with hostname UserHost that"
-                        " has a disk mounted at '/'")
-    list_of_hostnames.remove("UserHost")
 
     # Start a storage service on the user host
     print(f"Starting a storage service...")
     ss = simulation.create_simple_storage_service(user_host, ["/"])
 
-    # Creating a bare-metal compute service on ALL other hosts
-    print(f"Creating {len(list_of_hostnames)} compute services...")
+    # Create bare-metal compute service on clusters based on cluster specs
     running_bmcss = []
-    bmcs_to_cluster_map = {}
-    for host in list_of_hostnames:
-        bmcs = simulation.create_bare_metal_compute_service(host, {host: (-1, -1)}, "", {}, {})
-        running_bmcss.append(bmcs)
-        bmcs_to_cluster_map[bmcs.get_name()] = int(host.split("-")[0])
-
-    # Create a data structure that keeps track of the compute resources, which
-    # will be used for scheduling
-    print(f"Creating a convenient data structure for scheduling...")
     compute_resources: dict[ComputeService, dict] = {}
-    for bmcs in running_bmcss:
-        # print(f"Getting core counts...")
-        per_host_num_cores = bmcs.get_core_counts()
-        num_cores = per_host_num_cores[list(per_host_num_cores.keys())[0]]
-        # print(f"Getting core flop rates...")
-        per_host_core_speed = bmcs.get_core_flop_rates()
-        core_speed = per_host_core_speed[list(per_host_core_speed.keys())[0]]
-        compute_resources[bmcs] = {"num_idle_cores": num_cores, "core_speed": core_speed}
-    # print(compute_resources)
+    bmcs_to_cluster_map = {}
+
+    print(f"Creating {len(cluster_specs)} compute services...")
+    for cluster_id, cluster_spec in cluster_specs.items():
+        num_compute_hosts = cluster_spec["computeNodes"]
+        core_speed = cluster_spec["speed"]
+        link_bandwidth = cluster_spec["bw"]
+
+        head_host = cluster_id+"-0.me"
+        compute_host_names = [cluster_id+"-"+str(i)+".me" for i in range(cluster_spec["computeNodes"])]
+        compute_host_specs = {}
+        for compute_host_name in compute_host_names:
+            compute_host_specs[compute_host_name] = (-1,-1)
+        bmcs = simulation.create_bare_metal_compute_service(head_host, compute_host_specs, "", {}, {})
+        running_bmcss.append(bmcs)
+        bmcs_to_cluster_map[bmcs.get_name()] = int(cluster_id)
+        compute_resources[bmcs] = {"num_idle_cores": num_compute_hosts,  # 1 core per host
+                                   "core_speed": core_speed,
+                                   "link_bandwidth": link_bandwidth}
 
     # Import the workflow from JSON
     print(f"Importing the workflow from JSON...")
@@ -152,9 +199,6 @@ def do_simulation(request_platform_xml, request_controller_host, wf_instance):
                                                     ignore_avg_cpu=True,
                                                     show_warnings=True)
 
-    # Get all task flops now so that we avoid calling get_flop over and over and over
-    for task_name, task_object in workflow.get_tasks().items():
-        task_flops[task_name] = task_object.get_flops()
     num_tasks = len(workflow.get_tasks())
 
     # Create all needed files on the storage service
@@ -170,7 +214,8 @@ def do_simulation(request_platform_xml, request_controller_host, wf_instance):
 
     while num_completed_tasks < num_tasks:
         # Perform some scheduling, perhaps
-        schedule_tasks(simulation, workflow.get_ready_tasks(), compute_resources, ss)
+        schedule_tasks(simulation, workflow.get_ready_tasks(), compute_resources, ss,
+                       task_selection_scheme, cluster_selection_scheme)
 
         # Wait for next event
         event = simulation.wait_for_next_event()

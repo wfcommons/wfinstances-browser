@@ -45,7 +45,12 @@ async def post_wf_instance(request: Request, id: str) -> dict:
 
     wf_instance = retrieve_wf_instance(serialize_metric(metrics_collection.find_one({'_id': id})))
 
-    runtime = do_simulation(generate_xml(request_body["platform_spec"]), request_body["controller_hostname"], wf_instance)
+    runtime = do_simulation(generate_xml(request_body["platform_spec"]),
+                            request_body["platform_spec"]["clusters"],
+                            request_body["controller_hostname"],
+                            request_body["task_selection_scheme"],
+                            request_body["cluster_selection_scheme"],
+                            wf_instance)
 
     return {
         'detail': 'Simulation results',
