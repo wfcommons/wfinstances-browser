@@ -63,7 +63,7 @@ def validate_wf_instance(wf_instance: dict) -> None:
 
 
 def generate_xml(cluster_data):
-    print(f"cluster_data before parsing: {cluster_data}")
+    # print(f"cluster_data before parsing: {cluster_data}")
     xml_string = f"""<?xml version='1.0'?>
  <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
  <platform version="4.1">
@@ -86,7 +86,7 @@ def generate_xml(cluster_data):
 
     for id, values in cluster_data["clusters"].items():
         xml_string += f"""
-            <link id="link{id}" bandwidth="{values['bw']}kBps" latency="{values['latency']}ms"/>"""
+            <link id="link{id}" bandwidth="{values['bw']}MBps" latency="{values['latency']}ms"/>"""
 
     for id, values in cluster_data["clusters"].items():
         xml_string += f"""
@@ -98,5 +98,5 @@ def generate_xml(cluster_data):
     </zone>
 </platform>"""
 
-    print(xml_string)
+    # print(xml_string)
     return xml_string

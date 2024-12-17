@@ -21,10 +21,10 @@ RUN chmod 0644 /etc/cron.d/run-curl-job
 
 RUN crontab /etc/cron.d/run-curl-job
 
-# Install WRENCH API 0.3
+# Install WRENCH API v0.4
 RUN apt-get -y install zip
 RUN python3 -m pip install build
-RUN wget https://github.com/wrench-project/wrench-python-api/archive/refs/tags/v0.3.zip; unzip v0.3.zip; cd wrench-python-api-0.3; python3 -m build; python3 -m pip install ./dist/wrench-*.whl
+RUN wget https://github.com/wrench-project/wrench-python-api/archive/refs/tags/v0.4.zip; unzip v0.4.zip; cd wrench-python-api-0.4; python3 -m build; python3 -m pip install ./dist/wrench-*.whl
 
 
 COPY . .
