@@ -28,7 +28,7 @@ export function HelpModal({
                     <p>
                         <strong>The WfInstances browser displays an interactive table where each row corresponds to a workflow
                             instance's JSON file (in the <a rel="noreferrer" target="_blank"  href={"https://github.com/wfcommons/wfformat"}>WfFormat
-                                schema</a>) available on <a href={"https://github.com/wfcommons/wfinstances"} target="_blank" rel="noreferrer">WfInstances GitHub repository</a></strong>.
+                                schema</a>) available on <a href={"https://github.com/wfcommons/wfinstances"} target="_blank" rel="noreferrer">WfInstances GitHub repository</a></strong>
                     </p>
                     <List >
                         <ListItem
@@ -40,7 +40,7 @@ export function HelpModal({
                             }>
                             <strong>Showing/hiding metrics </strong> &#8212; The rightmost columns
                             display metrics computed from the data in workflow instance JSON files. Default metrics are displayed
-                            but more metrics are available and can be displayed/hidden at will by clicking on <IconColumns size="1rem" style={{marginBottom: '-2px'}}/>.
+                            but more metrics are available and can be displayed/hidden at will by clicking on <IconColumns size="1rem" style={{marginBottom: '-2px'}}/>
                         </ListItem>
                         <ListItem
                             style={{ marginBottom: '20px' }}
@@ -52,7 +52,7 @@ export function HelpModal({
                             <strong>Sorting/filtering workflow instances </strong> &#8212; Click on the header
                             of a metric column to sort workflow instances by that metric.
                             Click on <IconFilter size="1rem" style={{marginBottom: '-2px'}}/> to specify metric value ranges for
-                            filtering out workflow instances.
+                            filtering out workflow instances
                         </ListItem>
                         <ListItem
                             style={{ marginBottom: '20px' }}
@@ -62,7 +62,7 @@ export function HelpModal({
                                 </ThemeIcon>
                             }>
                             <strong>Downloading workflow instances</strong> &#8212; Use the checkboxes on the left side of the
-                            table to select particular workflow instances for download as a zip archive.
+                            table to select particular workflow instances for download as a zip archive
                         </ListItem>
                         <ListItem
                             style={{ marginBottom: '20px' }}
@@ -72,7 +72,7 @@ export function HelpModal({
                                 </ThemeIcon>
                             }>
                             <strong>Visualizing workflow instances</strong> &#8212; Click on <IconEye size="1rem" style={{marginBottom: '-2px'}}/> to visualize the structure of
-                            workflow instances with fewer than 250 tasks.
+                            workflow instances
                         </ListItem>
                         <ListItem
                             style={{ marginBottom: '20px' }}
@@ -81,7 +81,8 @@ export function HelpModal({
                                     <IconChartHistogram size="1rem" />
                                 </ThemeIcon>
                             }>
-                            <strong>Simulating workflow instances</strong> &#8212; Click on <IconChartHistogram size="1rem" style={{marginBottom: '-2px'}}/> to simulate the execution of workflow instances.
+                            <strong>Simulating workflow instances</strong> &#8212; Click on <IconChartHistogram size="1rem" style={{marginBottom: '-2px'}}/>
+                            to simulate the execution of workflow instances
                         </ListItem>
                     </List>
                 </Container>
