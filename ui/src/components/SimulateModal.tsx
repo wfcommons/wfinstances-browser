@@ -151,13 +151,13 @@ function NewTab ({
                      id
                  }) {
 
-    const bwMin = 50, bwMax = 1000, bwStep = 50;
-    const latencyMin = 1, latencyMax = 100, latencyStep = 1;
+    const bwMin = 100, bwMax = 10000, bwStep = 50;
+    const latencyMin = 1, latencyMax = 200, latencyStep = 1;
     const computeNodeMin = 1, computeNodeMax = 256, computeNodeStep = 1;
-    const coreMin = 1, coreMax = 10, coreStep = 1;
-    const speedMin = 1, speedMax = 10, speedStep = 1;
-    const readBandwidthMin = 50, readBandwidthMax = 1000, readBandwidthStep = 50;
-    const writeBandwidthMin = 50, writeBandwidthMax = 1000, writeBandwidthStep = 50;
+    const coreMin = 1, coreMax = 48, coreStep = 1;
+    const speedMin = 1, speedMax = 100, speedStep = 1;
+    const readBandwidthMin = 100, readBandwidthMax = 10000, readBandwidthStep = 50;
+    const writeBandwidthMin = 100, writeBandwidthMax = 10000, writeBandwidthStep = 50;
 
     const [deleteClusterButtonDisabled, setDeleteClusterButtonDisabled] = useState(false);
     const [addClusterButtonDisabled, setAddClusterButtonDisabled] = useState(false);
@@ -429,7 +429,7 @@ function NewTab ({
                     onChange={(value) => updateElement(index, 'bw', value)}
                     defaultValue='bw'
                     size="xs"
-                    suffix="kBps"
+                    suffix="MBps"
                     min={bwMin}
                     max={bwMax}
                 />
@@ -440,7 +440,7 @@ function NewTab ({
                     min={bwMin}
                     max={bwMax}
                     step={bwStep}
-                    label={(value) => `${value} kBps`} />
+                    label={(value) => `${value} MBps`} />
             </td>
             <td key='latency'>
                 <NumberInput
@@ -554,6 +554,12 @@ function NewTab ({
                                         The read and write bandwidth of the disk that is used to store all workflow files
                                     </ListItem>
                                 </List>
+                            </p>
+
+                            <p>
+                                We assume that the measured task execution times in workflow instances are based on an execution on a 100 GFlop/sec core.
+                                So if a task in the workflow instance has an execution time of 10 seconds, and you define a core
+                                to compute at 200 GFlop/sec, then that task's execution would be simulated to last 5 seconds on that core.
                             </p>
 
                         </Accordion.Panel>

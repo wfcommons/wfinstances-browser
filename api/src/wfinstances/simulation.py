@@ -151,8 +151,6 @@ def do_simulation(request_platform_xml,
                   user_host,
                   task_selection_scheme, cluster_selection_scheme, wf_instance):
 
-    print(cluster_specs)
-
     print(f"Instantiating a simulation...")
     simulation = Simulation()
 
@@ -189,7 +187,7 @@ def do_simulation(request_platform_xml,
     # Import the workflow from JSON
     print(f"Importing the workflow from JSON...")
     workflow = simulation.create_workflow_from_json(wf_instance,
-                                                    reference_flop_rate="100Mf",
+                                                    reference_flop_rate="100Gf",
                                                     ignore_machine_specs=True,
                                                     redundant_dependencies=False,
                                                     ignore_cycle_creating_dependencies=False,
