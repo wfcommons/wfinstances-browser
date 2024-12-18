@@ -167,8 +167,10 @@ def do_simulation(request_platform_xml,
     bmcs_to_cluster_map = {}
 
     print(f"Creating {len(cluster_specs)} compute services...")
+    # print(cluster_specs)
     for cluster_id, cluster_spec in cluster_specs.items():
         num_compute_hosts = cluster_spec["computeNodes"]
+        num_cores_per_compute_hosts = cluster_spec["cores"]
         core_speed = cluster_spec["speed"]
         link_bandwidth = cluster_spec["bw"]
 
@@ -176,11 +178,11 @@ def do_simulation(request_platform_xml,
         compute_host_names = [cluster_id+"-"+str(i)+".me" for i in range(cluster_spec["computeNodes"])]
         compute_host_specs = {}
         for compute_host_name in compute_host_names:
-            compute_host_specs[compute_host_name] = (-1,-1)
+            compute_host_specs[compute_host_name] = (-1, -1)
         bmcs = simulation.create_bare_metal_compute_service(head_host, compute_host_specs, "", {}, {})
         running_bmcss.append(bmcs)
         bmcs_to_cluster_map[bmcs.get_name()] = int(cluster_id)
-        compute_resources[bmcs] = {"num_idle_cores": num_compute_hosts,  # 1 core per host
+        compute_resources[bmcs] = {"num_idle_cores": num_compute_hosts * num_cores_per_compute_hosts,
                                    "core_speed": core_speed,
                                    "link_bandwidth": link_bandwidth}
 
