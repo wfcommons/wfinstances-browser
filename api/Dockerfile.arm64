@@ -21,7 +21,7 @@ RUN pip install jsonref --break-system-packages
 RUN apt-get install -y libboost-program-options-dev
 
 
-RUN wget https://github.com/wrench-project/wrench/archive/refs/tags/v2.4.tar.gz && tar -xzf v2.4.tar.gz && cd wrench-2.4 && mkdir build && cd build && cmake .. && make -j12 wrench-daemon examples && make install && cd ../.. && /bin/rm -rf wrench-2.4
+RUN wget https://github.com/wrench-project/wrench/archive/refs/tags/v2.5.tar.gz && tar -xzf v2.5.tar.gz && cd wrench-2.5 && mkdir build && cd build && cmake .. && make -j12 wrench-daemon examples && make install && cd ../.. && /bin/rm -rf wrench-2.5
 
 COPY requirements.txt .
 
@@ -43,12 +43,15 @@ RUN chmod 0644 /etc/cron.d/run-curl-job
 
 RUN crontab /etc/cron.d/run-curl-job
 
-# Install WRENCH API 0.3
+# Install WRENCH API v0.4
 RUN apt-get -y install zip
-RUN python3 -m pip install --break-system-packages build
-RUN wget https://github.com/wrench-project/wrench-python-api/archive/refs/tags/v0.3.tar.gz; tar -xzf v0.3.tar.gz; cd wrench-python-api-0.3; python3 -m build; python3 -m pip install --break-system-packages  ./dist/wrench-*.whl
+RUN python3 -m pip install build --break-system-packages
+RUN wget https://github.com/wrench-project/wrench-python-api/archive/refs/tags/v0.4.zip; unzip v0.4.zip; cd wrench-python-api-0.4; python3 -m build; python3 -m pip install ./dist/wrench-*.whl --break-system-packages
+
 
 
 COPY . .
 
-CMD cron && uvicorn src.main:app --host 0.0.0.0 --port 8081
+#CMD cron && uvicorn src.main:app --host 0.0.0.0 --port 8081
+CMD cron && bash ./run_uvicorn_and_wrench_daemon.bash
+
