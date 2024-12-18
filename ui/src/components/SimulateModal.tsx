@@ -674,12 +674,9 @@ function NewTab ({
                                     </Menu.Target>
 
                                     <Menu.Dropdown style={{zIndex: 1000}}>
-                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostFlops')}>Most
-                                            flops</Menu.Item>
-                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostData')}>Most
-                                            data</Menu.Item>
-                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostChildren')}>Most
-                                            children</Menu.Item>
+                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostFlops')}>MostFlops</Menu.Item>
+                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostData')}>MostData</Menu.Item>
+                                        <Menu.Item onClick={() => setSelectedTaskSelectionAlgorithm('MostChildren')}>MostChildren</Menu.Item>
                                     </Menu.Dropdown>
                                 </Menu>
                             </td>
