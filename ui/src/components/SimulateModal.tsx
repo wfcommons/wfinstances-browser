@@ -269,6 +269,9 @@ function NewTab ({
                 }
             },
         },
+        yaxis: {
+            title: { text: "Compute Resources (Cluster/Node/Core)" },
+        },
         tooltip: {
             custom: function({ seriesIndex, dataPointIndex, w }) {
                 const pointData = w.config.series[seriesIndex].data[dataPointIndex];
@@ -290,22 +293,24 @@ function NewTab ({
         runtimeData.forEach(task => {
             const { cluster_index, scheduled_time, completion_time } = task;
             const computeNodes = clusters[cluster_index].computeNodes;
+            const coresPerNode = clusters[cluster_index].cores;
 
-            let assignedNode = -1;
-            for (let node = 0; node < computeNodes; node++) {
+            let assignedCore = -1;
+            for (let core = 0; core < computeNodes * coresPerNode; core++) {
                 const isOverlap = scheduledTasks.some(t =>
                     t.cluster_index === cluster_index &&
-                    t.compute_node === node &&
-                    (t.scheduled_time < completion_time && t.completion_time > scheduled_time)
+                    t.compute_node === Math.floor(core / coresPerNode) &&
+                    t.core === core % coresPerNode &&
+                    (t.scheduled_time <= 0.99 * completion_time && t.completion_time >= 1.01 * scheduled_time)
                 );
                 if (!isOverlap) {
-                    assignedNode = node;
+                    assignedCore = core;
                     break;
                 }
             }
 
-            if (assignedNode !== -1) {
-                scheduledTasks.push({ ...task, compute_node: assignedNode });
+            if (assignedCore !== -1) {
+                scheduledTasks.push({ ...task, compute_node: Math.floor(assignedCore / coresPerNode), core: assignedCore % coresPerNode });
             }
         });
 
@@ -314,11 +319,12 @@ function NewTab ({
 
     interface ScheduledTask extends TaskData {
         compute_node: number;
+        core: number;
     }
 
     function transformToSeries(scheduledTasks: ScheduledTask[]): { data: { x: string; y: [number, number], completion: number, name: string }[] }[] {
         const data = scheduledTasks.map(task => ({
-            x: `Cluster ${task.cluster_index}: Node ${task.compute_node}`,
+            x: `${task.cluster_index}/${task.compute_node}/${task.core}`,
             y: [task.scheduled_time, task.completion_time] as [number, number],
             completion: task.completion_time,
             name: task.task_name, // Include the task name for tooltip
