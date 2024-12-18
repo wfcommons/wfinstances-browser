@@ -5,6 +5,7 @@ import {simulate} from '../../workflow_simulator/simulator';
 import { SimulationGraph } from '~/components/SimulationGraph';
 import React, { useState, useEffect } from 'react';
 import loadable from '@loadable/component';
+import {useQuery} from "@tanstack/react-query";
 
 const Chart = loadable(() => import('react-apexcharts'), {
     ssr: false,
@@ -12,10 +13,12 @@ const Chart = loadable(() => import('react-apexcharts'), {
 });
 export function SimulateModal({
                                   id,
+                                  client_ip,
                                   opened,
                                   onClose
                               }: {
     id: string,
+    client_ip: string,
     opened: boolean,
     onClose: () => void
 }) {
@@ -128,6 +131,7 @@ export function SimulateModal({
                             onReadBandwidthChange={(newData) => updateReadBandwidthTabData(tab.id, newData)}
                             onWriteBandwidthChange={(newData) => updateWriteBandwidthTabData(tab.id, newData)}
                             onTitleChange={(newData) => updateTitleTabData(tab.id, newData)}
+                            client_ip={client_ip}
                             id={id}
                         />
                     </Tabs.Panel>
@@ -148,6 +152,7 @@ function NewTab ({
                      onReadBandwidthChange,
                      onWriteBandwidthChange,
                      onTitleChange,
+                     client_ip,
                      id
                  }) {
 
@@ -338,7 +343,6 @@ function NewTab ({
         const updatedElements = elements.filter((_, i) => i !== index); // Remove the row at the given index
         setElements(updatedElements);
         onElementChange(updatedElements);
-        console.log(updatedElements.length)
         setDeleteClusterButtonDisabled(updatedElements.length == 1)
         setAddClusterButtonDisabled(false);
 
@@ -400,14 +404,13 @@ function NewTab ({
     const handleRunSimulation = async () => {
         const data = getData();
         setLoading(true); // Show loader
-        // setClusterData(data);
         // Pass the simulation data to the simulate function and wait for results
-        const results = await simulate(id, data);
+        const results = await simulate(client_ip, id, data);
         setGraphData(results.result.Runtime);  // Set the data returned from simulation
         const scheduledTasks = assignTasksToNodes(results.result.Runtime, data.platformSpec.clusters);
         const series = transformToSeries(scheduledTasks);
         setColorMap(getColorMap(results.result.Runtime))
-        console.log(series);
+        // console.log(series);
         setSeriesData(series);
         setShowGraph(true);  // Display the graph after simulation
         setLoading(false);

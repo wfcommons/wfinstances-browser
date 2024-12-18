@@ -12,10 +12,12 @@ Cytoscape.use(DAGRE);
 
 export function GraphModal({ 
     id,
+    client_ip,
     opened,
     onClose
 }: { 
     id: string,
+    client_ip: string,
     opened: boolean,
     onClose: () => void
 }) {
@@ -132,7 +134,14 @@ export function GraphModal({
         refetchOnWindowFocus: false,
         queryKey: ['id', id],
         queryFn: () => 
-            fetch(`/wf-instances/public/viz/${id}`)
+            fetch(`/wf-instances/public/viz/${id}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({"client_ip": client_ip}),
+                })
                 .then(res => res.json())
                 .then(res => buildGraphElements(res.result))
     });
