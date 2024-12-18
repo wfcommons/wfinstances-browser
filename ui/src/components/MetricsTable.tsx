@@ -27,21 +27,24 @@ function formatRuntime(work: number) {
 }
 
 export function MetricsTable({
-    data
+    data,
+    client_ip,
 } : {
     data: Metrics[]
+    client_ip: string;
 }) {
-    const [opened, { open, close }] = useDisclosure(false);
+    const [openedGraphModal, { open:openGraphModal, close:closeGraphModal }] = useDisclosure(false);
     const [openedSimulateModal, { open:openSimulateModal, close:closeSimulateModal}] = useDisclosure(false);
-    const [selectedRow, setSelectedRow] = useState<MRT_Row<Metrics> | null>(null);
+    const [selectedRowViz, setSelectedRowViz] = useState<MRT_Row<Metrics> | null>(null);
+    const [selectedRowSimulate, setSelectedRowSimulate] = useState<MRT_Row<Metrics> | null>(null);
 
-    const handleRowMenuAction = (row: MRT_Row<Metrics>) => {
-        setSelectedRow(row);
-        open();
+    const handleRowMenuActionViz = (row: MRT_Row<Metrics>) => {
+        setSelectedRowViz(row);
+        openGraphModal();
     }
 
     const handleRowMenuActionSimulate = (row: MRT_Row<Metrics>) => {
-        setSelectedRow(row);
+        setSelectedRowSimulate(row);
         openSimulateModal();
     }
 
@@ -212,7 +215,7 @@ export function MetricsTable({
                 <Box style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
                     <Tooltip label={vizTooltipMessage} position="top">
                         <ActionIcon
-                            onClick={() => handleRowMenuAction(row)}
+                            onClick={() => handleRowMenuActionViz(row)}
                             disabled={vizIsDisabled}
                         >
                             <IconEye />
@@ -248,8 +251,8 @@ export function MetricsTable({
     return (
         <>
             <MantineReactTable table={table} />
-            {selectedRow && <SimulateModal id={selectedRow.original.id} opened={openedSimulateModal} onClose={closeSimulateModal} />}
-            {selectedRow && <GraphModal id={selectedRow.original.id} opened={opened} onClose={close} />}
+            {selectedRowSimulate && <SimulateModal id={selectedRowSimulate.original.id} client_ip={client_ip} opened={openedSimulateModal} onClose={closeSimulateModal} />}
+            {selectedRowViz && <GraphModal id={selectedRowViz.original.id} client_ip={client_ip} opened={openedGraphModal} onClose={closeGraphModal} />}
         </>
     );
 }

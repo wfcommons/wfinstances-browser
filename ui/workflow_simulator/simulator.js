@@ -43,15 +43,17 @@
 //   </zone>
 // </platform>`
 
-export async function simulate(id, xmlData) {
+export async function simulate(client_ip, id, xmlData) {
 
     // Send simulation request to the api backend
-    const spec = { "platform_spec": xmlData.platformSpec,
+    const spec = {
+        "client_ip": client_ip,
+        "platform_spec": xmlData.platformSpec,
         "task_selection_scheme": xmlData.taskSelectionScheme,
         "cluster_selection_scheme": xmlData.clusterSelectionScheme,
-        "controller_hostname": "UserHost" };
+        "controller_hostname": "UserHost"
+    };
 
-    console.log("SENDING REQUEST TO BACKEND");
     const r = await fetch(`/wf-instances/public/simulate/${id}`, {
         method: 'POST',
         headers: {
