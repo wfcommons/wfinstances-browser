@@ -84,7 +84,6 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
     return valid_wf_instances, invalid_wf_instances
 
 
-
 def _generate_metrics(wf_instance: dict) -> dict:
     """
     Generate the num_tasks, num_files, total_bytes_read, total_bytes_written, depth, min_width, max_width metrics.
