@@ -7,11 +7,11 @@
 Date: Tuesday 1/21/25
 
 Business:
-- Project was introduced
+- Project was introduced 
 - Went over scope of project
-- Discussed issues and project deliverables
+- Discussed issues and project deliverables 
 
-Actions:
+Actions: 
 - Created WfInstances organization for team
 - Forked WfInstances-browser repo
 - Ran the app and populated the database
@@ -21,12 +21,12 @@ Actions:
 
 Date: Tuesday 1/28/25
 
-Business:
+Business: 
 - Talked about what usage report button should display to user
 - Discussed ways to connect backend and frontend
 - Went over how the API fetches data
 
-Actions:
+Actions: 
 - Created a new issue for making button display data to user
 - Added a new totals endpoint to usage/router.py under api
 - Modified UsageStatsModal.tsx to fetch data from the totals endpoint
@@ -35,9 +35,9 @@ Actions:
 ---
 ### Meeting 3 (Week: 2/4 - 2/8)
 
-Date: Tuesday, 2/4/25
+Date: Tuesday, 2/4/25 
 
-Business:
+Business: 
 - Modified database to get accurate dump of usage stats
 - Talked about ways to show location of where people are using the system (world map from IPs)
 - Continued discussing potential ways to do the visualization of usage data
@@ -66,23 +66,24 @@ Actions:
 
 Date: 2/18/25
 
-Business:
+Business: 
 - Short meeting to talk about next steps for project
-- Went over plan to add timescale feature to zoom in on graph
+- Went over plan to add timescale feature to zoom in on graph 
 
 Actions:
-- Changed the usage graph to show data by month
+- Changed the usage graph to show data by month 
 - Added another line in graph for distinct IPs for a month
 ---
 ### Meeting 6 (Week: 2/25 - 3/1)
 
 Date: 2/25/25
 
-Business:
+Business: 
 - Discussed implementing new way to populate the database
-- Use git clone and git pull
+- Use git clone and git pull 
 
 Actions:
 - Make graph legend use lines instead of square/rectangle for representation
+- Change modal size and chart zoom/pan sensitivity
 - Implement the new GitHub crawl (git clone)
 
