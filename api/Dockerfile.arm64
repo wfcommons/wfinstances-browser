@@ -1,6 +1,6 @@
 FROM arm64v8/ubuntu
 
-RUN apt-get update 
+RUN apt-get update
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
 
@@ -54,4 +54,3 @@ COPY . .
 
 #CMD cron && uvicorn src.main:app --host 0.0.0.0 --port 8081
 CMD cron && bash ./run_uvicorn_and_wrench_daemon.bash
-
