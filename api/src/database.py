@@ -3,6 +3,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
+
 load_dotenv()
 
 uri = os.getenv('MONGO_URI')
@@ -20,8 +21,6 @@ simulations_collection = db['simulations']
 # Survey collections
 surveys_collection = db['surveys']
 
-# Satisfaction collections
-satisfaction_collection = db['satisfaction']
 
 def add_to_collection(collection_name: str, data: dict):
     db[collection_name].insert_one(data)
@@ -65,24 +64,7 @@ def add_to_surveys_collection(client_ip: str, total_clicks: int, rating: int):
         "date": datetime.utcnow().isoformat(),
         "ip": client_ip,
         "total_clicks": total_clicks,
-        "rating": rating,
+        "usefulness_rating": usefulness_rating,
+        "usability_rating": usability_rating,
     }
-    surveys_collection.update_one(
-        {"ip": client_ip},
-        {"$set": data},
-        upsert=True
-    )
-
-def add_to_satisfaction_collection(category: str, rating: int):
-    satisfaction_collection.update_one(
-        {"category": category},
-        {
-            "$inc": {f"distribution.{rating - 1}": 1},
-            "$setOnInsert": {
-                "date": datetime.utcnow().isoformat(),
-                # Rate from 1 - 10
-                "distribution": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            }
-        },
-        upsert=True
-    )
+    add_to_collection("surveys", data, update_existing=True)
