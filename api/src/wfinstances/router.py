@@ -18,7 +18,7 @@ async def post_query_wf_instances(request: Request, ids: list[str]) -> dict:
     wf_instances = []
     for id_ in ids:
         wf_instance = retrieve_wf_instances(serialize_metrics([metrics_collection.find_one({'_id': id_})]))
-        wf_instances.extend(wf_instance)
+        wf_instances.append(wf_instance)
 
     return {
         'detail': ('WfInstances retrieved.'
