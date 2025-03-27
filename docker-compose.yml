@@ -7,8 +7,8 @@ services:
     build:
       context: ./nginx
       args:
-        PORT: ${NGINX_PORT}
-        SERVER_NAME: ${NGINX_SERVER_HOSTNAME}
+        NGINX_PORT: ${NGINX_PORT}
+        NGINX_SERVER_HOSTNAME: ${NGINX_SERVER_HOSTNAME}
     secrets:
       - nginx_certificate
       - nginx_private_key

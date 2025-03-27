@@ -18,15 +18,15 @@ RUN apt -y install inetutils-ping
 RUN apt -y install curl
 
 # Copy nginx custom config file
-ARG PORT
-ARG SERVER_NAME
+ARG NGINX_PORT
+ARG NGINX_SERVER_HOSTNAME
 
 COPY custom-nginx-locations-common.conf /etc/nginx/custom-nginx-locations-common.conf
-COPY custom-nginx-port-${PORT}.conf /etc/nginx/custom-nginx.conf
-RUN sed -i "s/SERVER_NAME/${SERVER_NAME}/g" /etc/nginx/custom-nginx.conf
+COPY custom-nginx-port-${NGINX_PORT}.conf /etc/nginx/custom-nginx.conf
+RUN sed -i "s/NGINX_SERVER_HOSTNAME/${NGINX_SERVER_HOSTNAME}/g" /etc/nginx/custom-nginx.conf
 
 # Start nginx
-EXPOSE $PORT
+EXPOSE $NGINX_PORT
 STOPSIGNAL SIGQUIT
 #CMD ["sleep", "10000"]
 CMD ["nginx", "-c", "/etc/nginx/custom-nginx.conf", "-g", "daemon off;"]
