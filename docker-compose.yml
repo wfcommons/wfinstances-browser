@@ -1,6 +1,6 @@
-
 services:
   nginx:
+    profiles: ["with-my-own-nginx"]
     container_name: wfinstances-browser-nginx
     depends_on:
       - ui
@@ -21,11 +21,12 @@ services:
 
   ui:
     container_name: wfinstances-browser-ui
-    build: ./ui
+    build:
+      context: ./ui
     depends_on:
       - api
     environment:
-      - WFINSTANCES_UI_PORT=${WFINSTANCES_UI_PORT}
+      - PORT=${WFINSTANCES_UI_PORT}
       - API_BASE_URL=http://api:${WFINSTANCES_API_PORT}
     ports:
       - 127.0.0.1:${WFINSTANCES_UI_PORT}:${WFINSTANCES_UI_PORT}
