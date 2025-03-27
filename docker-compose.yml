@@ -40,7 +40,6 @@ services:
     build:
       context: ./api
       args:
-        WFINSTANCES_CRAWL_PERIOD_IN_DAYS: ${WFINSTANCES_CRAWL_PERIOD_IN_DAYS}
         WFINSTANCES_API_PORT: ${WFINSTANCES_API_PORT}
     environment:
       - MONGO_URI=mongodb://mongodb:${MONGO_PORT}/?retryWrites=true&w=majority

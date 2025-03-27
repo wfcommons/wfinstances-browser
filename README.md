@@ -34,7 +34,7 @@ curl -X PUT http://localhost:8081/metrics/private/github/wfcommons/WfInstances
 
 REST API documentation is available at: [http://localhost:8081/docs](http://localhost:8081/docs)
 
-(The above assumes 8081 is the configured port for the backend.)
+(The above assumes WFINSTANCES_API_PORT=8081 is the configured port for the backend, as condigured in the `.env-*` file in use.)
 
 
 ## Get in Touch
