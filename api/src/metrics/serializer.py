@@ -10,7 +10,7 @@ def serialize_metric(metric: dict) -> dict | None:
     return {
         'id': metric.get('_id'),
         'githubRepo': metric.get('_githubRepo'),
-        'downloadUrl': metric.get('_downloadUrl'),
+        'filePath': metric.get('_filePath'),
         'numTasks': metric.get('numTasks'),
         'numFiles': metric.get('numFiles'),
         'sumFileSizes': metric.get('sumFileSizes'),

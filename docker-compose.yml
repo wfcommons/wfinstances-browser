@@ -34,7 +34,7 @@ services:
     container_name: wfinstances-browser-api
     depends_on:
       - mongodb
-#      - wrench
+    #      - wrench
     build:
       context: ./api
       args:
@@ -42,10 +42,14 @@ services:
     environment:
       - MONGO_URI=mongodb://mongodb:27017/?retryWrites=true&w=majority
       - NGINX_SERVER_HOSTNAME=${NGINX_SERVER_HOSTNAME}
+    volumes:
+      - ${GITHUB_DATA_DIRECTORY}:/data/github
     ports:
       - 127.0.0.1:8081:8081
     networks:
       - nginx-network
+    secrets:
+      - ipinfo_token_file
 
   mongodb:
     container_name: wfinstances-browser-mongodb
@@ -55,7 +59,7 @@ services:
     environment:
       MONGO_INITDB_DATABASE: wf_instance_browser_db
     volumes:
-      - ~/mongodata:/data/db
+      - ${MONGO_DATA_DIRECTORY}:/data/db
     networks:
       - nginx-network
 
@@ -64,6 +68,8 @@ secrets:
     file: ${NGINX_SSL_CERTIFICATE_PATH:-/dev/null}
   nginx_private_key:
     file: ${NGINX_SSL_PRIVATE_KEY_PATH:-/dev/null}
+  ipinfo_token_file:
+    file: ${IPINFO_DOT_IO_TOKEN_FILE:-/dev/null}
 
 volumes:
   db:
@@ -72,4 +78,3 @@ networks:
   nginx-network:
     name: nginx-network
     driver: bridge
-
