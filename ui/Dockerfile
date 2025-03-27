@@ -9,4 +9,6 @@ COPY . .
 
 RUN npm run build
 
-CMD npm run start
+ARG WFINSTANCES_UI_PORT
+
+CMD PORT=${WFINSTANCES_UI_PORT} npm run start
