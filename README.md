@@ -11,16 +11,21 @@ The only software requirement for running the server is [Docker](https://docker.
 
 ---
 
-## Running on localhost for development/testing
+## Running with Docker
 
-This command:
+Dependencies:
+- [Docker](https://docs.docker.com/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
+Edit/use one of the `.env-*` files to configure the deployment, and then:
+
+```bash
+$ docker-compose --env-file <.env file> build  --no-cache
+$ docker-compose up [-d]
 ```
-docker-compose up
-```
 
-will build Docker images, run containers, eventually starting a Web server on which
-the browser can be accessed at [http://localhost](http://localhost).
+The above will not run any Nginx front-end. If you want to do so, you must add the `--profile "with-my-own-nginx` argument to the `docker-compose` commands above.
+
 
 The database is empty the first time you launch the browser. To populate the database with metrics from the official [WfCommons WfInstances GitHub repo](https://github.com/wfcommons/WfInstances), run this command in a terminal on the machine running the server:
 ```
@@ -29,19 +34,26 @@ curl -X PUT http://localhost:8081/metrics/private/github/wfcommons/WfInstances
 
 REST API documentation is available at: [http://localhost:8081/docs](http://localhost:8081/docs)
 
-## Running in production
+(The above assumes 8081 is the configured port for the backend.)
 
-Modify the `.env` file at the root of the directory to customize the configuration (including using https) desired for your server. 
-See comments in that file for more information and examples.  After modifying this file, you may want to rebuild all images:
 
-```
-docker-compose build --no-cache
-```
+## Get in Touch
 
-before doing:
+The main channel to reach the WfCommons team is via the support email:
+[support@wrench-project.org](mailto:support@wrench-project.org).
 
-```
-docker-compose up
-```
+**Bug Report / Feature Request:** our preferred channel to report a bug or request a feature is via
+[Github Issues Track](https://github.com/wfcommons/wfinstances-browser/issues)
+
+
+## Funding Support
+
+eduWRENCH has been funded by the National Science Foundation (NSF).
+
+[![NSF Award 2411154][nsf-2411154-badge]][nsf-2411154-link]
+
+
+[nsf-2411154-link]:           https://www.nsf.gov/awardsearch/showAward?AWD_ID=2411154
+
 
 ---
