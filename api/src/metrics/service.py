@@ -41,7 +41,13 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
         origin.pull()
 
     # Now that the repository is cloned or updated, looking for .json files
-    now = time.time()
+    # If the metric collection is empty, then make sure that we go over all the files
+    # as they are all new to us
+    if (metrics_collection.count_documents({}) == 0):
+        now = 0
+    else:
+        now = time.time()
+
     for root, dirs, files in os.walk(local_dir):
         for file in files:
             if file.endswith('.json'):
