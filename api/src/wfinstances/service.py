@@ -1,7 +1,7 @@
 import requests
 import wrench
 import pathlib
-# import json
+import json
 from jsonschema import validate, ValidationError
 from src.exceptions import InvalidWfInstanceException, GithubResourceNotFoundException
 from src.wfinstances.simulation import schedule_tasks
@@ -31,12 +31,14 @@ def retrieve_wf_instance(metric: dict) -> dict | None:
     if not metric:
         return None
 
-    download_url = metric['downloadUrl']
-    response = requests.get(download_url)
-
-    if response.status_code != 200:
-        return None
-    return response.json()
+    file_path = metric['filePath']
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            wf_instance = json.load(f)
+    except json.JSONDecodeError:
+        sys.stderr.write(f"Invalid JSON format: {file}\n")
+        wf_instances = None
+    return wf_instance
 
 
 def validate_wf_instance(wf_instance: dict) -> None:

@@ -70,7 +70,7 @@ export function UsageStatsModal({
   // Fetch monthly data for a specific data type
   const fetchData = async (type: 'downloads' | 'visualizations' | 'simulations') => {
     try {
-      const response = await fetch(`http://localhost:8081/usage/public/monthly_usage/${type}/`);
+      const response = await fetch(`/usage/public/monthly_usage/${type}/`);
       if (!response.ok) {
         throw new Error('Failed to fetch monthly usage data');
       }
@@ -89,7 +89,7 @@ export function UsageStatsModal({
   // Fetch totals data
   const fetchTotals = async () => {
     try {
-      const response = await fetch('http://localhost:8081/usage/public/totals/');
+      const response = await fetch('/usage/public/totals/');
       if (!response.ok) {
         throw new Error('Failed to fetch totals data');
       }
@@ -110,7 +110,7 @@ export function UsageStatsModal({
     setTopCountriesLoading(true);
     setTopCountriesError(null);
     try {
-      const response = await fetch('http://localhost:8081/usage/public/top-countries/');
+      const response = await fetch('/usage/public/top-countries/');
       if (!response.ok) {
         throw new Error('Failed to fetch top countries data');
       }

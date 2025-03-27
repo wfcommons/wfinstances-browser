@@ -1,4 +1,4 @@
-FROM wrenchproject/wrench:unstable
+FROM wrenchproject/wrench:2.6
 USER root
 
 COPY requirements.txt .

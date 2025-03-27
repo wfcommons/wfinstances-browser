@@ -24,7 +24,7 @@ export function QuestionnairesModal({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:8081/survey/public/surveys/rating", {
+      const response = await fetch("/survey/public/surveys/rating", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

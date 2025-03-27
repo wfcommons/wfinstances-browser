@@ -50,7 +50,7 @@ export function MetricsTable({
   useEffect(() => {
     const fetchSurveyData = async () => {
       try {
-        const response = await fetch(`http://localhost:8081/survey/public/surveys/?ip=${client_ip}`);
+        const response = await fetch(`/survey/public/surveys/?ip=${client_ip}`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const result = await response.json();
 
@@ -80,7 +80,7 @@ export function MetricsTable({
       const requestBody = { ip: client_ip, click_type: type };
       console.log('Request Body:', requestBody);
 
-      const response = await fetch('http://localhost:8081/survey/public/surveys/', {
+      const response = await fetch('/survey/public/surveys/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),

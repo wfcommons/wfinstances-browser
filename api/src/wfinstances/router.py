@@ -33,7 +33,6 @@ async def post_wf_instance_viz(request: Request, id: str) -> dict:
 
     # Wait for the request body to be there
     request_body = await request.json()
-    print(request_body)
 
     # Call the function to update the visualizations collection
     add_item_to_visualizations_collection(id, request_body["client_ip"])
