@@ -20,10 +20,12 @@ RUN apt -y install curl
 # Copy nginx custom config file
 ARG NGINX_PORT
 ARG NGINX_SERVER_HOSTNAME
+ARG WFINSTANCES_UI_PORT
 
 COPY custom-nginx-locations-common.conf /etc/nginx/custom-nginx-locations-common.conf
 COPY custom-nginx-port-${NGINX_PORT}.conf /etc/nginx/custom-nginx.conf
 RUN sed -i "s/NGINX_SERVER_HOSTNAME/${NGINX_SERVER_HOSTNAME}/g" /etc/nginx/custom-nginx.conf
+RUN sed -i "s/WFINSTANCES_UI_PORT/${WFINSTANCES_UI_PORT}/g" /etc/nginx/custom-nginx-locations-common.conf
 
 # Start nginx
 EXPOSE $NGINX_PORT

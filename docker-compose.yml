@@ -9,6 +9,7 @@ services:
       args:
         NGINX_PORT: ${NGINX_PORT}
         NGINX_SERVER_HOSTNAME: ${NGINX_SERVER_HOSTNAME}
+        WFINSTANCES_UI_PORT: ${WFINSTANCES_UI_PORT}
     secrets:
       - nginx_certificate
       - nginx_private_key
@@ -23,7 +24,7 @@ services:
     depends_on:
       - api
     environment:
-      - WFINSTANCES_UI_PORT=8080
+      - WFINSTANCES_UI_PORT=${WFINSTANCES_UI_PORT}
       - API_BASE_URL=http://api:8081
     ports:
       - 127.0.0.1:${WFINSTANCES_UI_PORT}:${WFINSTANCES_UI_PORT}
