@@ -10,6 +10,7 @@ services:
         NGINX_PORT: ${NGINX_PORT}
         NGINX_SERVER_HOSTNAME: ${NGINX_SERVER_HOSTNAME}
         WFINSTANCES_UI_PORT: ${WFINSTANCES_UI_PORT}
+        WFINSTANCES_API_PORT: ${WFINSTANCES_API_PORT}
     secrets:
       - nginx_certificate
       - nginx_private_key
@@ -25,7 +26,7 @@ services:
       - api
     environment:
       - WFINSTANCES_UI_PORT=${WFINSTANCES_UI_PORT}
-      - API_BASE_URL=http://api:8081
+      - API_BASE_URL=http://api:${WFINSTANCES_API_PORT}
     ports:
       - 127.0.0.1:${WFINSTANCES_UI_PORT}:${WFINSTANCES_UI_PORT}
     networks:
@@ -35,18 +36,19 @@ services:
     container_name: wfinstances-browser-api
     depends_on:
       - mongodb
-    #      - wrench
     build:
       context: ./api
       args:
         WFINSTANCES_CRAWL_PERIOD_IN_DAYS: ${WFINSTANCES_CRAWL_PERIOD_IN_DAYS}
+        WFINSTANCES_API_PORT: ${WFINSTANCES_API_PORT}
     environment:
       - MONGO_URI=mongodb://mongodb:${MONGO_PORT}/?retryWrites=true&w=majority
       - NGINX_SERVER_HOSTNAME=${NGINX_SERVER_HOSTNAME}
+      - WFINSTANCES_API_PORT=${WFINSTANCES_API_PORT}
     volumes:
       - ${GITHUB_DATA_DIRECTORY}:/data/github
     ports:
-      - 127.0.0.1:8081:8081
+      - 127.0.0.1:${WFINSTANCES_API_PORT}:${WFINSTANCES_API_PORT}
     networks:
       - nginx-network
     secrets:

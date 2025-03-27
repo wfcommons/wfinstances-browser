@@ -14,6 +14,7 @@ RUN mkdir -p /data/github
 RUN git clone https://github.com/wfcommons/WfInstances.git /data/github
 
 ARG WFINSTANCES_CRAWL_PERIOD_IN_DAYS
+ARG WFINSTANCES_API_PORT
 
 RUN echo "0 * * * * cd /data/github && git pull origin main" > /etc/cron.d/git-pull-repo
 
@@ -31,5 +32,6 @@ RUN python3 -m pip install --break-system-packages ipinfo
 
 COPY . .
 
-#CMD cron && uvicorn src.main:app --host 0.0.0.0 --port 8081
-CMD cron && bash ./run_uvicorn_and_wrench_daemon.bash
+ENV WFINSTANCES_API_PORT=${WFINSTANCES_API_PORT}
+
+CMD cron && bash ./run_uvicorn_and_wrench_daemon.bash ${WFINSTANCES_API_PORT}
