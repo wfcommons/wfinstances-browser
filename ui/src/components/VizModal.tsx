@@ -10,7 +10,7 @@ import { useDisclosure } from '@mantine/hooks';
 
 Cytoscape.use(DAGRE);
 
-export function GraphModal({ 
+export function VizModal({
     id,
     client_ip,
     opened,
@@ -93,6 +93,13 @@ export function GraphModal({
         const tasks = workflowSpec.tasks;
         const files = workflowSpec.files ?? [];
 
+        // Create a map of task execution times
+        let task_execution_times: { [key: string]: number } = {};
+        wfInstance.workflow.execution.tasks.forEach((task_execution: Object) => {
+            task_execution_times[task_execution["id"]] = task_execution["runtimeInSeconds"]
+        });
+
+
         const graphElementsWithFiles: ElementDefinition[] = [];
         const graphElementsNoFiles: ElementDefinition[] = [];
         const colorMap = new Map<string, string>();
@@ -102,6 +109,7 @@ export function GraphModal({
         });
 
         tasks.forEach((task: Task) => {
+            task.runtimeInSeconds = task_execution_times[task.id]
             let bgColor;
             if (colorMap.has(task.name)) {
                 bgColor = colorMap.get(task.name);
@@ -124,6 +132,9 @@ export function GraphModal({
             task.children?.forEach((childId: string) => {
                 graphElementsNoFiles.push({ data: {source: task.id, target: childId, type: 'edge' }});
             });
+
+
+
         })
         setElementsWithFiles(graphElementsWithFiles);
         setElementsNoFiles(graphElementsNoFiles);

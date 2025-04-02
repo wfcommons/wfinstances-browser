@@ -13,7 +13,7 @@ import { useDisclosure } from '@mantine/hooks';
 import {ActionIcon, Tooltip, Box, Flex} from '@mantine/core';
 import {IconEye, IconChartHistogram} from '@tabler/icons-react';
 import { DownloadButton } from './DownloadButton';
-import { GraphModal } from '~/components/GraphModal';
+import { VizModal } from '~/components/VizModal';
 import { SimulateModal } from '~/components/SimulateModal';
 import { QuestionnairesModal } from '~/components/QuestionnairesModal';
 import { Metrics } from '~/types/Metrics';
@@ -34,7 +34,7 @@ export function MetricsTable({
   data: Metrics[]
   client_ip: string;
 }) {
-  const [openedGraphModal, { open:openGraphModal, close:closeGraphModal }] = useDisclosure(false);
+  const [openedVizModal, { open:openVizModal, close:closeVizModal }] = useDisclosure(false);
   const [openedSimulateModal, { open:openSimulateModal, close:closeSimulateModal}] = useDisclosure(false);
   const [selectedRowViz, setSelectedRowViz] = useState<MRT_Row<Metrics> | null>(null);
   const [selectedRowSimulate, setSelectedRowSimulate] = useState<MRT_Row<Metrics> | null>(null);
@@ -75,7 +75,7 @@ export function MetricsTable({
     fetchSurveyData();
   }, [client_ip]);
 
-  const incrementClickCount = async (type: 'DownloadButton' | 'GraphModal' | 'SimulateModal') => {
+  const incrementClickCount = async (type: 'DownloadButton' | 'VizModal' | 'SimulateModal') => {
     try {
       const requestBody = { ip: client_ip, click_type: type };
       console.log('Request Body:', requestBody);
@@ -104,7 +104,7 @@ export function MetricsTable({
 
   const handleRowMenuActionViz = (row: MRT_Row<Metrics>) => {
     setSelectedRowViz(row);
-    openGraphModal();
+    openVizModal();
   }
 
   const handleRowMenuActionSimulate = (row: MRT_Row<Metrics>) => {
@@ -281,8 +281,8 @@ export function MetricsTable({
             <ActionIcon
               onClick={() => {
                 setSelectedRowViz(row);
-                openGraphModal();
-                incrementClickCount('GraphModal');
+                openVizModal();
+                incrementClickCount('VizModal');
               }}
               disabled={vizIsDisabled}
             >
@@ -326,7 +326,7 @@ export function MetricsTable({
     <>
       <MantineReactTable table={table} />
       {selectedRowSimulate && <SimulateModal id={selectedRowSimulate.original.id} client_ip={client_ip} opened={openedSimulateModal} onClose={closeSimulateModal} />}
-      {selectedRowViz && <GraphModal id={selectedRowViz.original.id} client_ip={client_ip} opened={openedGraphModal} onClose={closeGraphModal} />}
+      {selectedRowViz && <VizModal id={selectedRowViz.original.id} client_ip={client_ip} opened={openedVizModal} onClose={closeVizModal} />}
       <QuestionnairesModal opened={showSurvey} onClose={() => setShowSurvey(false)} client_ip={client_ip} />
 
     </>

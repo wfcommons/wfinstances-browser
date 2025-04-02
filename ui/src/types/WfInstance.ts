@@ -1,6 +1,7 @@
 export type Task = {
     name: string,
-    id: string, 
+    id: string,
+    runtimeInSeconds: number,
     parents: string[],
     children: string[],
     inputFiles?: string[],
