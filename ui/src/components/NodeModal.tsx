@@ -17,7 +17,9 @@ export function NodeModal({
                     <Container>
                         {Object.keys(node.obj).map((element) => (
                             <div key={node.id}>
-                                <strong>{element}</strong>: {Array.isArray(node.obj[element]) ? node.obj[element].join(', ') : node.obj[element]}
+                                <strong>{element}</strong>: {Array.isArray(node.obj[element])
+                                ? (node.obj[element].length > 0 ? node.obj[element].join(', ') : "n/a")
+                                : node.obj[element]}
                             </div>
                         ))}
                     </Container>
