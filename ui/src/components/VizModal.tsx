@@ -78,7 +78,7 @@ export function VizModal({
 
     const layout = {
         name: "dagre",
-        animate: true
+        animate: true,
     };
 
     function getRandomColorHex(): string {
