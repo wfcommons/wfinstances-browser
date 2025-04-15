@@ -1,4 +1,4 @@
-import { Button, Center, Group, Loader, Modal } from '@mantine/core';
+import { Button, Center, Group, Loader, Modal, Box } from '@mantine/core';
 import Cytoscape, { ElementDefinition, NodeDataDefinition } from 'cytoscape';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -171,6 +171,17 @@ export function VizModal({
             ) : (
                 <>
                     <NodeModal node={node} opened={openedNodeModal} onClose={closeNodeModal} />
+                    <Box
+                        sx={{
+                            width: '100%',
+                            height: '80vh',
+                            overflow: 'auto',
+                            border: '1px solid #eaeaea',
+                            borderRadius: '4px',
+                            marginTop: '16px'
+                        }}
+                    >
+                        <div style={{ width: '150%', height: '150%' }}>
                     <CytoscapeComponent
                         key={useElementsWithFiles ? elementsWithFiles.length : elementsNoFiles.length}
                         elements={useElementsWithFiles? elementsWithFiles : elementsNoFiles}
@@ -191,6 +202,8 @@ export function VizModal({
                             });
                         }}
                     />
+                        </div>
+                    </Box>
                 </>
             )}
         </Modal>
