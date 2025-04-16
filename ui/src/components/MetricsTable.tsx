@@ -78,7 +78,7 @@ export function MetricsTable({
   const incrementClickCount = async (type: 'DownloadButton' | 'VizModal' | 'SimulateModal') => {
     try {
       const requestBody = { ip: client_ip, click_type: type };
-      console.log('Request Body:', requestBody);
+      // console.log('Request Body:', requestBody);
 
       const response = await fetch('/survey/public/surveys/', {
         method: 'POST',

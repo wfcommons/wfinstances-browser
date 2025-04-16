@@ -1,21 +1,22 @@
 import { Button, Center, Group, Loader, Modal, Box } from '@mantine/core';
 import Cytoscape, { ElementDefinition, NodeDataDefinition } from 'cytoscape';
-import { useState } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { NodeModal } from '~/components/NodeModal';
 import { Task, File, WfInstance } from '~/types/WfInstance';
 import DAGRE from 'cytoscape-dagre';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { useDisclosure } from '@mantine/hooks';
+import {max, min} from "@floating-ui/utils";
 
 Cytoscape.use(DAGRE);
 
 export function VizModal({
-    id,
-    client_ip,
-    opened,
-    onClose
-}: { 
+                             id,
+                             client_ip,
+                             opened,
+                             onClose
+                         }: {
     id: string,
     client_ip: string,
     opened: boolean,
@@ -26,6 +27,7 @@ export function VizModal({
     const [elementsWithFiles, setElementsWithFiles] = useState<ElementDefinition[]>([]);
     const [elementsNoFiles, setElementsNoFiles] = useState<ElementDefinition[]>([]);
     const [useElementsWithFiles, setUseElementsWithFiles] = useState(false);
+    const [cy, setCy] = useState<Cytoscape.Core | null>(null);
 
     function swapElements() {
         setUseElementsWithFiles(prev => !prev);
@@ -37,8 +39,9 @@ export function VizModal({
             style: {
                 "background-color": "data(bg)",
                 width: "label",
-                height: "label",
-                padding: "6px",
+                // height: "label",
+                height: "60px",
+                padding: "8px",
                 shape: "round-rectangle"
             }
         },
@@ -57,7 +60,7 @@ export function VizModal({
             style: {
                 "curve-style": "bezier",
                 "target-arrow-shape": "triangle",
-                width: 1.5
+                width: 5.0
             }
         },
         {
@@ -78,7 +81,79 @@ export function VizModal({
 
     const layout = {
         name: "dagre",
-        animate: true
+        animate: true,
+        rankDir: 'TB', // Top to Bottom layout
+        rankSep: 500,  // Increase vertical spacing
+        fit: true,     // Fit the graph in the viewport
+        padding: 50    // Add padding around the graph
+    };
+
+    // Function to resize and center the graph to fill the viewport vertically
+    const fitGraphToViewport = (mode: string) => {
+
+        if (cy) {
+            // const pan = cy.pan();
+            // console.log("Pan.x = " + pan.x)
+            // console.log("Pan.y = " + pan.y)
+            // const zoom = cy.zoom();
+            // console.log("Zoom = " + zoom)
+            // const bb = cy.elements().boundingBox();
+            // console.log("Left-most x:", bb.x1);
+            // console.log("Right-most x:", bb.x2);
+            // console.log("Top-most y:", bb.y1);
+            // console.log("Bottom-most y:", bb.y2);
+
+
+
+            // Get viewport and graph dimensions
+            const container = cy.container();
+            const viewportHeight = container ? container.clientHeight : 0;
+            const viewportWidth = container ? container.clientWidth : 0;
+
+            const boundingBox = cy.elements().boundingBox();
+            const graphHeight = boundingBox.h;
+            const graphWidth = boundingBox.w;
+
+            // console.log("Viewport height:", viewportHeight);
+            // console.log("Graph height:", graphHeight);
+            // console.log("Viewport width:", viewportWidth);
+            // console.log("Graph width:", graphWidth);
+
+            if (graphHeight > 0 && viewportHeight > 0 && graphWidth > 0 && viewportHeight > 0) {
+
+                if (mode == "b") {
+                    if (graphHeight > graphWidth) {
+                        mode = "h"
+                    } else {
+                        mode = "w"
+                    }
+                }
+                if (mode == "h") {
+                    const zoomFactorH = (viewportHeight * 0.7) / graphHeight;
+                    cy.zoom(zoomFactorH);
+                    cy.center();
+                    cy.panBy({ x: 0, y: - viewportHeight * 0.10});
+                } else if (mode == "w") {
+                    const zoomFactorW = (viewportWidth) / graphWidth;
+                    cy.zoom(zoomFactorW);
+                    cy.center();
+                    cy.panBy({ x: 0, y: - viewportHeight * 0.10});
+                }
+                // // Calculate zoom to stretch vertically (use 90% of available height)
+                // let zoomFactor;
+                // if (mode == "h") {
+                //     zoomFactor = max(zoomFactorW, zoomFactorH)
+                // } else if (mode == "w") {
+                //     zoomFactor = min(zoomFactorW, zoomFactorH)
+                // }
+                // console.log("Calculated zoom factor:", zoomFactor);
+                //
+                // // Apply zoom and center
+                // // cy.fit();
+                //
+                // console.log("Final zoom level:", cy.zoom());
+            }
+        }
     };
 
     function getRandomColorHex(): string {
@@ -120,7 +195,7 @@ export function VizModal({
 
             graphElementsWithFiles.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task', obj: task } });
             graphElementsNoFiles.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task', obj: task } });
-    
+
             task.inputFiles?.forEach((fileId: string) => {
                 graphElementsWithFiles.push({ data: { source: fileId, target: task.id, type: 'edge' } });
             });
@@ -144,7 +219,7 @@ export function VizModal({
     const { isLoading, refetch } = useQuery({
         refetchOnWindowFocus: false,
         queryKey: ['id', id],
-        queryFn: () => 
+        queryFn: () =>
             fetch(`/wf-instances/public/viz/${id}`,
                 {
                     method: 'POST',
@@ -163,6 +238,8 @@ export function VizModal({
             <Group justify="center" pt={15}>
                 <Button variant="success" onClick={swapElements}>{useElementsWithFiles ? "Hide Files" : "Show Files"}</Button>
                 <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
+                <Button variant="light" onClick={() => cy && fitGraphToViewport("w")} disabled={!cy}>Fit to Viewport Width</Button>
+                <Button variant="light" onClick={() => cy && fitGraphToViewport("h")} disabled={!cy}>Fit to Viewport Height</Button>
             </Group>
             {isLoading ? (
                 <Center>
@@ -181,27 +258,33 @@ export function VizModal({
                             marginTop: '16px'
                         }}
                     >
-                        <div style={{ width: '150%', height: '150%' }}>
-                    <CytoscapeComponent
-                        key={useElementsWithFiles ? elementsWithFiles.length : elementsNoFiles.length}
-                        elements={useElementsWithFiles? elementsWithFiles : elementsNoFiles}
-                        layout={layout}
-                        style={{ width: '100%', height: '100vh' }}
-                        stylesheet={cytoscapeStylesheet}
-                        cy={cy => {
-                            cy.on("tap", evt => {
-                                setNode(evt.target.data());
-                                if (node.type !== "edge") {
-                                    openNodeModal();
-                                }
-                            });
-                            cy.on('layoutstop', () => {
-                                // cy.fit();  // Fit the graph to the viewport
-                                cy.zoom(2);  // Adjust zoom level
-                                cy.center()
-                            });
-                        }}
-                    />
+                        <div style={{ width: '100%', height: '100%' }}>
+                            <CytoscapeComponent
+                                key={useElementsWithFiles ? elementsWithFiles.length : elementsNoFiles.length}
+                                elements={useElementsWithFiles ? elementsWithFiles : elementsNoFiles}
+                                layout={layout}
+                                style={{ width: '100%', height: '100vh' }}
+                                stylesheet={cytoscapeStylesheet}
+                                cy={(cyInstance) => {
+                                    // Save the Cytoscape instance to state
+                                    setCy(cyInstance);
+
+                                    cyInstance.on("tap", evt => {
+                                        setNode(evt.target.data());
+                                        if (node.type !== "edge") {
+                                            openNodeModal();
+                                        }
+                                    });
+
+                                    cyInstance.on('layoutstop', () => {
+                                        // Adjust zoom level and center after layout completes
+                                        // cyInstance.center();
+                                        // cyInstance.fit();
+                                        // cyInstance.zoom(0.2);
+                                        fitGraphToViewport("b")
+                                    });
+                                }}
+                            />
                         </div>
                     </Box>
                 </>
