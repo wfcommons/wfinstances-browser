@@ -49,7 +49,7 @@ export function QuestionnairesModal({
   return (
     <Modal opened={opened} onClose={onClose} title="User Survey">
       <Stack>
-        <Text>On a scale of 1 to 10, how would you rate the usefulness of this application?</Text>
+        <Text>On a scale of 1 to 10, how would you rate the <b>usefulness</b> of this application?</Text>
         <NumberInput
           placeholder="Enter your rating"
           value={usefulnessRating}
@@ -58,7 +58,7 @@ export function QuestionnairesModal({
           max={10}
         />
 
-        <Text>On a scale of 1 to 10, how would you rate the usability of this application?</Text>
+        <Text>On a scale of 1 to 10, how would you rate the <b>usability</b> of this application?</Text>
         <NumberInput
           placeholder="Enter your rating"
           value={usabilityRating}
