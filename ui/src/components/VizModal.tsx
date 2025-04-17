@@ -28,6 +28,7 @@ export function VizModal({
     const [elementsNoFiles, setElementsNoFiles] = useState<ElementDefinition[]>([]);
     const [useElementsWithFiles, setUseElementsWithFiles] = useState(false);
     const [cy, setCy] = useState<Cytoscape.Core | null>(null);
+    const [rankSep, setRankSep] = useState<number | 800>(800);
 
     function swapElements() {
         setUseElementsWithFiles(prev => !prev);
@@ -39,8 +40,7 @@ export function VizModal({
             style: {
                 "background-color": "data(bg)",
                 width: "label",
-                // height: "label",
-                height: "60px",
+                height: "label",
                 padding: "8px",
                 shape: "round-rectangle"
             }
@@ -49,10 +49,13 @@ export function VizModal({
             selector: "node[label]",
             style: {
                 label: "data(label)",
-                "font-size": "12",
+                "font-size": "16",
                 color: "white",
                 "text-halign": "center",
-                "text-valign": "center"
+                "text-valign": "center",
+                "text-wrap": "wrap", // ← enables wrapping
+                "text-max-width": "100px", // ← max width before wrapping
+                "text-justification": "left"
             }
         },
         {
@@ -83,7 +86,7 @@ export function VizModal({
         name: "dagre",
         animate: true,
         rankDir: 'TB', // Top to Bottom layout
-        rankSep: 500,  // Increase vertical spacing
+        rankSep: rankSep,
         fit: true,     // Fit the graph in the viewport
         padding: 50    // Add padding around the graph
     };
@@ -92,18 +95,16 @@ export function VizModal({
     const fitGraphToViewport = (mode: string) => {
 
         if (cy) {
-            // const pan = cy.pan();
-            // console.log("Pan.x = " + pan.x)
-            // console.log("Pan.y = " + pan.y)
-            // const zoom = cy.zoom();
-            // console.log("Zoom = " + zoom)
-            // const bb = cy.elements().boundingBox();
-            // console.log("Left-most x:", bb.x1);
-            // console.log("Right-most x:", bb.x2);
-            // console.log("Top-most y:", bb.y1);
-            // console.log("Bottom-most y:", bb.y2);
-
-
+            // Computing the graph's number of levels
+            // (Based on the cytoscape object, rather than getting the depth from the backend,
+            // which would be more efficient)
+            const levels: Set<number> = new Set();
+            cy.nodes().forEach((node) => {
+                const nodePosition = node.position();
+                const nodeLevel = nodePosition.y; // This is the level based on y-axis position
+                levels.add(nodeLevel);
+            });
+            const numLevels = levels.size
 
             // Get viewport and graph dimensions
             const container = cy.container();
@@ -129,29 +130,17 @@ export function VizModal({
                     }
                 }
                 if (mode == "h") {
-                    const zoomFactorH = (viewportHeight * 0.7) / graphHeight;
+                    // console.log("NumLevels = " + numLevels)
+                    // console.log("viewportHeight = " + viewportHeight)
+                    const zoomFactorH = 0.9*(viewportHeight) / ((numLevels ) * rankSep)
+                    // console.log("zoomFactorH = " + zoomFactorH)
                     cy.zoom(zoomFactorH);
-                    cy.center();
-                    cy.panBy({ x: 0, y: - viewportHeight * 0.10});
+                    cy.center()
                 } else if (mode == "w") {
                     const zoomFactorW = (viewportWidth) / graphWidth;
                     cy.zoom(zoomFactorW);
                     cy.center();
-                    cy.panBy({ x: 0, y: - viewportHeight * 0.10});
                 }
-                // // Calculate zoom to stretch vertically (use 90% of available height)
-                // let zoomFactor;
-                // if (mode == "h") {
-                //     zoomFactor = max(zoomFactorW, zoomFactorH)
-                // } else if (mode == "w") {
-                //     zoomFactor = min(zoomFactorW, zoomFactorH)
-                // }
-                // console.log("Calculated zoom factor:", zoomFactor);
-                //
-                // // Apply zoom and center
-                // // cy.fit();
-                //
-                // console.log("Final zoom level:", cy.zoom());
             }
         }
     };
@@ -161,6 +150,10 @@ export function VizModal({
         const [red, green, blue] = [randomize(), randomize(), randomize()];
 
         return `#${red}${green}${blue}`;
+    }
+
+    function addWrapPoints(label: string, everyN = 20): string {
+        return label.replace(new RegExp(`(.{${everyN}})`, 'g'), '$1\u200b');
     }
 
     function buildGraphElements(wfInstance: WfInstance): ElementDefinition[] {
@@ -193,8 +186,8 @@ export function VizModal({
                 colorMap.set(task.name, bgColor);
             }
 
-            graphElementsWithFiles.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task', obj: task } });
-            graphElementsNoFiles.push({ data: { id: task.id, label: task.name, bg: bgColor, type: 'task', obj: task } });
+            graphElementsWithFiles.push({ data: { id: task.id, label: addWrapPoints(task.name), bg: bgColor, type: 'task', obj: task } });
+            graphElementsNoFiles.push({ data: { id: task.id, label: addWrapPoints(task.name), bg: bgColor, type: 'task', obj: task } });
 
             task.inputFiles?.forEach((fileId: string) => {
                 graphElementsWithFiles.push({ data: { source: fileId, target: task.id, type: 'edge' } });
@@ -263,7 +256,7 @@ export function VizModal({
                                 key={useElementsWithFiles ? elementsWithFiles.length : elementsNoFiles.length}
                                 elements={useElementsWithFiles ? elementsWithFiles : elementsNoFiles}
                                 layout={layout}
-                                style={{ width: '100%', height: '100vh' }}
+                                style={{ width: '100%', height: '70vh' }}
                                 stylesheet={cytoscapeStylesheet}
                                 cy={(cyInstance) => {
                                     // Save the Cytoscape instance to state
@@ -277,11 +270,7 @@ export function VizModal({
                                     });
 
                                     cyInstance.on('layoutstop', () => {
-                                        // Adjust zoom level and center after layout completes
-                                        // cyInstance.center();
-                                        // cyInstance.fit();
-                                        // cyInstance.zoom(0.2);
-                                        fitGraphToViewport("b")
+                                        fitGraphToViewport("h")  // By default, adjust to fill height
                                     });
                                 }}
                             />
