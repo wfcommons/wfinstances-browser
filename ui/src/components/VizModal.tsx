@@ -49,7 +49,7 @@ export function VizModal({
             selector: "node[label]",
             style: {
                 label: "data(label)",
-                "font-size": "16",
+                "font-size": "40",
                 color: "white",
                 "text-halign": "center",
                 "text-valign": "center",
@@ -132,7 +132,7 @@ export function VizModal({
                 if (mode == "h") {
                     // console.log("NumLevels = " + numLevels)
                     // console.log("viewportHeight = " + viewportHeight)
-                    const zoomFactorH = 0.9*(viewportHeight) / ((numLevels ) * rankSep)
+                    const zoomFactorH = 0.87*(viewportHeight) / ((numLevels ) * rankSep)
                     // console.log("zoomFactorH = " + zoomFactorH)
                     cy.zoom(zoomFactorH);
                     cy.center()
@@ -152,7 +152,7 @@ export function VizModal({
         return `#${red}${green}${blue}`;
     }
 
-    function addWrapPoints(label: string, everyN = 20): string {
+    function addWrapPoints(label: string, everyN = 28): string {
         return label.replace(new RegExp(`(.{${everyN}})`, 'g'), '$1\u200b');
     }
 
