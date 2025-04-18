@@ -28,6 +28,7 @@
     "cytoscape": "^3.23.0",
     "cytoscape-cose-bilkent": "^4.1.0",
     "cytoscape-dagre": "^2.5.0",
+    "cytoscape-svg": "^0.4.0",
     "file-saver": "^2.0.5",
     "hammerjs": "^2.0.8",
     "isbot": "^4.1.0",

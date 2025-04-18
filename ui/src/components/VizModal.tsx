@@ -7,7 +7,8 @@ import { Task, File, WfInstance } from '~/types/WfInstance';
 import DAGRE from 'cytoscape-dagre';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { useDisclosure } from '@mantine/hooks';
-import {max, min} from "@floating-ui/utils";
+import Cytoscape from 'cytoscape';
+import CytoscapeComponent from 'react-cytoscapejs';
 
 Cytoscape.use(DAGRE);
 
@@ -93,6 +94,14 @@ export function VizModal({
 
     // Function to resize and center the graph to fill the viewport vertically
     const fitGraphToViewport = (mode: string) => {
+        const last_mode = localStorage.getItem('graph_last_mode') || "";
+        if (mode == "") {
+            mode = last_mode;
+        }
+        if (mode == "") {
+            mode = "w";   // by default
+        }
+        localStorage.setItem('graph_last_mode', mode);
 
         if (cy) {
             // Computing the graph's number of levels
@@ -115,35 +124,10 @@ export function VizModal({
             const graphHeight = boundingBox.h;
             const graphWidth = boundingBox.w;
 
-            // Pick the mode (with a static variable). This is horrible, but whatev
-            let last_mode = ""
-            if (mode != "") {
-                last_mode = mode;
-            }
-            if (mode == "") {
-                mode = last_mode;
-            }
-            if (mode == "") {
-                if (graphHeight > graphWidth) {
-                    mode = "h"
-                } else {
-                    mode = "w"
-                }
-            }
-            // console.log("Viewport height:", viewportHeight);
-            // console.log("Graph height:", graphHeight);
-            // console.log("Viewport width:", viewportWidth);
-            // console.log("Graph width:", graphWidth);
-
             if (graphHeight > 0 && viewportHeight > 0 && graphWidth > 0 && viewportHeight > 0) {
 
                 if (mode == "h") {
-                    // console.log("Current ZoomFactor = " + cy.zoom());
-                    // console.log("NumLevels = " + numLevels)
-                    // console.log("viewportHeight = " + viewportHeight)
-                    // console.log("rankSep = " + rankSep)
                     const zoomFactorH = 0.9*(viewportHeight) / ((numLevels - 1) * rankSep  + numLevels * 45)
-                    // console.log("Computing zoomFactorH = " + zoomFactorH)
                     cy.zoom(zoomFactorH);
                     cy.center()
                 } else if (mode == "w") {
@@ -172,7 +156,7 @@ export function VizModal({
         const files = workflowSpec.files ?? [];
 
         // Create a map of task execution times
-        let task_execution_times: { [key: string]: number } = {};
+        const task_execution_times: { [key: string]: number } = {};
         wfInstance.workflow.execution.tasks.forEach((task_execution: Object) => {
             task_execution_times[task_execution["id"]] = task_execution["runtimeInSeconds"]
         });
@@ -235,26 +219,92 @@ export function VizModal({
                 .then(res => buildGraphElements(res.result))
     });
 
+    // Add these export functions
+    const exportSVG = () => {
+        if (!cy) return;
+
+        // Get SVG string
+        const svgContent = cy.svg({scale: 0.1, full: true});
+
+        // Create a blob and download
+        const blob = new Blob([svgContent], {type: 'image/svg+xml;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `graph-${id}.svg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    useEffect(() => {
+        // This code only runs on the client after mounting
+        import('cytoscape-svg').then((svgModule) => {
+            const svg = svgModule.default;
+            Cytoscape.use(svg);
+        });
+    }, []);
+
     return (
         <Modal title="WfInstance Visualization" opened={opened} onClose={onClose} size='100%'>
             <i>{id}</i>
             <Group justify="center" pt={15}>
                 <Button variant="success" onClick={swapElements}>{useElementsWithFiles ? "Hide Files" : "Show Files"}</Button>
                 <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
-                <Button variant="light" onClick={() => cy && fitGraphToViewport("w")} disabled={!cy}>Fit to Viewport Width</Button>
-                <Button variant="light" onClick={() => cy && fitGraphToViewport("h")} disabled={!cy}>Fit to Viewport Height</Button>
+                <Button variant="light" onClick={() => cy && fitGraphToViewport("w")} disabled={!cy}>Fit to Width</Button>
+                <Button variant="light" onClick={() => cy && fitGraphToViewport("h")} disabled={!cy}>Fit to Height</Button>
+                <Button variant="outline" onClick={exportSVG} disabled={!cy}>Export (SVG)</Button>
                 <Box style={{minWidth: '250px'}}>
-                    <div style={{fontSize: 'small', marginBottom: '5px', textAlign: 'center'}}>Inter-level spacing</div>
+                    <div style={{fontSize: 'small', marginBottom: '0px', textAlign: 'center'}}>Inter-level spacing</div>
                     <Slider
                         min={1}
-                        max={10}
+                        max={20}
                         step={1}
                         marks={[
-                            {value: 1, label: '-'},
-                            {value: 10, label: '+'}
+                            // {value: 1, label: '-'},
+                            // {value: 20, label: '+'}
+                            {value: 1, label: ''},
+                            {value: 20, label: ''}
                         ]}
                         style={{minWidth: '200px'}}
-                        defaultValue={5}
+                        defaultValue={10}
+                        styles={(theme) => ({
+                            // Hide the colored track to the left of the thumb
+                            track: {
+                                '&:before': {
+                                    display: 'none', // This removes the colored part
+                                }
+                            },
+                            // You can also customize other parts if needed
+                            thumb: {
+                                borderWidth: 2,
+                                height: 16,
+                                width: 16,
+                                backgroundColor: theme.white,
+                            },
+                            // Make both mark dots look the same
+                            mark: {
+                                borderColor: '#e9ecef', // Use the same color for all marks
+                                backgroundColor: '#e9ecef',
+                                borderWidth: 1,
+                                width: 6,
+                                height: 6,
+                            },
+                            // Override the markFilled style to match the regular mark
+                            markFilled: {
+                                borderColor: '#e9ecef', // Same as normal mark
+                                backgroundColor: '#e9ecef', // Same as normal mark
+                                borderWidth: 1,
+                                width: 6,
+                                height: 6,
+                            },
+                            // Ensure the bar itself is visible
+                            bar: {
+                                backgroundColor: '#e9ecef', // Light gray color for the entire bar
+                            }
+                        })}
                         onChange={(value) => cy && setRankSep(100 * value)} disable={!cy}
                     />
                 </Box>
