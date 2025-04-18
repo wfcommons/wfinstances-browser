@@ -262,6 +262,7 @@ export function VizModal({
                         min={1}
                         max={20}
                         step={1}
+                        label={null}
                         marks={[
                             // {value: 1, label: '-'},
                             // {value: 20, label: '+'}
@@ -305,7 +306,7 @@ export function VizModal({
                                 backgroundColor: '#e9ecef', // Light gray color for the entire bar
                             }
                         })}
-                        onChange={(value) => cy && setRankSep(100 * value)} disable={!cy}
+                        onChange={(value) => cy && setRankSep(100 * Math.pow(value, 1.4))} disable={!cy}
                     />
                 </Box>
             </Group>
