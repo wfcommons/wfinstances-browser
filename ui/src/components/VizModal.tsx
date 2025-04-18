@@ -115,6 +115,21 @@ export function VizModal({
             const graphHeight = boundingBox.h;
             const graphWidth = boundingBox.w;
 
+            // Pick the mode (with a static variable). This is horrible, but whatev
+            let last_mode = ""
+            if (mode != "") {
+                last_mode = mode;
+            }
+            if (mode == "") {
+                mode = last_mode;
+            }
+            if (mode == "") {
+                if (graphHeight > graphWidth) {
+                    mode = "h"
+                } else {
+                    mode = "w"
+                }
+            }
             // console.log("Viewport height:", viewportHeight);
             // console.log("Graph height:", graphHeight);
             // console.log("Viewport width:", viewportWidth);
@@ -122,13 +137,6 @@ export function VizModal({
 
             if (graphHeight > 0 && viewportHeight > 0 && graphWidth > 0 && viewportHeight > 0) {
 
-                if (mode == "b") {
-                    if (graphHeight > graphWidth) {
-                        mode = "h"
-                    } else {
-                        mode = "w"
-                    }
-                }
                 if (mode == "h") {
                     // console.log("Current ZoomFactor = " + cy.zoom());
                     // console.log("NumLevels = " + numLevels)
@@ -236,7 +244,6 @@ export function VizModal({
                 <Button variant="light" onClick={() => cy && fitGraphToViewport("w")} disabled={!cy}>Fit to Viewport Width</Button>
                 <Button variant="light" onClick={() => cy && fitGraphToViewport("h")} disabled={!cy}>Fit to Viewport Height</Button>
                 <Box style={{minWidth: '250px'}}>
-                    {/*<Text size="sm">Inter-level spacing</Text>*/}
                     <div style={{fontSize: 'small', marginBottom: '5px', textAlign: 'center'}}>Inter-level spacing</div>
                     <Slider
                         min={1}
@@ -288,7 +295,7 @@ export function VizModal({
                                     });
 
                                     cyInstance.on('layoutstop', () => {
-                                        fitGraphToViewport("h")  // By default, adjust to fill height
+                                        fitGraphToViewport("")  // By default, adjust to fill height
                                     });
                                 }}
                             />
