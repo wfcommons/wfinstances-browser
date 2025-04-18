@@ -1,4 +1,4 @@
-import { Button, Center, Group, Loader, Modal, Box } from '@mantine/core';
+import {Button, Center, Group, Loader, Modal, Box, Slider} from '@mantine/core';
 import Cytoscape, { ElementDefinition, NodeDataDefinition } from 'cytoscape';
 import {useEffect, useRef, useState} from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -130,10 +130,12 @@ export function VizModal({
                     }
                 }
                 if (mode == "h") {
+                    // console.log("Current ZoomFactor = " + cy.zoom());
                     // console.log("NumLevels = " + numLevels)
                     // console.log("viewportHeight = " + viewportHeight)
-                    const zoomFactorH = 0.87*(viewportHeight) / ((numLevels ) * rankSep)
-                    // console.log("zoomFactorH = " + zoomFactorH)
+                    // console.log("rankSep = " + rankSep)
+                    const zoomFactorH = 0.9*(viewportHeight) / ((numLevels - 1) * rankSep  + numLevels * 45)
+                    // console.log("Computing zoomFactorH = " + zoomFactorH)
                     cy.zoom(zoomFactorH);
                     cy.center()
                 } else if (mode == "w") {
@@ -152,7 +154,7 @@ export function VizModal({
         return `#${red}${green}${blue}`;
     }
 
-    function addWrapPoints(label: string, everyN = 28): string {
+    function addWrapPoints(label: string, everyN = 10000): string {
         return label.replace(new RegExp(`(.{${everyN}})`, 'g'), '$1\u200b');
     }
 
@@ -233,10 +235,26 @@ export function VizModal({
                 <Button variant="default" onClick={() => refetch()}>Shuffle Colors</Button>
                 <Button variant="light" onClick={() => cy && fitGraphToViewport("w")} disabled={!cy}>Fit to Viewport Width</Button>
                 <Button variant="light" onClick={() => cy && fitGraphToViewport("h")} disabled={!cy}>Fit to Viewport Height</Button>
+                <Box style={{minWidth: '250px'}}>
+                    {/*<Text size="sm">Inter-level spacing</Text>*/}
+                    <div style={{fontSize: 'small', marginBottom: '5px', textAlign: 'center'}}>Inter-level spacing</div>
+                    <Slider
+                        min={1}
+                        max={10}
+                        step={1}
+                        marks={[
+                            {value: 1, label: '-'},
+                            {value: 10, label: '+'}
+                        ]}
+                        style={{minWidth: '200px'}}
+                        defaultValue={5}
+                        onChange={(value) => cy && setRankSep(100 * value)} disable={!cy}
+                    />
+                </Box>
             </Group>
             {isLoading ? (
                 <Center>
-                    <Loader my={300} />
+                <Loader my={300} />
                 </Center>
             ) : (
                 <>
