@@ -9,6 +9,8 @@ Instances](https://github.com/wfcommons/WfInstances) provided by the
 
 The only software requirement for running the server is [Docker](https://docker.com). 
 
+The browser is [live!](https://wfinstances.ics.hawaii.edu)
+
 ---
 
 ## Running with Docker
