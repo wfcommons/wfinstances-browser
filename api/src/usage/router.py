@@ -77,12 +77,6 @@ async def get_summarized_simulations() -> dict:
 @router.get('/public/totals/', response_model=ApiResponse)
 async def get_totals() -> dict:
 
-    # Temporary: fill in all countries
-    fill_in_countries("downloads")
-    fill_in_countries("visualizations")
-    fill_in_countries("simulations")
-    fill_in_countries("surveys")
-
     # Instead of counting documents, sum the num_instances field for downloads.
     downloads_data = list(downloads_collection.find({}))
     visualizations_data = list(visualizations_collection.find({}))
