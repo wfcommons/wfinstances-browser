@@ -3,6 +3,8 @@ from collections import defaultdict
 from functools import lru_cache
 import ipinfo
 import os
+from src.database import downloads_collection, visualizations_collection, simulations_collection
+
 
 def get_week_range(date):
     # Get the start (Sunday) and end (Saturday) of the week
@@ -86,3 +88,19 @@ def get_top_countries(ip_list: list[str]) -> list[tuple[str, int]]:
         country_counts[country] = country_counts.get(country, 0) + 1
     sorted_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)
     return sorted_countries[:10]
+
+def get_num_countries(ip_list: list[str]) -> list[tuple[str, int]]:
+    resolved = get_ip_country_name(ip_list)
+    country_counts = {}
+    for _, country in resolved:
+        if country == "Unknown":
+            continue
+        country_counts[country] = country_counts.get(country, 0) + 1
+    return len(country_counts)
+
+def get_all_ips() -> list[str]:
+    downloads_ips = [item["ip"] for item in downloads_collection.find({})]
+    visualizations_ips = [item["ip"] for item in visualizations_collection.find({})]
+    simulations_ips = [item["ip"] for item in simulations_collection.find({})]
+    all_ips = list(set(downloads_ips + visualizations_ips + simulations_ips))
+    return all_ips
