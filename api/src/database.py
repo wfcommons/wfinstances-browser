@@ -22,6 +22,18 @@ simulations_collection = db['simulations']
 surveys_collection = db['surveys']
 
 
+def fill_in_countries(collection_name: str):
+    collection = db[collection_name]
+    for document in collection.find():
+        if "country" not in document:
+            country = lookup_country(document["ip"])
+            collection.update_one(
+                {"_id": document["_id"]},
+                {"$set": {"country": country}}
+            )
+            print(f"Inserted 'country' into document with _id: {document['_id']}")
+
+
 def add_to_collection(collection_name: str, data: dict):
     db[collection_name].insert_one(data)
 
