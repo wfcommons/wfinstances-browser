@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from collections import defaultdict
-from functools import lru_cache
 import ipinfo
 import os
 from src.database import downloads_collection, visualizations_collection, simulations_collection
+from src.ip_geo_location import lookup_country
 
 
 def get_week_range(date):
@@ -31,21 +31,6 @@ def group_by_week(data, field_name):
     } for week in weekly_data]
 
     return result
-
-@lru_cache(maxsize=1024)
-def lookup_country(ip: str) -> str:
-    access_token = os.getenv("IPINFO_TOKEN")
-    if not access_token:
-        print("IPINFO_TOKEN environment variable is not set.")
-        return "Unknown"
-    try:
-        handler = ipinfo.getHandler(access_token)
-        details = handler.getDetails(ip)
-        country = details.details.get("country_name") or details.details.get("country")
-        return country if country and country.strip() != "" else "Unknown"
-    except Exception as e:
-        print(f"Error fetching country for IP {ip}: {e}")
-        return "Unknown"
 
 def get_month_range(date):
     # Return the ISO date string representing the first day of the month (e.g., "2024-01-01")

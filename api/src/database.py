@@ -2,7 +2,7 @@ import os, certifi
 from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
-
+from src.ip_geo_location import lookup_country
 
 load_dotenv()
 
@@ -27,10 +27,12 @@ def add_to_collection(collection_name: str, data: dict):
 
 def add_item_to_downloads_collection(wf_ids: list[str], client_ip: str):
     collection_name = "downloads"
+    country = lookup_country(client_ip)
 
     data = {
         "date": datetime.utcnow().date().isoformat(),
         "ip": client_ip,
+        "country": country,
         "wfinstances": wf_ids,
         "num_instances": len(wf_ids)
     }
@@ -39,10 +41,12 @@ def add_item_to_downloads_collection(wf_ids: list[str], client_ip: str):
 
 def add_item_to_visualizations_collection(wf_id: str, client_ip: str):
     collection_name = "visualizations"
+    country = lookup_country(client_ip)
 
     data = {
         "date": datetime.utcnow().date().isoformat(),
         "ip": client_ip,
+        "country": country,
         "wfinstance": wf_id,
     }
 
@@ -53,6 +57,7 @@ def update_simulation_collection(wf_id: str, client_ip: str):
 
     data = {
         "date": datetime.utcnow().date().isoformat(),
+        "country": country,
         "ip": client_ip,
         "wfinstance": wf_id,
     }
@@ -63,6 +68,7 @@ def add_to_surveys_collection(client_ip: str, total_clicks: int, rating: int):
     data = {
         "date": datetime.utcnow().isoformat(),
         "ip": client_ip,
+        "country": country,
         "total_clicks": total_clicks,
         "usefulness_rating": usefulness_rating,
         "usability_rating": usability_rating,
