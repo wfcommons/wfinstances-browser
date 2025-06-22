@@ -34,16 +34,16 @@ surveys_collection = db['surveys']
 #             print(f"Inserted 'country' into document with _id: {document['_id']}")
 
 # TMP FUNCTION TO UPDATE THE DATABASE
-def hash_ips(collection_name: str):
-    collection = db[collection_name]
-    for document in collection.find():
-        if "ip" in document:
-            hashed_ip = hash_ip(document["ip"])
-            collection.update_one(
-                {"_id": document["_id"]},
-                {"$set": {"ip": hashed_ip}}
-            )
-            print(f"Hashed 'ip' into document with _id: {document['_id']}")
+# def hash_ips(collection_name: str):
+#     collection = db[collection_name]
+#     for document in collection.find():
+#         if "ip" in document:
+#             hashed_ip = hash_ip(document["ip"])
+#             collection.update_one(
+#                 {"_id": document["_id"]},
+#                 {"$set": {"ip": hashed_ip}}
+#             )
+#             print(f"Hashed 'ip' into document with _id: {document['_id']}")
 
 def hash_ip(ip_address: str) -> str:
     ip_bytes = ip_address.encode('utf-8')
