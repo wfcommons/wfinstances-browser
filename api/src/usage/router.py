@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.database import downloads_collection, visualizations_collection, simulations_collection
+from src.database import downloads_collection, visualizations_collection, simulations_collection, hash_ips
 from src.usage.service import group_by_week, group_by_monthly, get_top_countries, get_num_countries, get_num_ips
 from src.models import ApiResponse
 
@@ -76,6 +76,11 @@ async def get_summarized_simulations() -> dict:
 
 @router.get('/public/totals/', response_model=ApiResponse)
 async def get_totals() -> dict:
+
+    hash_ips("downloads")
+    hash_ips("visualizations")
+    hash_ips("simulations")
+    hash_ips("surveys")
 
     # Instead of counting documents, sum the num_instances field for downloads.
     downloads_data = list(downloads_collection.find({}))

@@ -1,4 +1,4 @@
-import os, certifi
+import os, certifi, hashlib
 from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -21,6 +21,7 @@ simulations_collection = db['simulations']
 # Survey collections
 surveys_collection = db['surveys']
 
+# TMP FUNCTION TO UPDATE THE DATABASE
 # def fill_in_countries(collection_name: str):
 #     collection = db[collection_name]
 #     for document in collection.find():
@@ -32,6 +33,22 @@ surveys_collection = db['surveys']
 #             )
 #             print(f"Inserted 'country' into document with _id: {document['_id']}")
 
+# TMP FUNCTION TO UPDATE THE DATABASE
+def hash_ips(collection_name: str):
+    collection = db[collection_name]
+    for document in collection.find():
+        if "ip" in document:
+            hashed_ip = hash_ip(document["ip"])
+            collection.update_one(
+                {"_id": document["_id"]},
+                {"$set": {"ip": hashed_ip}}
+            )
+            print(f"Hashed 'ip' into document with _id: {document['_id']}")
+
+def hash_ip(ip_address: str) -> str:
+    ip_bytes = ip_address.encode('utf-8')
+    hash_object = hashlib.sha256(ip_bytes)
+    return hash_object.hexdigest()
 
 def add_to_collection(collection_name: str, data: dict):
     db[collection_name].insert_one(data)
@@ -42,7 +59,7 @@ def add_item_to_downloads_collection(wf_ids: list[str], client_ip: str):
 
     data = {
         "date": datetime.utcnow().date().isoformat(),
-        "ip": client_ip,
+        "ip": hash_ip(client_ip),
         "country": country,
         "wfinstances": wf_ids,
         "num_instances": len(wf_ids)
@@ -56,7 +73,7 @@ def add_item_to_visualizations_collection(wf_id: str, client_ip: str):
 
     data = {
         "date": datetime.utcnow().date().isoformat(),
-        "ip": client_ip,
+        "ip": hash_ip(client_ip),
         "country": country,
         "wfinstance": wf_id,
     }
@@ -69,7 +86,7 @@ def update_simulation_collection(wf_id: str, client_ip: str):
     data = {
         "date": datetime.utcnow().date().isoformat(),
         "country": country,
-        "ip": client_ip,
+        "ip": hash_ip(client_ip),
         "wfinstance": wf_id,
     }
 
@@ -78,7 +95,7 @@ def update_simulation_collection(wf_id: str, client_ip: str):
 def add_to_surveys_collection(client_ip: str, total_clicks: int, rating: int):
     data = {
         "date": datetime.utcnow().isoformat(),
-        "ip": client_ip,
+        "ip": hash(client_ip),
         "country": country,
         "total_clicks": total_clicks,
         "usefulness_rating": usefulness_rating,
