@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from src.database import downloads_collection, visualizations_collection, simulations_collection, fill_in_countries
-from src.usage.service import group_by_week, group_by_monthly, get_ip_country_name, get_top_countries, get_num_countries, get_all_ips
+from src.database import downloads_collection, visualizations_collection, simulations_collection
+from src.usage.service import group_by_week, group_by_monthly, get_top_countries, get_num_countries, get_num_ips
 from src.models import ApiResponse
 
 router = APIRouter()
@@ -81,13 +81,12 @@ async def get_totals() -> dict:
     downloads_data = list(downloads_collection.find({}))
     visualizations_data = list(visualizations_collection.find({}))
     simulations_data = list(simulations_collection.find({}))
-    all_ips = get_all_ips()
 
     downloads_total = sum(download.get('num_instances', 1) for download in downloads_data)
     visualizations_total = len(visualizations_data)
     simulations_total = len(simulations_data)
-    ips_total = len(all_ips)
-    countries_total = get_num_countries(all_ips)
+    ips_total = get_num_ips()
+    countries_total = get_num_countries()
 
     totals = {
         "downloads": downloads_total,
@@ -136,21 +135,10 @@ async def get_monthly_usage(data_type: str) -> dict:
         'result': chart_data
     }
 
-# @router.get('/public/ips/', response_model=ApiResponse)
-# async def get_ips_with_countries() -> dict:
-#     # Get all unique IPs that did something and get country name
-#     all_ips = get_all_ips()
-#     ip_country_mapping = get_ip_country_name(all_ips)  # Returns list of (ip, country)
-#     return {
-#         'detail': 'Data retrieved successfully.',
-#         'result': ip_country_mapping
-#     }
-
 @router.get('/public/top-countries/', response_model=ApiResponse)
 async def get_top_countries_route() -> dict:
     # Get top 10 countries based on combined usage
-    all_ips = get_all_ips()
-    top_countries = get_top_countries(all_ips)
+    top_countries = get_top_countries()
     return {
         'detail': 'Data retrieved successfully.',
         'result': top_countries

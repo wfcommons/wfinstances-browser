@@ -5,7 +5,6 @@ import os
 from src.database import downloads_collection, visualizations_collection, simulations_collection
 from src.ip_geo_location import lookup_country
 
-
 def get_week_range(date):
     # Get the start (Sunday) and end (Saturday) of the week
     start_of_week = date - timedelta(days=date.weekday() + 1)
@@ -56,36 +55,33 @@ def group_by_monthly(data, field_name):
 
     return result
 
-def get_ip_country_name(ip_list: list[str]) -> list[tuple[str, str]]:
-    result = []
-    unique_ips = set(ip_list)
-    for ip in unique_ips:
-        country = lookup_country(ip)
-        result.append((ip, country))
-    return result
-
-def get_top_countries(ip_list: list[str]) -> list[tuple[str, int]]:
-    resolved = get_ip_country_name(ip_list)
+def get_top_countries() -> list[tuple[str, int]]:
+    downloads_pairs = [item["country"]+"_"+item["ip"] for item in downloads_collection.find({})]
+    visualizations_pairs = [item["country"]+"_"+item["ip"] for item in visualizations_collection.find({})]
+    simulations_pairs = [item["country"]+"_"+item["ip"] for item in simulations_collection.find({})]
+    all_pairs = list(set(downloads_pairs + visualizations_pairs + simulations_pairs))
     country_counts = {}
-    for _, country in resolved:
+    for p in all_pairs:
+        country = p.split("_")[0]
         if country == "Unknown":
-            continue
-        country_counts[country] = country_counts.get(country, 0) + 1
+            country = "Other"
+        if not country in country_counts:
+            country_counts[country] = 0
+        country_counts[country] += 1
     sorted_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)
     return sorted_countries[:10]
 
-def get_num_countries(ip_list: list[str]) -> list[tuple[str, int]]:
-    resolved = get_ip_country_name(ip_list)
-    country_counts = {}
-    for _, country in resolved:
-        if country == "Unknown":
-            continue
-        country_counts[country] = country_counts.get(country, 0) + 1
-    return len(country_counts)
-
-def get_all_ips() -> list[str]:
+def get_num_countries() -> int:
+    downloads_countries = [item["country"] for item in downloads_collection.find({})]
+    visualizations_countries = [item["country"] for item in visualizations_collection.find({})]
+    simulations_countries = [item["country"] for item in simulations_collection.find({})]
+    all_countries = list(set(downloads_countries + visualizations_countries + simulations_countries))
+    return len(all_countries)
+    
+def get_num_ips() -> int:
     downloads_ips = [item["ip"] for item in downloads_collection.find({})]
     visualizations_ips = [item["ip"] for item in visualizations_collection.find({})]
     simulations_ips = [item["ip"] for item in simulations_collection.find({})]
     all_ips = list(set(downloads_ips + visualizations_ips + simulations_ips))
-    return all_ips
+    return len(all_ips)
+
