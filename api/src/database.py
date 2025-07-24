@@ -82,6 +82,8 @@ def add_item_to_visualizations_collection(wf_id: str, client_ip: str):
 
 def update_simulation_collection(wf_id: str, client_ip: str):
     collection_name = "simulations"
+    country = lookup_country(client_ip)
+
 
     data = {
         "date": datetime.utcnow().date().isoformat(),
@@ -93,6 +95,7 @@ def update_simulation_collection(wf_id: str, client_ip: str):
     add_to_collection(collection_name, data)
 
 def add_to_surveys_collection(client_ip: str, total_clicks: int, rating: int):
+    country = lookup_country(client_ip)
     data = {
         "date": datetime.utcnow().isoformat(),
         "ip": hash(client_ip),
