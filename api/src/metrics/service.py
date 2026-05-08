@@ -30,6 +30,14 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
     repo_url = f"https://github.com/{owner}/{repo}.git"
     local_dir = f"/data/github/{repo}"
 
+    # Now that the repository is cloned or updated, looking for .json files
+    # If the metric collection is empty, then make sure that we go over all the files
+    # as they are all new to us
+    if (metrics_collection.count_documents({}) == 0):
+        now = 0
+    else:
+        now = time.time()
+        
     # Clone the repository if it doesn't exist locally
     if not os.path.exists(local_dir):
         print(f"Cloning repository {repo_url} into {local_dir}...")
@@ -40,13 +48,6 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
         origin = repo.remotes.origin
         origin.pull()
 
-    # Now that the repository is cloned or updated, looking for .json files
-    # If the metric collection is empty, then make sure that we go over all the files
-    # as they are all new to us
-    if (metrics_collection.count_documents({}) == 0):
-        now = 0
-    else:
-        now = time.time()
 
     for root, dirs, files in os.walk(local_dir):
         for file in files:
