@@ -50,7 +50,7 @@ The main channel to reach the WfCommons team is via the support email:
 
 ## Funding Support
 
-eduWRENCH has been funded by the National Science Foundation (NSF).
+WfCommons has been funded by the National Science Foundation (NSF).
 
 [![NSF Award 2411154][nsf-2411154-badge]][nsf-2411154-link]
 
