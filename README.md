@@ -29,7 +29,7 @@ $ docker-compose up [-d]
 The above will not run any Nginx front-end. If you want to do so, you must add the `--profile with-my-own-nginx` argument to the `docker-compose` commands above.
 
 
-The database is empty the first time you launch the browser. To populate the database with metrics from the official [WfCommons WfInstances GitHub repo](https://github.com/wfcommons/WfInstances), run this command in a terminal on the machine running the server:
+To populate or update the database with metrics from the official [WfCommons WfInstances GitHub repo](https://github.com/wfcommons/WfInstances), run this command in a terminal on the machine running the server:
 ```
 curl -X PUT http://localhost:8081/metrics/private/github/wfcommons/WfInstances
 ```

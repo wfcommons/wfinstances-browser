@@ -37,7 +37,7 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
         now = 0
     else:
         now = time.time()
-        
+
     # Clone the repository if it doesn't exist locally
     if not os.path.exists(local_dir):
         print(f"Cloning repository {repo_url} into {local_dir}...")
