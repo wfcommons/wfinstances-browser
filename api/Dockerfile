@@ -16,7 +16,7 @@ RUN git clone https://github.com/wfcommons/WfInstances.git /data/github
 ARG WFINSTANCES_API_PORT
 
 # Run on the hour, each our
-RUN echo "0 * * * * cd /data/github && git pull origin main" > /etc/cron.d/git-pull-repo
+RUN echo "0 * * * * cd /data/github/WfInstances/ && git pull origin main" > /etc/cron.d/git-pull-repo
 
 RUN chmod 0644 /etc/cron.d/git-pull-repo
 
