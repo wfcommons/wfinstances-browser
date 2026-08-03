@@ -11,13 +11,13 @@ import time
 import git
 
 
-def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
+def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
     """
     Insert WfInstances and generate their metrics from a GitHub repository into the MongoDB collections.
 
     Args:
         owner: The owner of the GitHub repository
-        repo: The name of the GitHub repository
+        repo_name: The name of the GitHub repository
 
     Raises:
         HTTPException: GitHub repository does not exist
@@ -27,66 +27,96 @@ def insert_metrics_from_github(owner: str, repo: str) -> tuple[list, list]:
     valid_wf_instances, invalid_wf_instances = [], []
 
     # Set up the repository URL and local directory
-    repo_url = f"https://github.com/{owner}/{repo}.git"
-    local_dir = f"/data/github/{repo}"
+    repo_url = f"https://github.com/{owner}/{repo_name}.git"
+    local_dir = f"/data/github/{repo_name}"
 
-    # Now that the repository is cloned or updated, looking for .json files
-    # If the metric collection is empty, then make sure that we go over all the files
-    # as they are all new to us
-    if (metrics_collection.count_documents({}) == 0):
-        now = 0
-    else:
-        now = time.time()
+    git_dir = local_dir / ".git"
+    new_clone = not git_dir.is_dir()
 
     # Clone the repository if it doesn't exist locally
-    if not os.path.exists(local_dir):
+    if new_clone:
         print(f"Cloning repository {repo_url} into {local_dir}...")
-        git.Repo.clone_from(repo_url, local_dir)
+        git_repo = git.Repo.clone_from(repo_url, local_dir)
+
+        # A new clone has no previous local revision, so examine every JSON file.
+        json_files_to_process = {
+            path
+            for path in local_dir.rglob("*")
+            if path.is_file()
+            and path.suffix.lower() == ".json"
+            and ".git" not in path.parts
+        }
+
     else:
         print(f"Repository already exists locally. Pulling the latest changes...")
-        repo = git.Repo(local_dir)
-        origin = repo.remotes.origin
-        origin.pull()
+        git_repo = git.Repo(local_dir)
 
-
-    for root, dirs, files in os.walk(local_dir):
-        for file in files:
-            if file.endswith('.json'):
-                file_path = os.path.join(root, file)
-                if now > os.path.getmtime(file_path):
-                    sys.stderr.write(f"Skipping unchanged file {file}\n")
-                    continue
-                else:
-                    sys.stderr.write(f"Inspecting updated file {file}\n")
-
-                # Read the JSON file
-                try:
-                    with open(file_path, "r", encoding="utf-8") as f:
-                        wf_instance = json.load(f)
-                except json.JSONDecodeError:
-                    sys.stderr.write(f"Invalid JSON format: {file}\n")
-                    invalid_wf_instances.append(file)
-                    continue
-
-                # Validate the WfInstance schema
-                try:
-                    validate_wf_instance(wf_instance)
-                except InvalidWfInstanceException:
-                    invalid_wf_instances.append(file)
-                    continue
-
-                valid_wf_instances.append(file)
-
-                # Generate metrics and store them in the database
-                metrics = _generate_metrics(wf_instance)
-                metrics["_id"] = file
-                metrics["_githubRepo"] = f"{owner}/{repo}"
-                metrics["_filePath"] = file_path
-                metrics_collection.find_one_and_update(
-                    {"_id": metrics["_id"]},
-                    {"$set": metrics},
-                    upsert=True,
+        if git_repo.is_dirty(untracked_files=True):
+                raise RuntimeError(
+                    f"Repository {local_dir} contains local modifications. "
+                    "Refusing to pull because change detection would be ambiguous."
                 )
+
+        old_commit = git_repo.head.commit.hexsha
+        # --ff-only prevents an unexpected local merge commit.
+        git_repo.git.pull("--ff-only")
+
+        new_commit = git_repo.head.commit.hexsha
+
+        print(f"Previous commit: {old_commit}")
+        print(f"Current commit:  {new_commit}")
+        print(git_repo.git.diff("--name-status", old_commit, new_commit))
+
+        json_files_to_process = set()
+
+        if old_commit != new_commit:
+            # --no-renames makes a rename appear as a deletion plus an addition.
+            # Therefore, the file at its new path will be processed.
+            changed_paths = git_repo.git.diff(
+                "--name-only",
+                "--diff-filter=AM",
+                "--no-renames",
+                old_commit,
+                new_commit,
+            ).splitlines()
+
+            for relative_name in changed_paths:
+                path = local_dir / relative_name
+
+                if path.is_file() and path.suffix.lower() == ".json":
+                    json_files_to_process.add(path)
+
+    for file_path in sorted(json_files_to_process):
+        sys.stderr.write(f"Inspecting updated file {file_path}\n")
+
+        # Read the JSON file
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                wf_instance = json.load(f)
+        except json.JSONDecodeError:
+            sys.stderr.write(f"Invalid JSON format: {file}\n")
+            invalid_wf_instances.append(file)
+            continue
+
+        # Validate the WfInstance schema
+        try:
+            validate_wf_instance(wf_instance)
+        except InvalidWfInstanceException:
+            invalid_wf_instances.append(file)
+            continue
+
+        valid_wf_instances.append(file)
+
+        # Generate metrics and store them in the database
+        metrics = _generate_metrics(wf_instance)
+        metrics["_id"] = file
+        metrics["_githubRepo"] = f"{owner}/{repo}"
+        metrics["_filePath"] = file_path
+        metrics_collection.find_one_and_update(
+            {"_id": metrics["_id"]},
+            {"$set": metrics},
+            upsert=True,
+        )
 
     return valid_wf_instances, invalid_wf_instances
 
