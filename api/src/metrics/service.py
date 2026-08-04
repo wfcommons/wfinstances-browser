@@ -137,9 +137,13 @@ def _generate_metrics(wf_instance: dict) -> dict:
 
     Returns: The metrics generated using the list and graph data structures
     """
-    execution = wf_instance['workflow']['execution']
-    specification = wf_instance['workflow']['specification']
-    return _generate_execution_metrics(execution) | _generate_specification_metrics(specification)
+    if "execution" in wf_instance['workflow']:
+        execution_metrics = _generate_execution_metrics(wf_instance['workflow']['execution'])
+    else:
+        execution_metrics = {}
+
+    specification_metrics = _generate_specification_metrics(wf_instance['workflow']['specification'])
+    return execution_metrics | specification_metrics
 
 
 def _generate_execution_metrics(execution: dict) -> dict:
@@ -151,12 +155,33 @@ def _generate_execution_metrics(execution: dict) -> dict:
 
     Returns: The metrics generated using the list data structure
     """
-    total_runtime_in_seconds, total_read_bytes, total_written_bytes = 0, 0, 0
 
-    for task in execution['tasks']:
-        total_runtime_in_seconds += task.get('runtimeInSeconds', 0)
-        total_read_bytes += task.get('readBytes', 0)
-        total_written_bytes += task.get('writtenBytes', 0)
+    total_runtime_in_seconds = 0
+    try:
+        total_runtime_in_seconds = execution["metrics"]["sumTaskRuntimesInSeconds"]
+    except KeyError:
+        total_runtime_in_seconds = sum(
+            task.get("runtimeInSeconds", 0)
+            for task in execution["tasks"]
+        )
+
+    total_read_bytes = 0
+    try:
+        total_read_bytes = execution["metrics"]["totalNumBytesRead"]
+    except KeyError:
+        total_read_bytes = sum(
+            task.get("readBytes", 0)
+            for task in execution["tasks"]
+        )
+
+    total_written_bytes = 0
+    try:
+        total_written_bytes = execution["metrics"]["totalNumBytesWritten"]
+    except KeyError:
+        total_written_bytes = sum(
+            task.get("writtenBytes", 0)
+            for task in execution["tasks"]
+        )
 
     return {
         'totalReadBytes': total_read_bytes,
@@ -174,40 +199,53 @@ def _generate_specification_metrics(specification: dict) -> dict:
 
     Returns: The metrics generated using the graph data structure
     """
-    # Build graph of tasks
-    graph, top_level_nodes = Graph(), set()
-    for task in specification['tasks']:
-        if len(task['parents']) == 0:
-            top_level_nodes.add(task['id'])
-        for child in task['children']:
-            graph.add_edge(task['id'], child)
-
-    # Calculate levels and depth
-    depth, levels = 0, defaultdict(int)
-    for node in top_level_nodes:
-        queue = deque([node])
-        while queue:
-            task = queue.popleft()
-            for child_node in graph.adj_dict[task]:
-                levels[child_node] = max(1 + levels[task], levels[child_node])
-                queue.append(child_node)
-                depth = max(depth, levels[child_node])
-    depth += 1
-
-    # Calculate min and max width from levels
-    counter = Counter()
-    for level in levels.values():
-        counter[level] += 1
-    most_common = counter.most_common()
-    min_width, max_width = most_common[-1][1], most_common[0][1]
 
     # Calculate the sum of file sum_file_sizes (in bytes)
     sum_file_sizes = 0
-    for file in specification['files']:
-        #sys.stderr.write(f"FILE: {file["id"]} : {file['sizeInBytes']}\n")
-        sum_file_sizes += file.get('sizeInBytes', 0)
-    #sys.stderr.write(f"TOTAL SIZE: {sum_file_sizes}")
+    try:
+        sum_file_sizes = specification["metrics"]["sumOfFileSizesInBytes"]
+    except KeyError:
+        sum_file_sizes = sum(
+            file.get("sizeInBytes", 0)
+            for file in specification["files"]
+        )
 
+    logger = logging.getLogger("uvicorn.error")
+    # Calculate depth, min_width, and max_width only if needed
+    try:
+        depth = specification["metrics"]["numberOfLevels"]
+        min_width = specification["metrics"]["minimumWidth"]
+        max_width = specification["metrics"]["maximumWidth"]
+        logger.info("Successfully acquired depth/min_width/max_width metrics from the instance itself")
+
+    except KeyError:
+        logger.info("Computing depth/min_width/max_width metrics, which can take a while ")
+        # Build graph of tasks
+        graph, top_level_nodes = Graph(), set()
+        for task in specification['tasks']:
+            if len(task['parents']) == 0:
+                top_level_nodes.add(task['id'])
+            for child in task['children']:
+                graph.add_edge(task['id'], child)
+
+        # Calculate levels and depth
+        depth, levels = 0, defaultdict(int)
+        for node in top_level_nodes:
+            queue = deque([node])
+            while queue:
+                task = queue.popleft()
+                for child_node in graph.adj_dict[task]:
+                    levels[child_node] = max(1 + levels[task], levels[child_node])
+                    queue.append(child_node)
+                    depth = max(depth, levels[child_node])
+        depth += 1
+
+        # Calculate min and max width from levels
+        counter = Counter()
+        for level in levels.values():
+            counter[level] += 1
+        most_common = counter.most_common()
+        min_width, max_width = most_common[-1][1], most_common[0][1]
 
     return {
         'numTasks': len(specification['tasks']),
