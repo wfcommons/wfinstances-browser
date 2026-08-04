@@ -86,6 +86,8 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
 
                 if path.is_file() and path.suffix.lower() == ".json":
                     json_files_to_process.add(path)
+        else:
+            print("Nothing to update!")
 
     for file_path in sorted(json_files_to_process):
         sys.stderr.write(f"Inspecting updated file {file_path}\n")

@@ -5,7 +5,9 @@ COPY requirements.txt .
 
 RUN pip install --break-system-packages -r requirements.txt
 
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git 
+
+RUN apt-get install -y vim
 
 RUN apt-get install -y cron
 
