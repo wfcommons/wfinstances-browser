@@ -80,7 +80,7 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
                 old_commit,
                 new_commit,
             ).splitlines()
-            print(change_paths)
+            print(changed_paths)
 
             for relative_name in changed_paths:
                 path = local_dir / relative_name
@@ -91,14 +91,14 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
     print(f"Need to update {len(json_files_to_process)} files")
 
     for file_path in sorted(json_files_to_process):
-        sys.stderr.write(f"Inspecting updated file {file_path}\n")
+        print(f"Inspecting updated file {file_path}")
 
         # Read the JSON file
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 wf_instance = json.load(f)
         except json.JSONDecodeError:
-            sys.stderr.write(f"Invalid JSON format: {file_path}\n")
+            print(f"Invalid JSON format: {file_path}")
             invalid_wf_instances.append(file_path.name)
             continue
 
@@ -121,6 +121,7 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
             {"$set": metrics},
             upsert=True,
         )
+        print(f"Processed file {file_path}")
 
     return valid_wf_instances, invalid_wf_instances
 
