@@ -28,7 +28,7 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
 
     # Set up the repository URL and local directory
     repo_url = f"https://github.com/{owner}/{repo_name}.git"
-    local_dir = f"/data/github/{repo_name}"
+    local_dir = Path(f"/data/github/{repo_name}")
 
     git_dir = local_dir / ".git"
     new_clone = not git_dir.is_dir()
