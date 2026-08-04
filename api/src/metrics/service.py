@@ -9,6 +9,7 @@ import os
 import json
 import time
 import git
+from pathlib import Path
 
 
 def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
