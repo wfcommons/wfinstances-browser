@@ -97,22 +97,22 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
             with open(file_path, "r", encoding="utf-8") as f:
                 wf_instance = json.load(f)
         except json.JSONDecodeError:
-            sys.stderr.write(f"Invalid JSON format: {file}\n")
-            invalid_wf_instances.append(str(file_path))
+            sys.stderr.write(f"Invalid JSON format: {file_path}\n")
+            invalid_wf_instances.append(file_path.name)
             continue
 
         # Validate the WfInstance schema
         try:
             validate_wf_instance(wf_instance)
         except InvalidWfInstanceException:
-            invalid_wf_instances.append(str(file_path)
+            invalid_wf_instances.append(file_path.name)
             continue
 
         valid_wf_instances.append(file)
 
         # Generate metrics and store them in the database
         metrics = _generate_metrics(wf_instance)
-        metrics["_id"] = file
+        metrics["_id"] = file_path.name
         metrics["_githubRepo"] = f"{owner}/{repo}"
         metrics["_filePath"] = file_path
         metrics_collection.find_one_and_update(
