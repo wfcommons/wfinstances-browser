@@ -98,14 +98,14 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
                 wf_instance = json.load(f)
         except json.JSONDecodeError:
             sys.stderr.write(f"Invalid JSON format: {file}\n")
-            invalid_wf_instances.append(file)
+            invalid_wf_instances.append(str(file_path))
             continue
 
         # Validate the WfInstance schema
         try:
             validate_wf_instance(wf_instance)
         except InvalidWfInstanceException:
-            invalid_wf_instances.append(file)
+            invalid_wf_instances.append(str(file_path)
             continue
 
         valid_wf_instances.append(file)
