@@ -10,6 +10,7 @@ import json
 import time
 import git
 from pathlib import Path
+import logging
 
 
 def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
@@ -34,9 +35,11 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
     git_dir = local_dir / ".git"
     new_clone = not git_dir.is_dir()
 
+    logger = logging.getLogger("uvicorn.error")
+
     # Clone the repository if it doesn't exist locally
     if new_clone:
-        print(f"Cloning repository {repo_url} into {local_dir}...")
+        logger.info(f"Cloning repository {repo_url} into {local_dir}...")
         git_repo = git.Repo.clone_from(repo_url, local_dir)
 
         # A new clone has no previous local revision, so examine every JSON file.
@@ -49,7 +52,7 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
         }
 
     else:
-        print(f"Repository already exists locally. Pulling the latest changes...")
+        logger.info(f"Repository already exists locally. Pulling the latest changes...")
         git_repo = git.Repo(local_dir)
 
         if git_repo.is_dirty(untracked_files=True):
@@ -64,9 +67,9 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
 
         new_commit = git_repo.head.commit.hexsha
 
-        print(f"Previous commit: {old_commit}")
-        print(f"Current commit:  {new_commit}")
-        print(git_repo.git.diff("--name-status", old_commit, new_commit))
+        logger.info(f"Previous commit: {old_commit}")
+        logger.info(f"Current commit:  {new_commit}")
+        logger.info(git_repo.git.diff("--name-status", old_commit, new_commit))
 
         json_files_to_process = set()
 
@@ -80,7 +83,6 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
                 old_commit,
                 new_commit,
             ).splitlines()
-            print(changed_paths)
 
             for relative_name in changed_paths:
                 path = local_dir / relative_name
@@ -88,17 +90,17 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
                 if path.is_file() and path.suffix.lower() == ".json":
                     json_files_to_process.add(path)
 
-    print(f"Need to update {len(json_files_to_process)} files")
+    logger.info(f"Need to update {len(json_files_to_process)} files")
 
     for file_path in sorted(json_files_to_process):
-        print(f"Inspecting updated file {file_path}")
+        logger.info(f"Inspecting updated file {file_path}")
 
         # Read the JSON file
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 wf_instance = json.load(f)
         except json.JSONDecodeError:
-            print(f"Invalid JSON format: {file_path}")
+            logger.info(f"Invalid JSON format: {file_path}")
             invalid_wf_instances.append(file_path.name)
             continue
 
@@ -121,7 +123,7 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
             {"$set": metrics},
             upsert=True,
         )
-        print(f"Processed file {file_path}")
+        logger.info(f"Processed file {file_path}")
 
     return valid_wf_instances, invalid_wf_instances
 
