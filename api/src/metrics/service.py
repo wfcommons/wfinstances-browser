@@ -108,13 +108,13 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
             invalid_wf_instances.append(file_path.name)
             continue
 
-        valid_wf_instances.append(file)
+        valid_wf_instances.append(file_path.name)
 
         # Generate metrics and store them in the database
         metrics = _generate_metrics(wf_instance)
         metrics["_id"] = file_path.name
-        metrics["_githubRepo"] = f"{owner}/{repo}"
-        metrics["_filePath"] = file_path
+        metrics["_githubRepo"] = f"{owner}/{repo_name}"
+        metrics["_filePath"] = str(file_path)
         metrics_collection.find_one_and_update(
             {"_id": metrics["_id"]},
             {"$set": metrics},
