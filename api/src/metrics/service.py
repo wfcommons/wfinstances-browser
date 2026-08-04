@@ -230,6 +230,10 @@ def _generate_specification_metrics(specification: dict) -> dict:
 
         # Calculate levels and depth
         depth, levels = 0, defaultdict(int)
+        levels = {
+            task["id"]: 0
+            for task in specification["tasks"]
+        }
         for node in top_level_nodes:
             queue = deque([node])
             while queue:
