@@ -36,6 +36,8 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
     new_clone = not git_dir.is_dir()
 
     logger = logging.getLogger("uvicorn.error")
+    logger.info(f"Updating instances...")
+
 
     # Clone the repository if it doesn't exist locally
     if new_clone:
@@ -124,6 +126,9 @@ def insert_metrics_from_github(owner: str, repo_name: str) -> tuple[list, list]:
             upsert=True,
         )
         logger.info(f"Processed file {file_path}")
+
+    logger.info(f"Update of instances complete")
+
 
     return valid_wf_instances, invalid_wf_instances
 
