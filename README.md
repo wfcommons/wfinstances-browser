@@ -5,7 +5,7 @@
 This is a web application that allows users to browse, select, and visualize
 the available [Workflow
 Instances](https://github.com/wfcommons/WfInstances) provided by the
-[WFCommons Project](https://wfcommons.org).
+[WfCommons Project](https://wfcommons.org).
 
 The only software requirement for running the server is [Docker](https://docker.com). 
 
@@ -36,7 +36,7 @@ curl -X PUT http://localhost:8081/metrics/private/github/wfcommons/WfInstances
 
 REST API documentation is available at: [http://localhost:8081/docs](http://localhost:8081/docs)
 
-(The above assumes WFINSTANCES_API_PORT=8081 is the configured port for the backend, as condigured in the `.env-*` file in use.)
+(The above assumes WFINSTANCES_API_PORT=8081 is the configured port for the backend, as configured in the `.env-*` file in use.)
 
 
 ## Get in Touch
