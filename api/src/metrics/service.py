@@ -324,7 +324,7 @@ def _generate_specification_metrics(specification: dict) -> dict:
         logger.info("Successfully acquired depth/min_width/max_width metrics from the instance itself")
     except KeyError:
         logger.info("Computing depth/min_width/max_width metrics, which can take a while ")
-        depth, min_width, max_width = compute_graph_metrics(specification["tasks"])
+        depth, min_width, max_width = _compute_graph_metrics(specification["tasks"])
 
     return {
         'numTasks': len(specification['tasks']),
