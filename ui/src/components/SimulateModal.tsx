@@ -9,8 +9,19 @@ import {useQuery} from "@tanstack/react-query";
 
 const Chart = loadable(() => import('react-apexcharts'), {
     ssr: false,
-    resolveComponent: (components: any) => components.default['default'] as any,
+    resolveComponent: (module: any) => {
+        // Handle both a direct default export and a nested default wrapper.
+        const component = module.default?.default ?? module.default;
+
+        if (component == null) {
+            console.error('Unexpected react-apexcharts module:', module);
+            throw new Error('Could not resolve the react-apexcharts component');
+        }
+
+        return component as React.ComponentType<any>;
+    },
 });
+
 export function SimulateModal({
                                   id,
                                   client_ip,
