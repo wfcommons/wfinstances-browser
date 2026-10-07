@@ -415,6 +415,18 @@ export function UsageStatsModal({
                         ) : (
                             <p>No country data available</p>
                         )}
+                        <p
+                            style={{
+                                marginTop: '1rem',
+                                marginBottom: 0,
+                                fontSize: '0.8rem',
+                                lineHeight: 1.5,
+                                color: '#666',
+                            }}
+                        >
+                            <strong>Privacy:</strong> We do not store IP addresses.
+                            {' '}We use one-way hashes instead to compile usage statistics.
+                        </p>
                     </div>
                 </div>
             )}
